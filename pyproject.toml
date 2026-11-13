@@ -1,0 +1,16 @@
+[project]
+name = "gss"
+version = "0.1.0"
+description = "GSS: Find Time Zero, a pump-probe alignment RL environment (Harbor task)"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["sim/tests"]
+
+[tool.uv]
+package = false

@@ -1,0 +1,64 @@
+"""Physical and lab constants. Units: mm, s, fs, EUR unless stated otherwise."""
+
+import math
+
+C_MM_PER_FS = 2.99792458e-4  # speed of light
+
+# Table (QUOP convention: XZ is the table plane, +Y is height above the breadboard)
+TABLE_X = 2400.0
+TABLE_Z = 1200.0
+MAX_HEIGHT = 300.0
+MIN_POST_HEIGHT = 50.0
+WALK_OFFSET = 300.0  # the walkway ring runs 300 mm outside the table edge
+WALK_SPEED = 500.0  # mm/s, careful walking around an optical table
+REACH = 600.0  # you can reach 600 mm in from the edge you stand at
+DESK = (-WALK_OFFSET, 0.0, 600.0)  # desk with monitor and scope, at the x=0 end of the table
+WATCH_RADIUS = 1500.0  # monitor readable within 1.5 m of the desk
+
+# Pulses: Gaussian, durations quoted as intensity FWHM
+TAU_PUMP_FWHM = 100.0
+TAU_PROBE_FWHM = 60.0
+# Cross-correlation 1/e half-width used in eta: exp(-(dt/tau_c)^2).
+# Intensity I(t) ~ exp(-4 ln2 t^2 / FWHM^2) = exp(-t^2/T^2) with T = FWHM / (2 sqrt(ln2)).
+# The cross-correlation of two such Gaussians has T_c^2 = T1^2 + T2^2.
+TAU_C = math.sqrt(TAU_PUMP_FWHM**2 + TAU_PROBE_FWHM**2) / (2 * math.sqrt(math.log(2)))  # ~70 fs
+
+# Beams (1/e^2 intensity radius of the collimated beam) and focusing
+W_PUMP = 0.5
+W_PROBE = 0.8
+LAMBDA_PUMP = 800e-6
+LAMBDA_PROBE = 1300e-6
+LENS_F = 100.0
+
+
+def waist(lam: float, w_coll: float) -> float:
+    return lam * LENS_F / (math.pi * w_coll)
+
+
+W0_PUMP = waist(LAMBDA_PUMP, W_PUMP)  # ~51 um
+W0_PROBE = waist(LAMBDA_PROBE, W_PROBE)  # ~52 um
+
+# Optics apertures
+MIRROR_R = 12.7  # 1" optic
+CLIP_START = 10.0  # transmission starts dropping this far off-centre
+RETRO_R = 19.05  # 1.5" hollow retroreflector on the delay stage
+RETRO_CLIP_START = 16.5
+LENS_R = 12.7
+LENS_CLIP_START = 10.5
+STAGE_APEX_OFFSET = 90.0  # apex is 90 mm beyond the stage reference point at position 0
+RETRO_FRONT = 40.0  # entrance face is 40 mm in front of the apex
+
+# Episode
+BUDGET_S = 4 * 3600.0
+MIN_ACTION_S = 5.0
+SPEND_CAP = 30000.0
+ALPHA = 0.2
+
+# Detector models
+BBO_GOOD = dict(A=1000.0, b_pump=50.0, b_probe=20.0, sigma=100.0)
+BBO_WRONG = dict(A=10.0, b_pump=2000.0, b_probe=20.0, sigma=100.0)
+CAM_PIXEL = 0.0055
+CAM_NOISE_PX = 0.3
+CAM_HALF_FOV = 2.5
+SCOPE_QUANT_PS = 20.0
+SCOPE_JITTER_PS = 10.0

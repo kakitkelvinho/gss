@@ -4,8 +4,8 @@ Agreed decisions for the Friday walking skeleton. These take precedence over HAN
 Q-numbers refer to the grilling session.
 
 ## Stack and process
-- **Python 3.12**, `uv` + lockfile, `fastmcp` (pinned, as in Harbor's `hello-mcp` example) over streamable-http on port 8000, `pytest`, `numpy`. (Q21, Q44)
-- `sim/` is a plain package with no MCP imports. The SFT loop (HANDOFF §8) imports it directly. (Q44)
+- **Python 3.12**, `uv` + lockfile, `fastmcp` (pinned, as in Harbor's `hello-mcp` example) over streamable-http on port 8000, `pytest`. numpy turned out to be unnecessary. (Q21, Q44)
+- `sim/` is a plain package with no MCP imports and no third-party dependencies (stdlib only). The SFT loop (HANDOFF §8) imports it directly. (Q44)
 - One episode per server process. The seed comes from env `GSS_SEED`. There is no reset tool. (Q2)
 - MIT `LICENSE`. All code is written at the event.
 
@@ -27,7 +27,7 @@ Q-numbers refer to the grilling session.
 | Overlap diagnostic (sample mount) | correct-cut BBO, type-I SFG 800+1300→495 nm · wrong-cut BBO (800 nm SHG cut: strong pump background, cross term ~1%) · fast photodiode (Q3, Q16, Q17) |
 | Mounting | 1" mirror in kinematic mount (~€150) · periscope, a rigid two-mirror height changer (~€500) (Q24, Q29) |
 
-- Free table equipment: camera at the sample mount (`"sample"` plane, plus a `"far"` screen 1 m behind for pointing), a 1 GHz scope (photodiode timing ±50 ps), and an IR card. (Q1, Q17′, Q37)
+- Free table equipment: camera at the sample mount (`"sample"` = focal plane, `"lens"` = where each beam hits the lens), a 1 GHz scope (photodiode timing ±50 ps), and an IR card. (Q1, Q17′, Q37)
 - Buying costs 15 min and can happen at any time. A second item in an occupied slot swaps in, and both purchases count toward C. A purchase that would push total spend past €30k is refused. (Q7)
 - Swapping diagnostics in the sample mount doesn't change any path.
 
@@ -37,7 +37,12 @@ Q-numbers refer to the grilling session.
 - **Clipping:** 1" optics. Transmission starts dropping about 10 mm off-centre, and a beam that lands off the mirror entirely carries on past it. Transmission T enters η. (Q25)
 - **Heights:** only periscopes change a beam's height. A beam at the wrong height misses the sample. Polarisation rotation is deferred. (Q29)
 - **Delay stage:** adds 2·x of path wherever it sits in a route. A beam that isn't parallel to the rail makes the spot drift by ~2·x·θ as the stage moves. Its manual explains this; nothing hints at how hard it is to align. (Q34, Q36)
-- **Spatial overlap:** w = 50 µm. O = exp(−d²/w²)·exp(−(Δθ/θ_c)²) with θ_c ≈ 2 mrad. (Q9, Q15′)
+- **Focusing (decided after grilling):** the sample mount is free table equipment: an f = 100 mm lens with the sample at its focal plane (plus a small per-seed defocus δz).
+  Beams arrive roughly parallel (non-collinear, a few mm apart on the lens) and cross at the focus with w0 ≈ 50 µm
+  (pump W = 0.5 mm, probe W = 0.8 mm). Thin lens: spot = f·θ + δz·θ − δz·ρ/f. One mirror centres the beam on the lens, the other overlaps the foci.
+  Crossing angle is ignored in L1 and matters in L2.
+- **Spatial overlap:** normalised overlap of the two focal spots at the sample plane, O = (2w1w2/(w1²+w2²))·exp(−2d²/(w1²+w2²)) ≈ exp(−d²/w0²). (Q9, Q15′)
+- **Shutters:** both arms start blocked, so do-nothing makes no stray beams.
 - **Timing:** Δt = t_pump − t_probe. Pulses are Gaussian, quoted as intensity FWHM. τ_c = √(τ₁²+τ₂²)/(2√ln2) ≈ 70 fs (1/e half-width). (Q4, Q12)
 - **BBO signal:** S = A·T·O·exp(−(Δt/τ_c)²) + b_pump + b_probe + N(0, σ/√t_int), quantised to 1 count.
   Correct cut: A=1000, b_pump=50, b_probe=20, σ=100 /√s. Wrong cut: A=10, b_pump=2000. (Q16)
