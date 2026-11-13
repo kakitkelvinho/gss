@@ -4,6 +4,8 @@ Team: **God's Strongest Soldiers (GSS)**. Project / repo / Harbor task name: **`
 
 Paste this whole file into a fresh Claude Code session as the first message.
 
+> **Update (Fri 2026-11-14):** the design was refined in a grilling session. **`docs/DECISIONS.md` takes precedence** over this file wherever the two disagree. The main changes: Python instead of Node; a blank table where the agent places and aligns mirrors by hand (beam-centre-line physics, walking time, clipping); the coarse delay comes from layout instead of a rail item; and QUOP is used only as a replay viewer.
+
 ## 0. One-paragraph pitch and final goal
 **Final goal (what the agent must achieve):** starting from an empty table with two ultrafast beams (pump and probe), buy the cheapest set of parts that can work, then bring the two pulses into spatial and temporal overlap at the sample position, i.e. find *time zero*, within 4 h of simulated lab time. Success is measured from the simulator's true state: how well the beams overlap at the sample in space and time, with a small penalty for overspending.
 
@@ -17,7 +19,7 @@ Pitch framing: pump–probe overlap is a **standard ultrafast-optics technique**
 Stretch: post-train a small open model on experience from the environment and show it improves (tiebreaker).
 Fallback: same architecture with a **cavity-locking (PDH)** task.
 
-Team: two physics PhDs + a physics intern. Strong in optics, newer to Docker/MCP/ML. **JavaScript (Node) for simulator and MCP server**; Python only for fine-tuning.
+Team: two physics PhDs + a physics intern. Strong in optics, newer to Docker/MCP/ML. **Python for everything** (sim, FastMCP server, fine-tuning); decided Fri night, see `docs/DECISIONS.md`.
 
 **Guiding rule: a small environment that works end to end beats a rich one that doesn't reproduce.**
 
@@ -153,4 +155,4 @@ The real gap will likely come from **execution**, not the parts list. Make these
 - No API keys in the repo; fixed seeds everywhere.
 
 ## 11. Open questions for AfterQuery mentors
-Starter-kit/scoring-skeleton repo · which frontier model + effort · exact stop-early baseline · one task vs many seeded episodes · separate sim container OK? · their post-training stack.
+Starter-kit/scoring-skeleton repo · which frontier model + effort · exact stop-early baseline · one task vs many seeded episodes · separate sim container OK? · their post-training stack · can the agent ever see `tests/` (holds the verifier token) during its run? · OK to use our own earlier open-source tool (QUOP) purely as a replay viewer? · should stray beams leaving the table be penalised?
