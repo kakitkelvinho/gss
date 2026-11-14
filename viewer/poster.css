@@ -1,0 +1,55 @@
+/* Classic illustrated science fiction cover palette: coral dusk, violet ink, parchment, and orange. */
+:root {
+  font-family: 'Avenir Next', 'Trebuchet MS', Arial, sans-serif;
+  color: #f4e6d7;
+  background: #302a43;
+}
+.app {
+  --line: #73627e;
+  --accent: #f0ab61;
+  background: #302a43;
+}
+.scene-shell { background: #514266; }
+.player, .call-panel, .score-panel, .corner-button, .flyout {
+  background: #2d2943;
+  border-color: #786782;
+  color: #f4e6d7;
+}
+.player button, .corner-button, .run-picker, .player .speed {
+  background: #3a3453;
+  border-color: #7c6d8c;
+  color: #f4e6d7;
+}
+.player button:hover, .corner-button:hover, .flyout-item:hover, .flyout-item:focus-visible {
+  background: #514462;
+}
+.player button[aria-pressed=true], .corner-button[aria-expanded=true] {
+  background: #594159;
+  border-bottom-color: var(--accent);
+  color: #fff1da;
+}
+.panel-heading, .score-heading {
+  font-family: 'Avenir Next Condensed', 'Arial Narrow', Impact, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.panel-heading small, .score-line small, .totals span, .flyout-title, .hint {
+  color: #c3b2c1;
+}
+.call-row { color: #d6c7d0; }
+.call-row .number { color: #bca9bd; }
+.call-row:hover { background: #443955; color: #fff0e0; }
+.call-row.active { background: #57415b; color: #fff1dd; border-bottom-color: var(--accent); }
+.call-row .mark { color: var(--accent); }
+.score-line strong {
+  font-family: 'Avenir Next Condensed', 'Arial Narrow', Impact, sans-serif;
+  font-size: 31px;
+  font-weight: 800;
+  letter-spacing: .025em;
+}
+.totals div, .mini-icon { border-color: #786782; }
+.flyout-item { color: #f4e6d7; }
+.badge { background: #2d2943; color: #fff1da; border-color: #786782; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline-color: #f0ab61; }

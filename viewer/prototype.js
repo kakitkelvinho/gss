@@ -16,12 +16,16 @@ function project(p) { return { x: 520 + (p.x - 1200) * .246 - (p.z - 600) * .204
 function at(p) { const q = project(p); return `${q.x.toFixed(1)},${q.y.toFixed(1)}`; }
 function partSvg(part) {
   const p = project(part.pos), id = esc(part.id), kind = part.kind;
-  const base = `<ellipse cx="0" cy="0" rx="20" ry="8" fill="#162c36" stroke="#8da19e" stroke-width="2"/><ellipse cx="0" cy="-2" rx="10" ry="4" fill="#b5b7a8"/><path d="M-7 -4 L-7 -40 Q0 -44 7 -40 L7 -4" fill="url(#metal)" stroke="#6e8587" stroke-width="1"/>`;
+  const tableY = project({ x: part.pos.x, z: part.pos.z, h: 0 }).y - p.y;
+  const base = `<ellipse cx="0" cy="${tableY.toFixed(1)}" rx="20" ry="7" fill="#363248" stroke="#d7c4bb" stroke-width="1.5"/><ellipse cx="0" cy="${(tableY - 2).toFixed(1)}" rx="10" ry="3.5" fill="#a8abb0"/><path d="M-5 9 L-5 ${tableY - 2} Q0 ${tableY + 2} 5 ${tableY - 2} L5 9 Z" fill="url(#metal)" stroke="#656b79" stroke-width="1.5"/><rect x="-11" y="7" width="22" height="10" rx="2" fill="#626b75" stroke="#b9b9b4" stroke-width="1"/>`;
   let head = '';
-  if (kind === 'mirror') head = `<g transform="translate(0,-45) rotate(${(part.yaw_deg || 0) * .35})"><rect x="-17" y="-16" width="34" height="28" rx="3" fill="#39494e" stroke="#c4c6b8" stroke-width="2"/><ellipse cx="0" cy="-3" rx="12" ry="11" fill="url(#mirror)" stroke="#f6f2e4" stroke-width="2"/><circle cx="18" cy="-9" r="4" fill="#d0a562"/><circle cx="18" cy="4" r="4" fill="#b3aaa0"/><path d="M-18 14 L18 14" stroke="#263944" stroke-width="5"/></g>`;
-  if (kind === 'stage') head = `<g transform="translate(0,-44)"><rect x="-28" y="-18" width="56" height="33" rx="3" fill="#485861" stroke="#c7c2b1" stroke-width="2"/><path d="M-24 -12 L24 -12 M-24 8 L24 8" stroke="#d8b779" stroke-width="2"/><rect x="-17" y="-25" width="34" height="8" fill="#a7ada7"/><circle cx="-22" cy="1" r="5" fill="#2b3c41"/><circle cx="22" cy="1" r="5" fill="#2b3c41"/><path d="M-8 -18 L-8 -9 M8 -18 L8 -9" stroke="#ece6d5" stroke-width="3"/></g>`;
-  if (kind === 'periscope') head = `<g transform="translate(0,-43)"><rect x="-10" y="-47" width="20" height="48" rx="2" fill="#68767a" stroke="#c9c3ad" stroke-width="2"/><ellipse cx="0" cy="-42" rx="13" ry="6" fill="url(#mirror)" stroke="#dbe1db" stroke-width="2"/><ellipse cx="0" cy="-1" rx="13" ry="6" fill="url(#mirror)" stroke="#dbe1db" stroke-width="2"/><circle cx="13" cy="-24" r="4" fill="#d7a76b"/></g>`;
-  if (kind === 'sample') head = `<g transform="translate(0,-43)"><rect x="-34" y="-10" width="68" height="13" rx="2" fill="#465560" stroke="#b5b6ac" stroke-width="2"/><ellipse cx="0" cy="-11" rx="20" ry="8" fill="#d1af79" stroke="#f1d9a0" stroke-width="2"/><circle cx="0" cy="-11" r="5" fill="#eec99e"/><path d="M-22 -21 L-22 -9 M22 -21 L22 -9" stroke="#b7c1bb" stroke-width="5"/><ellipse cx="-22" cy="-22" rx="6" ry="9" fill="#8bd0d1" fill-opacity=".5" stroke="#c6f1e8"/><ellipse cx="22" cy="-22" rx="6" ry="9" fill="#8bd0d1" fill-opacity=".5" stroke="#c6f1e8"/></g>`;
+  if (kind === 'mirror') head = `<g transform="rotate(${(part.yaw_deg || 0) * .35})"><path d="M-20 -17 L12 -17 L20 -9 L20 15 L-20 15 Z" fill="#555765" stroke="#c6c0be" stroke-width="2"/><path d="M-20 -17 L-14 -22 L18 -22 L12 -17 Z" fill="#a6a4a8"/><ellipse cx="-2" cy="-1" rx="13" ry="13" fill="url(#mirror)" stroke="#eee5da" stroke-width="2.5"/><path d="M-15 -5 Q-1 -15 10 -4" fill="none" stroke="#fff7ee" stroke-width="1" opacity=".7"/><circle cx="19" cy="-14" r="5" fill="url(#metal)" stroke="#3b4051"/><circle cx="19" cy="12" r="5" fill="url(#metal)" stroke="#3b4051"/><path d="M15 -14 H23 M15 12 H23" stroke="#53515d" stroke-width="1"/></g>`;
+  if (kind === 'stage') head = `<g><path d="M-34 -13 L29 -13 L36 -7 L36 14 L-34 14 Z" fill="#555a68" stroke="#cbc3be" stroke-width="2"/><path d="M-29 -7 H30 M-29 8 H30" stroke="#dbd4cc" stroke-width="2"/><rect x="-11" y="-19" width="31" height="26" rx="2" fill="#8c8f98" stroke="#eee6dc" stroke-width="1.5"/><path d="M-6 -15 L-6 3 M15 -15 L15 3" stroke="#4b5161" stroke-width="2"/><path d="M-5 -21 L5 -31 L15 -21" fill="none" stroke="#e2d6cc" stroke-width="3"/><circle cx="-29" cy="11" r="4" fill="#303746"/><circle cx="29" cy="11" r="4" fill="#303746"/></g>`;
+  if (kind === 'periscope') head = `<g><rect x="-9" y="-36" width="18" height="44" rx="2" fill="#686e7a" stroke="#bfc0bf" stroke-width="1.5"/><path d="M-18 -39 L10 -39 L18 -32 L-11 -32 Z" fill="#a7a8ae" stroke="#e5ddd3"/><ellipse cx="-2" cy="-32" rx="12" ry="7" fill="url(#mirror)" stroke="#e9e4db" stroke-width="2"/><path d="M-18 -4 L10 -4 L18 3 L-11 3 Z" fill="#a7a8ae" stroke="#e5ddd3"/><ellipse cx="-2" cy="3" rx="12" ry="7" fill="url(#mirror)" stroke="#e9e4db" stroke-width="2"/><circle cx="13" cy="-17" r="4" fill="url(#metal)"/></g>`;
+  if (kind === 'sample') {
+    const secondLens = (part.lenses || []).length > 1 ? `<path d="M26 -17 V7" stroke="#b5b7bd" stroke-width="5"/><ellipse cx="26" cy="-15" rx="7" ry="15" fill="#83aab6" fill-opacity=".62" stroke="#e5e7df" stroke-width="2"/>` : '';
+    head = `<g><path d="M-34 11 H34" stroke="#c4c0bc" stroke-width="6"/><path d="M-8 -17 V7" stroke="#b5b7bd" stroke-width="5"/><ellipse cx="-8" cy="-15" rx="7" ry="15" fill="#83aab6" fill-opacity=".62" stroke="#e5e7df" stroke-width="2"/>${secondLens}<rect x="8" y="-11" width="11" height="18" rx="1" fill="#d1a87b" stroke="#f4dfca" stroke-width="1.5"/><path d="M13 -16 V-11" stroke="#e4d6ca" stroke-width="2"/></g>`;
+  }
   return `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})" aria-label="${id} ${kind}">${base}${head}<title>${id}</title></g>`;
 }
 function housingSvg(x, z, label, color) {
@@ -46,7 +50,28 @@ function robotSvg(pose, targetPart) {
     : bent
     ? `<path d="M-19 -106 L14 -111 L52 -142 M26 -107 L59 -112 L85 -132" fill="none" stroke="#8b9898" stroke-width="13" stroke-linecap="round"/><circle cx="52" cy="-142" r="6" fill="#b2bfbc"/><circle cx="85" cy="-132" r="6" fill="#b2bfbc"/>`
     : `<path d="M-19 -108 L-33 -68 L-14 -57 M24 -108 L56 -75 L93 -82" fill="none" stroke="#8b9898" stroke-width="13" stroke-linecap="round"/><circle cx="-14" cy="-57" r="6" fill="#b2bfbc"/><circle cx="93" cy="-82" r="6" fill="#b2bfbc"/>`;
-  return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><ellipse cx="0" cy="3" rx="42" ry="11" fill="#0c1416" opacity=".45"/>${worktop}<path d="M-17 -63 L-23 -3 L-5 -3 L2 -61 M15 -63 L24 -3 L42 -3 L27 -63" fill="#576669" stroke="#8e9d9b" stroke-width="2"/><path d="M-27 -113 Q0 -130 30 -112 L29 -65 L-24 -65 Z" fill="#697777" stroke="#b4beb9" stroke-width="2"/><path d="M-24 -90 L27 -90" stroke="#45575a" stroke-width="4"/>${arms}<g transform="translate(${bent ? 19 : 2} -143) rotate(${bent ? 20 : 0})"><path d="M-22 -20 L16 -20 L22 -11 L20 15 L-19 15 L-23 -8 Z" fill="#a9b4b0" stroke="#d7dcd4" stroke-width="2"/><rect x="-17" y="-9" width="35" height="15" rx="3" fill="#273a3d"/><path d="M-11 -2 H-5 M5 -2 H11" stroke="#9bc8c7" stroke-width="3"/><circle cx="0" cy="-23" r="4" fill="#c1cbc4"/></g>${prop}</g>`;
+  return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(1.1)">
+    <ellipse cx="0" cy="3" rx="43" ry="10" fill="#231e37" opacity=".45"/>
+    ${worktop}
+    <path d="M-24 -68 L-3 -68 L-8 -37 L-17 -30 L-30 -33 Z M8 -68 L28 -68 L35 -32 L21 -28 L10 -38 Z" fill="#d8d2c9" stroke="#343249" stroke-width="2"/>
+    <circle cx="-18" cy="-34" r="8" fill="#3a354e" stroke="#b5aaa8" stroke-width="2"/><circle cx="23" cy="-33" r="8" fill="#3a354e" stroke="#b5aaa8" stroke-width="2"/>
+    <path d="M-29 -32 L-31 -4 L-4 -4 L-5 -12 L-13 -13 L-15 -31 Z M17 -31 L20 -13 L13 -11 L12 -4 L43 -4 L39 -31 Z" fill="#c8c6c0" stroke="#3a354e" stroke-width="2"/>
+    <path d="M-32 -12 H-11 M20 -12 H40" stroke="#d77b81" stroke-width="3"/>
+    <path d="M-28 -116 L28 -116 L33 -76 L22 -63 L-19 -63 L-31 -77 Z" fill="#34324c" stroke="#d6d0ca" stroke-width="2"/>
+    ${arms}
+    <path d="M-39 -121 L-16 -127 L-8 -111 L-29 -99 L-45 -105 Z M13 -111 L27 -127 L48 -121 L51 -105 L30 -99 Z" fill="#d77b81" stroke="#ede0d2" stroke-width="2"/>
+    <path d="M-29 -112 L-3 -119 L8 -114 L30 -111 L24 -81 L6 -70 L-22 -82 Z" fill="#e2d8ca" stroke="#fff0dc" stroke-width="2"/>
+    <path d="M-23 -105 L-3 -108 L-3 -86 L-18 -90 Z M9 -107 L25 -104 L19 -90 L9 -85 Z" fill="#b9adb4"/>
+    <path d="M-6 -104 L5 -104 L10 -90 L0 -82 L-10 -90 Z" fill="#e9a659" stroke="#fff0d6" stroke-width="1.5"/>
+    <path d="M-19 -71 L24 -71 L20 -62 L-17 -62 Z" fill="#a3a1aa" stroke="#343249" stroke-width="2"/>
+    <g transform="translate(${bent ? 19 : 2} -150) rotate(${bent ? 20 : 0})">
+      <path d="M-24 -16 L-13 -30 L8 -30 L23 -15 L23 10 L12 20 L-17 20 L-25 9 Z" fill="#e2d8ca" stroke="#39364d" stroke-width="2"/>
+      <path d="M-22 -17 L-11 -27 L11 -27 L21 -17 L13 -12 L-14 -12 Z" fill="#c66e7d"/>
+      <path d="M-20 -8 L18 -8 L17 8 L-18 8 Z" fill="#292a43"/>
+      <path d="M-12 -1 H-3 M5 -1 H13" stroke="#f6b466" stroke-width="3"/>
+      <path d="M-13 -30 L0 -39 L14 -30 M-1 -38 L-1 -49 L6 -39" fill="none" stroke="#eadfcf" stroke-width="3"/>
+      <path d="M-20 11 L-13 20 H12 L19 11" fill="none" stroke="#b9abb1" stroke-width="2"/>
+    </g>${prop}</g>`;
 }
 function sceneSvg(call) {
   const snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {}, action = contextFor(call);
@@ -55,13 +80,26 @@ function sceneSvg(call) {
   for (let x = 0; x <= 2400; x += 100) for (let z = 0; z <= 1200; z += 100) { const p = project({ x, z, h: 0 }); dots.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="1.1" fill="#809395" opacity=".56"/>`); }
   const lines = [['800nm', '#ed745b'], ['opa', '#6dc9d1']].map(([key, color]) => (beams[key]?.open ? (beams[key].segments || []).map(segment => `<path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="6" opacity=".16"/><path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="2.4" stroke-linecap="round"/>`).join('') : '')).join('');
   const table = `<path d="M${at({x:0,z:0})} L${at({x:2400,z:0})} L${at({x:2400,z:1200})} L${at({x:0,z:1200})} Z" fill="url(#table)" stroke="#c3c9bd" stroke-width="3"/><path d="M${at({x:0,z:1200})} L${at({x:2400,z:1200})} l0 22 L${at({x:0,z:1200})} Z" fill="#213b43" opacity=".6"/>${dots.join('')}`;
-  return `<svg viewBox="0 0 1040 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Optical table with mounted components and a robot working beside the table"><defs><linearGradient id="table" x2="1" y2="1"><stop stop-color="#687579"/><stop offset="1" stop-color="#3b4b50"/></linearGradient><linearGradient id="metal"><stop stop-color="#526469"/><stop offset=".45" stop-color="#e1e1d6"/><stop offset="1" stop-color="#66777a"/></linearGradient><radialGradient id="mirror"><stop stop-color="#e2f1ec"/><stop offset=".55" stop-color="#93afb4"/><stop offset="1" stop-color="#4d6369"/></radialGradient></defs><rect width="1040" height="700" fill="#20282b"/><ellipse cx="525" cy="517" rx="440" ry="84" fill="#101719" opacity=".45"/>${table}${lines}${housingSvg(2320,294,'800 nm','#cc6b5c')}${housingSvg(2320,935,'OPA','#6eafb6')}${parts.map(partSvg).join('')}${robotSvg(action.pose,target)}</svg>`;
+  return `<svg viewBox="0 0 1040 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Optical table with mounted components and a mecha working beside the table">
+    <defs>
+      <linearGradient id="posterSky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#df8794"/><stop offset=".53" stop-color="#9c698c"/><stop offset="1" stop-color="#3d355a"/></linearGradient>
+      <linearGradient id="table" x2="1" y2="1"><stop stop-color="#77748c"/><stop offset="1" stop-color="#42415d"/></linearGradient>
+      <linearGradient id="metal"><stop stop-color="#5a5b70"/><stop offset=".46" stop-color="#e4dfd5"/><stop offset="1" stop-color="#6b6b7b"/></linearGradient>
+      <radialGradient id="mirror"><stop stop-color="#f4f4e9"/><stop offset=".55" stop-color="#abc1c0"/><stop offset="1" stop-color="#586477"/></radialGradient>
+    </defs>
+    <rect width="1040" height="700" fill="url(#posterSky)"/>
+    <circle cx="813" cy="144" r="173" fill="#f6b094" opacity=".2"/>
+    <g fill="#3d3558" opacity=".35"><path d="M89 513 V261 H99 V245 H107 V220 H116 V245 H124 V513 Z M168 514 V306 H177 V281 H185 V222 H193 V281 H201 V514 Z M825 511 V267 H833 V252 H842 V210 H850 V252 H860 V511 Z M919 515 V332 H927 V311 H936 V278 H943 V311 H951 V515 Z"/><path d="M55 495 Q300 465 520 491 T1010 485 V700 H55 Z"/></g>
+    <text x="62" y="135" font-family="Avenir Next Condensed, Arial Narrow, Impact, sans-serif" font-size="55" font-weight="900" letter-spacing="3" fill="#fae7d6">FIND TIME ZERO</text>
+    <ellipse cx="525" cy="520" rx="448" ry="92" fill="#29243f" opacity=".55"/>
+    ${table}${lines}${housingSvg(2320,294,'800 nm','#cc6b5c')}${housingSvg(2320,935,'OPA','#6eafb6')}${parts.map(partSvg).join('')}${robotSvg(action.pose,target)}
+  </svg>`;
 }
 function mapSvg(call) {
   const snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {};
   const sx = x => 12 + x / 2400 * 306, sz = z => 10 + z / 1200 * 150;
   const beam = [['800nm','#ed745b'],['opa','#6dc9d1']].map(([key,color]) => beams[key]?.open ? (beams[key].segments || []).map(seg => `<path d="M${sx(seg[0].x)},${sz(seg[0].z)} L${sx(seg[1].x)},${sz(seg[1].z)}" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`).join('') : '').join('');
-  return `<svg class="map-svg" viewBox="0 0 330 170" role="img" aria-label="Top down layout of the optical table"><rect x="12" y="10" width="306" height="150" rx="2" fill="#28444d" stroke="#c1c5b8"/><path d="M88.5 10 V160 M165 10 V160 M241.5 10 V160 M12 47.5 H318 M12 85 H318 M12 122.5 H318" stroke="#739091" stroke-width=".6" opacity=".5"/>${beam}${parts.map(p=>`<g><circle cx="${sx(p.pos.x)}" cy="${sz(p.pos.z)}" r="4.5" fill="#e3d8b7" stroke="#102831" stroke-width="1.3"/><title>${esc(p.id)}</title></g>`).join('')}<rect x="299" y="29" width="19" height="35" fill="#d1d0c2"/><rect x="299" y="108" width="19" height="35" fill="#d1d0c2"/></svg>`;
+  return `<svg class="map-svg" viewBox="0 0 330 170" role="img" aria-label="Top down layout of the optical table"><rect x="12" y="10" width="306" height="150" rx="2" fill="#514663" stroke="#e5c9c4"/><path d="M88.5 10 V160 M165 10 V160 M241.5 10 V160 M12 47.5 H318 M12 85 H318 M12 122.5 H318" stroke="#b7a0b7" stroke-width=".6" opacity=".5"/>${beam}${parts.map(p=>`<g><circle cx="${sx(p.pos.x)}" cy="${sz(p.pos.z)}" r="4.5" fill="#efdfcf" stroke="#352b47" stroke-width="1.3"/><title>${esc(p.id)}</title></g>`).join('')}<rect x="299" y="29" width="19" height="35" fill="#dfd3cb"/><rect x="299" y="108" width="19" height="35" fill="#dfd3cb"/></svg>`;
 }
 function scoreSvg(run, step) {
   const trajectory = run.trajectory, end = Math.max(1, step), values = trajectory.slice(0, end + 1).map(t => Math.max(0, Math.min(1, Number(t.truth?.reward || 0))));
