@@ -88,5 +88,5 @@ Q-numbers refer to the grilling session.
 ## Implementation notes (step 1)
 - `install(part_id)` (2 min, at the sample mount) swaps between owned diagnostics; buying a diagnostic installs it.
 - The stage starts at position 0 after purchase. The reference layout puts time zero near mid-travel, so the stop-early baseline (overlap, no timing) scores 0.
-- C_min = cheapest stage + correct-cut BBO + 4 mirrors = EUR 2200 (same for every seed).
+- C_min = cheapest stage + correct-cut BBO + 2 mirrors = EUR 1900 (same for every seed). Originally 4 mirrors (EUR 2200); blind playthroughs found working 2-mirror layouts.
 - Separate random streams: lab (`gss-lab-<seed>`), per-mount tilt errors (`gss-mount-<seed>-<part>`), placement errors and measurement noise.

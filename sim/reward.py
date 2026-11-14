@@ -7,8 +7,10 @@ from sim import catalogue as cat
 from sim import constants as K
 
 # Cheapest design that can physically reach overlap: cheapest delay stage + the correct-cut BBO +
-# 4 mirrors (a beam can be sloped with pitch knobs, so a periscope is not strictly needed).
-N_MIN_MIRRORS = 4
+# 2 mirrors. Two turns are the minimum (e.g. both beams turned once into a lens facing -z, or the
+# pump turned 180 deg while the probe goes straight); heights can be matched with pitch knobs or a
+# vertical offset at the retroreflector, so no periscope is needed. Blind playthroughs found both.
+N_MIN_MIRRORS = 2
 
 
 def c_min() -> float:
