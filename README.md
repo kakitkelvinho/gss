@@ -103,7 +103,9 @@ Seeds 1–10, played over MCP and scored through the verifier route (full table 
 | stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.6% | R < 0.05 ✅ |
 
 Blind playthroughs by fresh Claude agents with no access to the code ([docs/playthroughs.md](docs/playthroughs.md)):
-1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 of 3 succeeded (R ≈ 0.93).
+on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
+(R ≈ 0.93); after the de-hint and buildability changes, 2 runs scored R = 0.88 and 0.72 (slower, with partial
+failures such as clipping at the lens edge and timing off by backlash).
 
 Harbor/OpenCode runs: *TODO, these need inference credits.* Add the Harbor job logs and scores here.
 

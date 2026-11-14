@@ -66,6 +66,8 @@ PARTS: dict[str, dict] = {
             "1\" (25.4 mm) protected silver mirror, >97% at 700-2000 nm. Kinematic mount with "
             "two knobs (yaw, pitch), +/-50 mrad range each. Clear aperture: beams more than about "
             "10 mm from the centre start to clip. "
+            "Mount plate 38 x 38 mm, centred on the optic, from 0.5 to 12 mm behind the mirror surface; "
+            "1/2\" post (6.35 mm radius) below the plate, 6 mm behind the mirror surface. "
             "Post height 50-300 mm. Footprint ~25 mm radius."),
     ),
     "PER-1": dict(
@@ -138,7 +140,7 @@ def manuals(lab) -> dict[str, str]:
             "Sample mount with an f = 100 mm achromatic lens. place(sample, x, z, height, yaw): (x, z, "
             "height) is the lens centre, yaw the direction light travels through the lens. The sample "
             "position (and the installed diagnostic) is the lens focal plane. Lens clear aperture radius "
-            f"{K.LENS_R} mm. install(item) swaps the diagnostic without moving the mount. Flip-in camera: "
+            f"{K.LENS_R} mm, held in a 2\" mount ring (outer radius {K.LENS_MOUNT_R} mm). install(item) swaps the diagnostic without moving the mount. Flip-in camera: "
             f"view_camera('sample') images the focal plane ({K.CAM_PIXEL*1000:.1f} um pixels, field of view "
             f"+/-{K.CAM_HALF_FOV} mm); view_camera('lens') images the lens plane. Each spot reports its "
             "centroid, 1/e^2 radius and relative_power (fraction of that beam's output power reaching the "
