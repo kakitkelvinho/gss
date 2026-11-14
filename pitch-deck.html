@@ -1,0 +1,570 @@
+<!doctype html>
+<!--
+Pitch deck, Junction · AfterQuery "Break the agent" challenge.
+Style borrowed from the group-meeting template (flat, black/white, one yellow highlight), with no Aalto or MQO logos.
+The deck uses only documented project claims and scored results. The 3D scene is a labelled concept illustration.
+Keys: arrows/space navigate · V video cut (2-min subset) · N speaker notes · T theme · F full screen · L laser · P pen · C clear · O overview.
+Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, light theme).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GSS · Find Time Zero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#FFFFFF; --fg:#000000; --muted:#595959; --accent:#F7E159; --ring:#000000; --line:#D9D9D9; }
+  :root[data-theme="dark"] { --bg:#000000; --fg:#FFFFFF; --muted:#A6A6A6; --accent:#F7E159; --ring:#F7E159; --line:#333333; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; background:#000; overflow:hidden; font-family:"Inter", Arial, sans-serif; }
+
+  .stage { position:absolute; left:50%; top:50%; width:1920px; height:1080px; transform-origin:center center; }
+  .slide { position:absolute; inset:0; display:none; flex-direction:column; padding:110px 200px 200px;
+    background:var(--bg); color:var(--fg); overflow:hidden; }
+  .slide.active { display:flex; }
+  .slide h1 { letter-spacing:-0.025em; font-size:120px; line-height:1.1; font-weight:700; }
+  .slide h2 { letter-spacing:-0.025em; font-size:80px; line-height:1.15; font-weight:700; margin-bottom:64px; }
+  .slide p, .slide li { font-size:44px; line-height:1.4; }
+  .slide h1, .slide h2 { text-wrap:balance; } .slide p, .slide li { text-wrap:pretty; }
+  .slide ul { list-style:none; margin-left:56px; }
+  .slide li { padding-left:56px; position:relative; margin-bottom:22px; }
+  .slide li::before { content:""; position:absolute; left:10px; top:28px; width:14px; height:14px; border-radius:50%; background:var(--fg); }
+  .slide li li { color:var(--muted); margin-top:12px; margin-bottom:0; }
+  .slide li ul { margin-left:0; }
+  .slide p + ul { margin-top:36px; }
+  .slide .muted { color:var(--muted); }
+  .slide mark { background:var(--accent); color:#000; padding:0 .15em; }
+  .slide aside.notes { display:none; }
+
+  .title { justify-content:center; }
+  .title h1 { margin-bottom:32px; }
+  .title p { color:var(--muted); }
+  .section { justify-content:center; }
+  .section h1 { font-size:144px; max-width:1000px; }
+  .section p { margin-top:32px; color:var(--muted); }
+  .split .cols { display:grid; grid-template-columns:1fr 1fr; gap:80px; flex:1; min-height:0; align-items:start; }
+  .split .cols ul { margin-left:0; }
+
+  /* big statement slide */
+  .big { font-size:96px; font-weight:700; letter-spacing:-0.05em; line-height:1.05; }
+
+  /* text-only meme: two panels, left-aligned */
+  .meme2 { display:grid; grid-template-columns:1fr 1fr; gap:0; flex:1; min-height:0; }
+  .meme2 .pn { display:flex; flex-direction:column; justify-content:center; gap:28px; padding:0 64px; }
+  .meme2 .pn:first-child { padding-left:0; }
+  .meme2 .pn + .pn { border-left:1px solid var(--line); }
+  .meme2 .who { font-size:44px; color:var(--muted); }
+  .meme2 .what { font-size:72px; font-weight:700; letter-spacing:-0.04em; line-height:1.1; }
+  .cap { font-size:44px; color:var(--muted); font-style:italic; margin-top:24px; }
+
+  /* goal / actions / observations / reward */
+  .quad { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; column-gap:96px; row-gap:40px; flex:1; min-height:0; }
+  .quad > div { display:flex; flex-direction:column; gap:12px; }
+  .quad .k { font-size:44px; font-weight:700; }
+  .quad .v { font-size:44px; line-height:1.35; }
+
+  /* diagrams */
+  .diagram { flex:1; min-height:0; display:flex; align-items:center; }
+  .diagram svg { width:100%; height:auto; max-height:100%; overflow:visible; }
+  svg .ln { stroke:var(--fg); stroke-width:5; fill:none; stroke-linecap:round; }
+  svg .lnm { stroke:var(--muted); stroke-width:4; fill:none; stroke-dasharray:14 12; }
+  svg .nd { fill:var(--accent); stroke:var(--ring); stroke-width:4; }
+  svg .bt { fill:var(--fg); font-size:44px; font-weight:700; letter-spacing:-0.02em; }
+  svg .lb { fill:var(--fg); font-size:34px; }
+  svg .lm { fill:var(--muted); font-size:32px; }
+  svg .ax { stroke:var(--line); stroke-width:2; }
+  svg .bar-ref { fill:var(--accent); stroke:var(--ring); stroke-width:3; }
+  svg .bar-ag { fill:var(--fg); }
+  svg .bar-base { fill:none; stroke:var(--muted); stroke-width:3; stroke-dasharray:10 8; }
+
+  .slide pre.code { background:#1E1E1E; color:#D4D4D4; border-radius:2px; padding:44px 56px;
+    font-family:Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", monospace; font-size:36px; line-height:1.7; white-space:pre; overflow:hidden; }
+  .slide code { background:#1E1E1E; color:#D4D4D4; border-radius:2px; padding:.05em .3em; font-family:Consolas, "SF Mono", Menlo, monospace; font-size:.85em; }
+  .code .k { color:#569CD6; } .code .s { color:#CE9178; } .code .c { color:#6A9955; } .code .f { color:#DCDCAA; } .code .n { color:#B5CEA8; }
+
+  /* footer: text wordmark instead of logos */
+  .foot { position:absolute; left:0; right:0; bottom:0; height:150px; padding:0 200px; z-index:5;
+    display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
+  .wordmark { font-size:30px; font-weight:700; letter-spacing:-0.02em; color:var(--fg); }
+  .wordmark span { font-weight:400; color:var(--muted); }
+  .right { display:flex; align-items:center; gap:28px; }
+  .count { font-size:30px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .vtag { font-size:24px; background:var(--accent); color:#000; padding:2px 12px; display:none; }
+  body.video .vtag { display:inline; }
+
+  /* overview grid */
+  body.overview .stage { position:static; transform:none !important; width:auto; height:auto; display:grid;
+    grid-template-columns:repeat(auto-fill, 360px); gap:20px; padding:24px; justify-content:center; background:#222; }
+  body.overview { overflow:auto; }
+  :root:has(body.overview) { background:#222; }
+  body.overview .slide { display:flex; position:relative; zoom:.1875; cursor:pointer; width:1920px; height:1080px; outline:0 solid var(--accent); }
+  body.overview .slide.active { outline:40px solid var(--accent); }
+  body.overview.video .slide:not([data-video]) { opacity:.35; }
+  body.overview .foot { display:none; }
+
+  /* speaker notes panel (N) */
+  #notes { position:fixed; left:0; right:0; bottom:0; max-height:34vh; overflow:auto; z-index:35; display:none;
+    background:rgba(20,22,26,.96); color:#fff; font-size:18px; line-height:1.5; padding:16px 28px; }
+  #notes b { color:#F7E159; font-weight:700; }
+  body.shownotes #notes { display:block; }
+
+  /* control sidebar (right edge) */
+  #hot { position:fixed; top:0; right:0; bottom:0; width:32px; z-index:30; }
+  #bar { position:fixed; top:50%; right:0; z-index:31; width:210px; padding:10px; display:flex; flex-direction:column; gap:6px;
+    background:rgba(20,22,26,.94); border-radius:16px 0 0 16px; box-shadow:0 8px 30px rgba(0,0,0,.4);
+    transform:translate(110%, -50%); transition:transform .18s ease .35s; }
+  #hot:hover + #bar, #bar:hover, #bar:focus-within { transform:translate(0, -50%); transition-delay:0s; }
+  #bar button { display:flex; justify-content:space-between; align-items:center; gap:12px; font:inherit; font-size:16px; color:#fff;
+    background:transparent; border:1px solid transparent; border-radius:10px; padding:10px 12px; cursor:pointer; text-align:left; }
+  #bar button:hover { background:rgba(255,255,255,.12); }
+  #bar button.on { background:#F7E159; border-color:#F7E159; color:#000; }
+  #bar kbd { font:inherit; font-size:12px; opacity:.65; border:1px solid rgba(255,255,255,.35); border-radius:4px; padding:0 6px; }
+  #ink { position:fixed; inset:0; width:100vw; height:100vh; z-index:8; pointer-events:none; touch-action:none; }
+  body.pen #ink { cursor:crosshair; }
+  #laser { position:fixed; left:0; top:0; width:38px; height:38px; margin:-19px 0 0 -19px; border-radius:50%; pointer-events:none; z-index:40; display:none;
+    background:radial-gradient(circle, #fff 0 10%, #ff2d2d 28%, rgba(255,45,45,.55) 52%, rgba(255,45,45,0) 72%); }
+  body.laser, body.laser * { cursor:none; }
+  body.laser #bar, body.laser #bar * { cursor:default; }
+  body.overview #ink, body.overview #laser, body.overview #notes { display:none !important; }
+
+
+  /* ================= animation ================= */
+  @keyframes rise { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:none; } }
+  @keyframes fade { from { opacity:0; } to { opacity:1; } }
+  @keyframes grow { from { transform:scaleY(0); } to { transform:scaleY(1); } }
+  @keyframes draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+  @keyframes sweep { to { background-size:100% 100%; } }
+  @keyframes pump  { 0% { transform:translate(0,0); opacity:0; } 8% { opacity:1; } 50% { transform:translate(560px,0); opacity:1; } 56%,100% { transform:translate(560px,0); opacity:0; } }
+  @keyframes probe { 0% { transform:translate(0,0); opacity:0; } 8% { opacity:1; } 50% { transform:translate(280px,280px); opacity:1; } 56%,100% { transform:translate(280px,280px); opacity:0; } }
+  @keyframes flash { 0%,46% { transform:scale(0); opacity:0; } 52% { transform:scale(1); opacity:1; } 80%,100% { transform:scale(2.4); opacity:0; } }
+
+  .slide.active > :not(aside) { animation:rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.active > :nth-child(2) { animation-delay:.08s; }
+  .slide.active > :nth-child(3) { animation-delay:.16s; }
+  .slide.active > :nth-child(4) { animation-delay:.24s; }
+  .slide.active > :nth-child(5) { animation-delay:.32s; }
+  /* bullets and columns arrive one by one */
+  .slide.active > ul > li, .slide.active .cols ul > li, .slide.active .quad > div, .slide.active .cols > div > p {
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.active ul > li:nth-child(1) { animation-delay:.30s; }
+  .slide.active ul > li:nth-child(2) { animation-delay:.42s; }
+  .slide.active ul > li:nth-child(3) { animation-delay:.54s; }
+  .slide.active ul > li:nth-child(4) { animation-delay:.66s; }
+  .slide.active .cols > div:nth-child(2) li:nth-child(1) { animation-delay:.70s; }
+  .slide.active .cols > div:nth-child(2) li:nth-child(2) { animation-delay:.82s; }
+  .slide.active .cols > div:nth-child(2) li:nth-child(3) { animation-delay:.94s; }
+  .slide.active .cols > div:nth-child(2) li:nth-child(4) { animation-delay:1.06s; }
+  .slide.active .cols > div:nth-child(2) > p { animation-delay:.6s; }
+  .slide.active .quad > div:nth-child(1) { animation-delay:.25s; }
+  .slide.active .quad > div:nth-child(2) { animation-delay:.40s; }
+  .slide.active .quad > div:nth-child(3) { animation-delay:.55s; }
+  .slide.active .quad > div:nth-child(4) { animation-delay:.70s; }
+  /* meme: punchline lands late */
+  .slide.active .meme2 .pn { animation:rise .5s cubic-bezier(.2,.7,.2,1) .3s both; }
+  .slide.active .meme2 .pn + .pn { animation-delay:1.3s; }
+  /* highlighter sweep on <mark> */
+  .slide mark { background:linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / 100% 100%; }
+  .slide.active mark { background-size:0% 100%; animation:sweep .5s ease-out 1s forwards; }
+  /* chart: bars grow from the axis, reference last */
+  svg .bar-ref, svg .bar-ag, svg .bar-base { transform-box:fill-box; transform-origin:50% 100%; }
+  .slide.active svg .bar-base, .slide.active svg .bar-ag, .slide.active svg .bar-ref { animation:grow .7s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.active svg rect:nth-of-type(1) { animation-delay:.3s; } .slide.active svg rect:nth-of-type(2) { animation-delay:.4s; }
+  .slide.active svg rect:nth-of-type(3) { animation-delay:.55s; } .slide.active svg rect:nth-of-type(4) { animation-delay:.65s; }
+  .slide.active svg rect:nth-of-type(5) { animation-delay:.75s; } .slide.active svg .bar-ref { animation-duration:1.1s; animation-delay:1.1s; }
+  .slide.active svg g { animation:fade .4s 1.6s both; }
+  /* environment diagram: arrows draw themselves */
+  .slide.active svg line.ln[pathLength] { stroke-dasharray:1; animation:draw .6s ease-out both; }
+  .slide.active svg line.ln[pathLength]:nth-of-type(2) { animation-delay:.6s; }
+  .slide.active svg line.ln[pathLength]:nth-of-type(3) { animation-delay:1.0s; }
+  .slide.active svg line.ln[pathLength]:nth-of-type(4) { animation-delay:1.4s; }
+  .slide.active svg polygon.nd { animation:fade .3s both; }
+  .slide.active svg polygon:nth-of-type(1) { animation-delay:.95s; }
+  .slide.active svg polygon:nth-of-type(2) { animation-delay:1.35s; }
+  .slide.active svg polygon:nth-of-type(3) { animation-delay:1.75s; }
+  /* pump-probe: two pulses meet at the sample, on loop */
+  .pp { position:absolute; right:200px; top:50%; width:620px; margin-top:-200px; }
+  .pp .beam { stroke:var(--line); stroke-width:4; }
+  .pp .pulse { fill:var(--accent); stroke:var(--ring); stroke-width:3; }
+  .pp .flash { fill:var(--accent); transform-box:fill-box; transform-origin:center; }
+  .slide.active .pp .pump  { animation:pump 2.8s cubic-bezier(.45,0,.55,1) .6s infinite both; }
+  .slide.active .pp .probe { animation:probe 2.8s cubic-bezier(.45,0,.55,1) .6s infinite both; }
+  .slide.active .pp .flash { animation:flash 2.8s ease-out .6s infinite both; }
+  .pp text { fill:var(--muted); font-size:30px; }
+
+  body.overview .slide *, body.overview .slide { animation:none !important; }
+  @media (prefers-reduced-motion: reduce) { .slide *, .slide { animation:none !important; } .slide mark { background-size:100% 100% !important; } }
+  @media print { .slide *, .slide { animation:none !important; } .slide mark { background-size:100% 100% !important; } }
+
+  @page { size:1920px 1080px; margin:0; }
+  @media print {
+    :root, :root[data-theme="dark"] { --bg:#FFFFFF; --fg:#000000; --muted:#595959; --ring:#000000; --line:#D9D9D9; }
+    html, body { overflow:visible; height:auto; background:#fff; }
+    .stage { position:static; transform:none !important; width:1920px; height:auto; }
+    .slide { display:flex !important; position:relative; width:1920px; height:1080px; break-after:page;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .slide:last-of-type { break-after:auto; }
+    .foot { position:fixed; } .right { display:none; }
+    #hot, #bar, #laser, #ink, #notes { display:none !important; }
+  }
+
+  /* Pitch-specific layout: spare monochrome deck, one physical 3D moment. */
+  .title-credit { margin-top:72px; font-size:30px !important; }
+  .scene-slide { padding:82px 155px 155px; }
+  .scene-slide h2 { margin-bottom:20px; max-width:1350px; }
+  .scene-layout { display:grid; grid-template-columns:520px 1fr; align-items:center; gap:18px; flex:1; min-height:0; }
+  .scene-copy { align-self:center; position:relative; z-index:2; }
+  .scene-copy p { font-size:47px; line-height:1.27; }
+  .scene-facts { display:grid; grid-template-columns:auto 1fr; gap:12px 20px; margin-top:42px; align-items:baseline; }
+  .scene-facts strong { font-size:42px; font-weight:700; }
+  .scene-facts span { font-size:31px; color:var(--muted); }
+  .pulse-scene { width:100%; max-height:635px; overflow:visible; }
+  .scene-label { font:700 32px Inter,Arial,sans-serif; fill:#1d2d3c; }
+  .pump-label { fill:#066f98; } .probe-label { fill:#b85012; }
+  .scene-caption { position:absolute; bottom:161px; right:165px; font-size:22px !important; color:var(--muted); }
+  @keyframes pump3d { 0%,8% { transform:translate(0,0); opacity:0; } 14% {opacity:1} 52% {transform:translate(405px,-100px);opacity:1} 56%,100% {transform:translate(405px,-100px);opacity:0} }
+  @keyframes probe3d { 0%,8% { transform:translate(0,0); opacity:0; } 14% {opacity:1} 52% {transform:translate(-358px,-120px);opacity:1} 56%,100% {transform:translate(-358px,-120px);opacity:0} }
+  @keyframes impact3d { 0%,47% {opacity:0; transform:scale(.2)} 52% {opacity:1; transform:scale(1)} 73%,100% {opacity:0; transform:scale(1.75)} }
+  .pulse-pump,.pulse-probe,.impact-halo,.impact-core { transform-box:fill-box; transform-origin:center; }
+  .slide.active .pulse-pump { animation:pump3d 3.6s cubic-bezier(.35,0,.65,1) infinite; }
+  .slide.active .pulse-probe { animation:probe3d 3.6s cubic-bezier(.35,0,.65,1) infinite; }
+  .slide.active .impact-halo,.slide.active .impact-core { animation:impact3d 3.6s ease-out infinite; }
+  .loop-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:25px; flex:1; align-items:center; }
+  .loop-steps > div { min-height:330px; border-top:7px solid var(--fg); padding-top:25px; display:flex; flex-direction:column; gap:24px; }
+  .loop-steps strong { font-size:58px; letter-spacing:-.04em; }
+  .loop-steps span { font-size:36px; line-height:1.32; }
+  .deck-footer-line { font-size:32px !important; }
+  .score-chart { display:flex; flex-direction:column; justify-content:center; gap:40px; flex:1; }
+  .score-row { display:grid; grid-template-columns:340px 1fr 150px; align-items:center; gap:28px; font-size:38px; }
+  .score-row > b { text-align:right; font-variant-numeric:tabular-nums; }
+  .score-track { height:62px; border-left:3px solid var(--fg); background:var(--line); position:relative; }
+  .score-track::before { content:' '; width:12px; height:12px; border-radius:50%; background:var(--fg); position:absolute; left:0; top:25px; }
+  .score-track i { display:block; height:100%; background:var(--accent); }
+  .ref-row { font-weight:700; } .ref-row .score-track::before { display:none; }
+  .score-note { font-size:29px !important; }
+  .failure-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:25px; margin:0 0 50px; }
+  .failure-metric { border-top:6px solid var(--fg); padding-top:20px; display:flex; flex-direction:column; gap:14px; }
+  .failure-metric strong { font-size:67px; letter-spacing:-.04em; }
+  .failure-metric span { font-size:31px; color:var(--muted); }
+  .failure-slide blockquote { font-size:38px; line-height:1.25; border-left:10px solid var(--accent); padding-left:24px; }
+  .failure-slide blockquote small { display:block; font-size:27px; color:var(--muted); margin-top:8px; }
+  .failure-takeaway { margin-top:38px; font-size:36px !important; }
+  .integrity-layout { display:grid; grid-template-columns:1fr 1fr; gap:70px; flex:1; align-items:center; }
+  .formula { background:var(--accent); color:#000; padding:42px; font-size:54px; font-weight:700; line-height:1.18; letter-spacing:-.035em; }
+  .integrity-text p { font-size:39px; margin-bottom:30px; }
+  .closing-line { font-size:66px !important; line-height:1.2 !important; max-width:1300px; }
+  .slide:has(.closing-line) { justify-content:center; }
+  @media (prefers-reduced-motion:reduce) {
+    .pulse-pump { transform:translate(405px,-100px) !important; opacity:1 !important; }
+    .pulse-probe { transform:translate(-358px,-120px) !important; opacity:1 !important; }
+    .impact-halo,.impact-core { opacity:.8 !important; transform:none !important; }
+  }
+  @media print {
+    .pulse-pump { transform:translate(405px,-100px) !important; opacity:1 !important; }
+    .pulse-probe { transform:translate(-358px,-120px) !important; opacity:1 !important; }
+    .impact-halo,.impact-core { opacity:.8 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <section class="slide title" data-video>
+    <h1>Can AI find<br><mark>time zero?</mark></h1>
+    <p>Build a pump–probe experiment from an empty optical table.</p>
+    <p class="title-credit">GSS · God's Strongest Soldiers · Junction 2026 · AfterQuery</p>
+    <aside class="notes"><b>~8 s.</b> We're experimental physicists. Instead of asking whether AI can take our job, we gave an agent a lab and measured what happened.</aside>
+  </section>
+
+  <section class="slide section" data-video>
+    <h1>A known design is not a working setup.</h1>
+    <p>Knowing pump–probe optics is the beginning. The agent still has to build, align, measure, and recover when its first plan fails.</p>
+    <aside class="notes"><b>~12 s.</b> The task tests execution in a physical loop. Manuals and datasheets contain the needed information; success requires decisions under a time budget.</aside>
+  </section>
+
+  <section class="slide scene-slide" data-video>
+    <h2>Two pulses. One spot. One instant.</h2>
+    <div class="scene-layout">
+      <div class="scene-copy">
+        <p>The 800 nm pulse and the OPA pulse must focus on the same sample spot and arrive within roughly 100 fs.</p>
+        <div class="scene-facts"><strong>≤ 4 hours</strong><span>simulated lab time</span><strong>≤ €30,000</strong><span>parts budget</span></div>
+      </div>
+      <svg class="pulse-scene" viewBox="0 0 1200 680" role="img" aria-label="Isometric illustration of two luminous pulses travelling from different directions and striking a sample simultaneously">
+        <defs>
+          <linearGradient id="tableTop" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e8ecf0"/><stop offset="1" stop-color="#a8b3c0"/></linearGradient>
+          <linearGradient id="tableSide" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8c98a6"/><stop offset="1" stop-color="#4d5966"/></linearGradient>
+          <linearGradient id="sample" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".5" stop-color="#b9c3cd"/><stop offset="1" stop-color="#4e5966"/></linearGradient>
+          <radialGradient id="pumpGlow"><stop stop-color="#fff"/><stop offset=".2" stop-color="#b3f2ff"/><stop offset=".58" stop-color="#00a5dc" stop-opacity=".88"/><stop offset="1" stop-color="#007cbd" stop-opacity="0"/></radialGradient>
+          <radialGradient id="probeGlow"><stop stop-color="#fff"/><stop offset=".2" stop-color="#ffe6be"/><stop offset=".58" stop-color="#ff8a32" stop-opacity=".88"/><stop offset="1" stop-color="#e15b13" stop-opacity="0"/></radialGradient>
+          <radialGradient id="impactGlow"><stop stop-color="#fff"/><stop offset=".2" stop-color="#fff8c0"/><stop offset=".55" stop-color="#f7e159" stop-opacity=".85"/><stop offset="1" stop-color="#f7e159" stop-opacity="0"/></radialGradient>
+          <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="13"/></filter>
+          <pattern id="holes" width="25" height="25" patternUnits="userSpaceOnUse" patternTransform="matrix(.95 -.52 .8 .45 0 0)"><circle cx="8" cy="8" r="1.6" fill="#73808b" opacity=".38"/></pattern>
+        </defs>
+        <ellipse cx="625" cy="610" rx="500" ry="42" fill="#000" opacity=".12" filter="url(#softGlow)"/>
+        <path d="M110 365 L650 80 L1120 340 L580 625 Z" fill="url(#tableTop)" stroke="#75808d" stroke-width="3"/>
+        <path d="M110 365 L580 625 L580 651 L110 391 Z" fill="url(#tableSide)"/>
+        <path d="M580 625 L1120 340 L1120 366 L580 651 Z" fill="#697582"/>
+        <path d="M110 365 L650 80 L1120 340 L580 625 Z" fill="url(#holes)" opacity=".7"/>
+        <path d="M235 437 L640 350" stroke="#128cb9" stroke-width="23" opacity=".08" stroke-linecap="round"/>
+        <path d="M1000 457 L640 350" stroke="#ed7b2c" stroke-width="23" opacity=".09" stroke-linecap="round"/>
+        <path d="M235 437 L640 350" stroke="#44c9ef" stroke-width="4" opacity=".78" stroke-linecap="round"/>
+        <path d="M1000 457 L640 350" stroke="#ffad63" stroke-width="4" opacity=".82" stroke-linecap="round"/>
+        <ellipse cx="640" cy="372" rx="113" ry="38" fill="#283845" opacity=".22"/>
+        <path d="M565 344 L635 305 L713 347 L640 386 Z" fill="#3e4b58" stroke="#192630" stroke-width="3"/>
+        <path d="M565 344 L640 386 L640 405 L565 362 Z" fill="#26323d"/>
+        <path d="M640 386 L713 347 L713 365 L640 405 Z" fill="#5d6d79"/>
+        <path d="M609 335 L642 317 L674 335 L642 353 Z" fill="url(#sample)" stroke="#15222e" stroke-width="3"/>
+        <path d="M609 335 L642 353 L642 365 L609 347 Z" fill="#637481"/>
+        <path d="M642 353 L674 335 L674 347 L642 365 Z" fill="#8595a0"/>
+        <ellipse class="impact-halo" cx="642" cy="337" rx="95" ry="76" fill="url(#impactGlow)"/>
+        <ellipse class="impact-core" cx="642" cy="337" rx="16" ry="10" fill="#fff"/>
+        <g class="pulse-pump"><ellipse cx="235" cy="437" rx="54" ry="26" fill="url(#pumpGlow)" filter="url(#softGlow)"/><ellipse cx="235" cy="437" rx="40" ry="18" fill="url(#pumpGlow)"/><ellipse cx="235" cy="437" rx="15" ry="7" fill="#e9faff"/></g>
+        <g class="pulse-probe"><ellipse cx="1000" cy="457" rx="54" ry="26" fill="url(#probeGlow)" filter="url(#softGlow)"/><ellipse cx="1000" cy="457" rx="40" ry="18" fill="url(#probeGlow)"/><ellipse cx="1000" cy="457" rx="15" ry="7" fill="#fff1da"/></g>
+        <text x="137" y="518" class="scene-label pump-label">800 nm</text><text x="976" y="528" class="scene-label probe-label">OPA</text>
+        <text x="670" y="267" class="scene-label sample-label">sample</text>
+        <path d="M700 275 L669 320" stroke="#23313d" stroke-width="2"/>
+      </svg>
+    </div>
+    <p class="scene-caption">Concept illustration of the Level 2 crossing geometry; the animation shows the target state.</p>
+    <aside class="notes"><b>~18 s.</b> Both pulses must hit the same focal spot at the same time. The 3D drawing illustrates Level 2's crossing geometry. It is not a replay of the agent run shown later, which used Level 1.</aside>
+  </section>
+
+  <section class="slide" data-video>
+    <h2>The agent controls a physics lab through MCP.</h2>
+    <div class="loop-steps">
+      <div><strong>Plan</strong><span>Read manuals, choose optics and a detection route.</span></div>
+      <div><strong>Build</strong><span>Buy and place parts; route both beams through the sample.</span></div>
+      <div><strong>Measure</strong><span>Read camera spots and noisy signals; turn knobs and scan delay.</span></div>
+      <div><strong>Submit</strong><span>A separate verifier scores the simulator's true final state.</span></div>
+    </div>
+    <p class="muted deck-footer-line">Harbor + OpenCode · Python simulator · seeded labs · about 20 MCP actions</p>
+    <aside class="notes"><b>~18 s.</b> All lab changes go through tools that consume simulated time. The agent sees instrument readings, not simulator truth. The verifier is separate and hidden from the agent.</aside>
+  </section>
+
+  <section class="slide" data-video>
+    <h2>One scored Flash run: the agent missed time zero.</h2>
+    <div class="score-chart" role="img" aria-label="Scores on seed 1 Level 1: do nothing zero, stop early zero, Gemini 3.8 Flash zero, scripted reference 0.908">
+      <div class="score-row"><span>Do nothing</span><div class="score-track"><i style="width:0"></i></div><b>0.000</b></div>
+      <div class="score-row"><span>Stop early</span><div class="score-track"><i style="width:0"></i></div><b>0.000</b></div>
+      <div class="score-row flash-row"><span>Gemini 3.8 Flash</span><div class="score-track"><i style="width:0"></i></div><b>0.000</b></div>
+      <div class="score-row ref-row"><span>Scripted reference</span><div class="score-track"><i style="width:90.8%"></i></div><b>0.908</b></div>
+    </div>
+    <p class="muted score-note">Same seed, Level 1, 1300 nm OPA. One completed Flash trial; more agent trials are still needed.</p>
+    <aside class="notes"><b>~20 s.</b> This is one completed Flash trial, not a reliable estimate across models. The reference is a Harbor oracle run on the same seed. The other Gemini Carbon attempts errored, so we do not count them as scored model trials.</aside>
+  </section>
+
+  <section class="slide failure-slide" data-video>
+    <h2>It aligned the spots. It missed the pulses.</h2>
+    <div class="failure-grid">
+      <div class="failure-metric"><strong>0.93</strong><span>spatial overlap</span></div>
+      <div class="failure-metric"><strong>46,057 fs</strong><span>timing error at the end</span></div>
+      <div class="failure-metric"><strong>234 min</strong><span>of 240 min used</span></div>
+    </div>
+    <blockquote>“The alignment and time-zero setup … has been completed and submitted.”<small>Agent's final report; verifier score: 0</small></blockquote>
+    <p class="failure-takeaway">A camera confirms where beams land. A delay scan and signal check are needed to confirm <em>when</em> they arrive.</p>
+    <aside class="notes"><b>~20 s.</b> This is the real run's final report, shortened with an ellipsis. The agent achieved spatial overlap but never verified a temporal peak. It used a short integration on one scan and did not check a single-arm background. The lab manuals describe the diagnostic and scan tools.</aside>
+  </section>
+
+  <section class="slide" data-video>
+    <h2>Reward follows the physical outcome.</h2>
+    <div class="integrity-layout">
+      <div class="formula">beam throughput × spot overlap × timing overlap</div>
+      <div class="integrity-text">
+        <p>Saving money cannot earn points with an empty table. Cost and time only reduce a successful physical score.</p>
+        <p>Do nothing and stop early both score 0 across seeds 1–10. The scripted expert reaches 0.91 average in Level 1.</p>
+      </div>
+    </div>
+    <aside class="notes"><b>~15 s.</b> The verifier reads the true simulator state from a separate container. Baselines establish that empty or unfinished setups do not pay. We have tests for malformed actions, hidden verifier routes, post-submit calls, and end-to-end collection. Current limitation: the timing term is so sharp that partial progress can still round to zero.</aside>
+  </section>
+
+  <section class="slide" data-video>
+    <h2>Can an agent build a working experiment?</h2>
+    <p class="closing-line">GSS measures the gap between knowing the physics and making it work.</p>
+    <p class="muted" style="margin-top:58px">Source and setup: github.com/kakitkelvinho/gss</p>
+    <aside class="notes"><b>~7 s.</b> We have a reproducible expert solution and a first scored agent failure. Next we will test more seeds and stronger agents.</aside>
+  </section>
+
+  <section class="slide split">
+    <h2>Why the difficulty is meaningful</h2>
+    <div class="cols">
+      <div><p>Observable, learnable decisions</p><ul><li>Manuals specify geometry, OPA path, and instrument ranges.</li><li>The camera reports focal spots; the detector and delay stage reveal timing.</li><li>Every action costs simulated lab time.</li></ul></div>
+      <div><p>Physics in the loop</p><ul><li>Ray tracing, clipping on optics and mounts, lens focusing.</li><li>Polarisation, detector wavelength limits, noise, and stage backlash.</li><li>Seeded labs make reruns reproducible.</li></ul></div>
+    </div>
+    <aside class="notes">The task is difficult because the agent must infer a procedure and correct errors while the clock runs. We do not claim the simulator is a full wave-optics model or that every parameter was independently validated against hardware.</aside>
+  </section>
+
+  <section class="slide">
+    <h2>What the current score does—and misses</h2>
+    <p>The score multiplies beam throughput, spatial overlap, and a narrow temporal overlap term. Cost and time apply as penalties.</p>
+    <p class="muted" style="margin-top:42px">A run can align the spots well and still score zero when the pulses miss by many picoseconds. A more graded progress signal is a future design option, not a result in this deck.</p>
+    <aside class="notes">The critique correctly identifies a weakness for training: all non-successful runs can look alike. We have not changed the scoring code, so this slide states the limitation instead of presenting a proposed rubric as implemented.</aside>
+  </section>
+
+  <section class="slide">
+    <h2>Reproduce and inspect the result</h2>
+    <pre class="code"><span class="c"># from the repository root</span>
+<span class="k">harbor</span> run -p . -a oracle
+<span class="k">harbor</span> run -p . -a opencode -m <span class="s">gemini/gemini-3.8-flash</span>
+<span class="k">python3</span> scripts/summarise_jobs.py jobs/</pre>
+    <p class="muted" style="margin-top:40px">README: setup and baselines · jobs/summary.md: scored runs · viewer: replay</p>
+    <aside class="notes">Model runs need inference credentials. The repo also contains a Windows WSL setup guide. We have run Harbor locally; clean-machine reproducibility remains to be checked.</aside>
+  </section>
+
+  <section class="slide">
+    <h2>Evidence still to collect</h2>
+    <ul><li>Two more scored agent trials on different seeds and OPA wavelengths.</li><li>At least one stronger model run.</li><li>A clean-machine reproduction and an exploit review.</li></ul>
+    <p class="muted" style="margin-top:35px">These are next steps, not claims about the current results.</p>
+    <aside class="notes">Judges rerun three agent trials. We currently have one completed Flash trial; two Carbon runs ended with agent errors and do not count as scored evidence.</aside>
+  </section>
+
+  <div class="foot">
+    <div class="wordmark">GSS <span>· God's Strongest Soldiers</span></div>
+    <div class="right"><span class="vtag">video cut</span><span class="count" id="count"></span></div>
+  </div>
+</div>
+
+<canvas id="ink"></canvas>
+<div id="hot"></div>
+<nav id="bar" aria-label="Presentation controls">
+  <button id="b-fs" type="button"><span class="t">Full screen</span><kbd>F</kbd></button>
+  <button id="b-theme" type="button"><span class="t">Dark mode</span><kbd>T</kbd></button>
+  <button id="b-video" type="button"><span class="t">Video cut</span><kbd>V</kbd></button>
+  <button id="b-notes" type="button"><span class="t">Speaker notes</span><kbd>N</kbd></button>
+  <button id="b-laser" type="button"><span class="t">Laser pointer</span><kbd>L</kbd></button>
+  <button id="b-pen" type="button"><span class="t">Pen</span><kbd>P</kbd></button>
+  <button id="b-clear" type="button"><span class="t">Clear ink</span><kbd>C</kbd></button>
+  <button id="b-over" type="button"><span class="t">Overview</span><kbd>O</kbd></button>
+</nav>
+<div id="laser"></div>
+<div id="notes"></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage'), count = document.getElementById('count');
+  var ink = document.getElementById('ink'), ctx = ink.getContext('2d'), laser = document.getElementById('laser');
+  var notes = document.getElementById('notes'), bar = document.getElementById('bar'), root = document.documentElement;
+  var $ = function (id) { return document.getElementById(id); };
+  var bTheme = $('b-theme'), bFs = $('b-fs'), bLaser = $('b-laser'), bPen = $('b-pen'), bClear = $('b-clear'),
+      bOver = $('b-over'), bVideo = $('b-video'), bNotes = $('b-notes');
+  var PEN = { color:'#ff3b30', width:7 };
+  var i = 0, mode = null, cur = null, strokes = {};
+
+  function label(btn, t) { btn.querySelector('.t').textContent = t; }
+  function inOverview() { return document.body.classList.contains('overview'); }
+  function isVideo() { return document.body.classList.contains('video'); }
+  function order() { return slides.map(function (s, k) { return k; }).filter(function (k) { return !isVideo() || slides[k].hasAttribute('data-video'); }); }
+  function geom() { var r = stage.getBoundingClientRect(); return { x:r.left, y:r.top, s:r.width / 1920 }; }
+
+  function redraw() {
+    var d = window.devicePixelRatio || 1, g = geom();
+    ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,ink.width,ink.height);
+    ctx.setTransform(d*g.s,0,0,d*g.s,d*g.x,d*g.y); ctx.lineCap='round'; ctx.lineJoin='round';
+    (strokes[i] || []).forEach(function (st) {
+      ctx.strokeStyle = st.c; ctx.lineWidth = st.w; ctx.beginPath(); ctx.moveTo(st.p[0][0], st.p[0][1]);
+      for (var k = 1; k < st.p.length; k++) ctx.lineTo(st.p[k][0], st.p[k][1]);
+      if (st.p.length === 1) ctx.lineTo(st.p[0][0] + 0.01, st.p[0][1]);
+      ctx.stroke();
+    });
+  }
+  function fit() {
+    if (inOverview()) { stage.style.transform = ''; return; }
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+    var d = window.devicePixelRatio || 1;
+    ink.width = Math.round(window.innerWidth * d); ink.height = Math.round(window.innerHeight * d);
+    redraw();
+  }
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    var o = order(), pos = o.indexOf(i);
+    count.textContent = (pos < 0 ? '–' : pos + 1) + ' / ' + o.length;
+    var a = slides[i].querySelector('aside.notes');
+    notes.innerHTML = '<b>Slide ' + (i + 1) + '.</b> ' + (a ? a.innerHTML : '(no notes)');
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) {}
+    redraw();
+  }
+  function step(dir) {
+    var o = order(), pos = o.indexOf(i);
+    if (pos < 0) { pos = 0; for (var k = 0; k < o.length; k++) if (o[k] < i) pos = k; if (dir > 0 && o[pos] < i) pos++; dir = 0; }
+    pos = Math.max(0, Math.min(o.length - 1, pos + dir)); show(o[pos]);
+  }
+  function setTheme(t) { root.setAttribute('data-theme', t); label(bTheme, t === 'dark' ? 'Light mode' : 'Dark mode');
+    try { localStorage.setItem('pitch-theme', t); } catch (e) {} }
+  function toggleTheme() { setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+  function isFs() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function toggleFs() { var r = isFs() ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+    : (root.requestFullscreen || root.webkitRequestFullscreen).call(root); if (r && r.catch) r.catch(function(){}); }
+  function fsLabel() { label(bFs, isFs() ? 'Exit full screen' : 'Full screen'); fit(); }
+  function setMode(m) {
+    mode = (mode === m) ? null : m;
+    document.body.classList.toggle('laser', mode === 'laser'); document.body.classList.toggle('pen', mode === 'pen');
+    bLaser.classList.toggle('on', mode === 'laser'); bPen.classList.toggle('on', mode === 'pen');
+    ink.style.pointerEvents = mode === 'pen' ? 'auto' : 'none';
+    if (mode !== 'laser') laser.style.display = 'none';
+  }
+  function toggleVideo() { document.body.classList.toggle('video'); bVideo.classList.toggle('on', isVideo());
+    if (isVideo() && !slides[i].hasAttribute('data-video')) step(1); else show(i); }
+  function toggleNotes() { document.body.classList.toggle('shownotes'); bNotes.classList.toggle('on', document.body.classList.contains('shownotes')); }
+  function toggleOverview(on) { if (on && mode) setMode(mode); document.body.classList.toggle('overview', on); fit(); if (!on) show(i); }
+  function clearInk() { strokes[i] = []; redraw(); }
+
+  document.addEventListener('mousemove', function (e) {
+    if (mode !== 'laser') return;
+    if (e.target.closest && e.target.closest('#bar')) { laser.style.display = 'none'; return; }
+    laser.style.display = 'block'; laser.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+  });
+  root.addEventListener('mouseleave', function () { laser.style.display = 'none'; });
+  function pt(e) { var g = geom(); return [(e.clientX - g.x) / g.s, (e.clientY - g.y) / g.s]; }
+  ink.addEventListener('pointerdown', function (e) { if (mode !== 'pen') return; e.preventDefault();
+    try { ink.setPointerCapture(e.pointerId); } catch (x) {}
+    cur = { c:PEN.color, w:PEN.width, p:[pt(e)] }; (strokes[i] = strokes[i] || []).push(cur); redraw(); });
+  ink.addEventListener('pointermove', function (e) { if (!cur) return; cur.p.push(pt(e)); redraw(); });
+  ink.addEventListener('pointerup', function () { cur = null; });
+  ink.addEventListener('pointercancel', function () { cur = null; });
+
+  bFs.addEventListener('click', toggleFs); bTheme.addEventListener('click', toggleTheme);
+  bLaser.addEventListener('click', function () { setMode('laser'); }); bPen.addEventListener('click', function () { setMode('pen'); });
+  bClear.addEventListener('click', clearInk); bOver.addEventListener('click', function () { toggleOverview(!inOverview()); });
+  bVideo.addEventListener('click', toggleVideo); bNotes.addEventListener('click', toggleNotes);
+  bar.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) b.blur(); });
+  document.addEventListener('fullscreenchange', fsLabel); document.addEventListener('webkitfullscreenchange', fsLabel);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key, kl = k.length === 1 ? k.toLowerCase() : k;
+    if (kl === 'o') { toggleOverview(!inOverview()); return; }
+    if (kl === 'f') { toggleFs(); return; }
+    if (kl === 't') { toggleTheme(); return; }
+    if (kl === 'v') { toggleVideo(); return; }
+    if (inOverview()) { if (k === 'Escape') toggleOverview(false); return; }
+    if (kl === 'n') { toggleNotes(); return; }
+    if (kl === 'l') { setMode('laser'); return; }
+    if (kl === 'p') { setMode('pen'); return; }
+    if (kl === 'c') { clearInk(); return; }
+    if (k === 'Escape') { if (mode) setMode(mode); return; }
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { step(1); e.preventDefault(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { step(-1); }
+    else if (k === 'Home') { show(order()[0]); } else if (k === 'End') { var o = order(); show(o[o.length - 1]); }
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#bar, #hot, #notes')) return;
+    if (mode === 'pen') return;
+    var sl = e.target.closest('.slide');
+    if (inOverview()) { if (sl) { i = slides.indexOf(sl); toggleOverview(false); } return; }
+    step(e.clientX < window.innerWidth * 0.25 ? -1 : 1);
+  });
+  window.addEventListener('resize', fit);
+  window.addEventListener('beforeprint', function () { slides.forEach(function (s) { s.classList.add('active'); }); });
+  window.addEventListener('afterprint', function () { show(i); });
+
+  var saved = null; try { saved = localStorage.getItem('pitch-theme'); } catch (e) {}
+  setTheme(saved || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  var h = parseInt(location.hash.slice(1), 10);
+  fit(); show(isNaN(h) ? 0 : h - 1);
+})();
+</script>
+</body>
+</html>
