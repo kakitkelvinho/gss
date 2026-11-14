@@ -303,7 +303,7 @@ class Episode:
                     "T_opa": b["opa"].T if vis["opa"] else 0.0, "eta": 0.0,
                     "end_800": "blocked" if vis["800nm"] is None else b["800nm"].end_note,
                     "end_opa": "blocked" if vis["opa"] is None else b["opa"].end_note}
-        return P.truth(vis["800nm"], vis["opa"], self.lab.opa_path, self.level)
+        return P.truth(vis["800nm"], vis["opa"], self.lab.opa_extra_path, self.level)
 
     def _update_stray(self):
         vis = self._visible()
@@ -820,9 +820,9 @@ class Episode:
         if self.inv["sample"]["part"] is None:
             vis = {"800nm": None, "opa": None}
         if d["model"] == "photodiode":
-            return P.photodiode(vis, self.lams, d["range_nm"], self.lab.opa_path, self.rng_noise)
+            return P.photodiode(vis, self.lams, d["range_nm"], self.lab.opa_extra_path, self.rng_noise)
         f = cat.filter_spec(self.filter) if (self.filter and d["readout"] == "camera") else None
-        return P.nonlinear_signal(d, f, self.lab.opa_lambda, vis["800nm"], vis["opa"], self.lab.opa_path,
+        return P.nonlinear_signal(d, f, self.lab.opa_lambda, vis["800nm"], vis["opa"], self.lab.opa_extra_path,
                                   t_int, self.rng_noise, self.level)
 
     def _t_read_signal(self, t_int):

@@ -71,7 +71,8 @@ class Part:
         if self.kind == "mirror":
             n = dir_from_angles(self.yaw + self.knob_yaw + self.mount_err[0],
                                 self.knob_pitch + self.mount_err[1])
-            return [Disc(self.id, "mirror", self.pos, n, K.MIRROR_R, K.CLIP_START)]
+            return [Disc(self.id, "mirror", self.pos, n, K.MIRROR_R, K.CLIP_START),
+                    MountBody(self.id, self.pos, n, post=True)]
         if self.kind == "periscope":
             a = V.yaw_dir(self.yaw)
             up = 1.0 if y > self.height_in else -1.0
@@ -82,7 +83,8 @@ class Part:
             n2 = dir_from_angles(self.yaw + self.knob_yaw + self.mount_err[0],
                                  -up * math.pi / 4 + self.knob_pitch + self.mount_err[1])
             return [Disc(self.id, "lower", lower_c, n1, K.MIRROR_R, K.CLIP_START),
-                    Disc(self.id, "upper", self.pos, n2, K.MIRROR_R, K.CLIP_START)]
+                    Disc(self.id, "upper", self.pos, n2, K.MIRROR_R, K.CLIP_START),
+                    MountBody(self.id, lower_c, n1, post=False), MountBody(self.id, self.pos, n2, post=False)]
         if self.kind == "stage":
             u = V.yaw_dir(self.yaw)
             apex = V.add(self.pos, V.mul(u, K.STAGE_APEX_OFFSET + self.stage_pos))
@@ -180,9 +182,63 @@ class Lens:
         if t <= EPS:
             return None
         h = V.add(p, V.mul(d, t))
-        if V.norm(V.sub(h, self.center)) > K.LENS_R:
+        if V.norm(V.sub(h, self.center)) > K.LENS_MOUNT_R:
             return None
         return Hit(t, h, self)
+
+
+@dataclass
+class MountBody:
+    """Mount plate behind a mirror (oriented box) plus, optionally, its post (vertical cylinder).
+    Absorbs any beam that hits it."""
+    part_id: str
+    center: Vec  # optic centre
+    normal: Vec  # optic normal (reflecting side)
+    post: bool
+    role: str = "mount"
+
+    def intersect(self, p: Vec, d: Vec) -> Hit | None:
+        best = None
+        n = self.normal
+        es = V.unit(V.cross(V.Y, n)) if abs(n[1]) < 0.999 else (1.0, 0.0, 0.0)
+        ev = V.cross(n, es)
+        rel = V.sub(p, self.center)
+        lo, hi = -math.inf, math.inf
+        for axis, (a, b) in ((n, (-K.MOUNT_DEPTH[1], -K.MOUNT_DEPTH[0])), (es, (-K.MOUNT_HALF, K.MOUNT_HALF)),
+                             (ev, (-K.MOUNT_HALF, K.MOUNT_HALF))):
+            o, v = V.dot(rel, axis), V.dot(d, axis)
+            if abs(v) < 1e-15:
+                if o < a or o > b:
+                    lo, hi = 1.0, 0.0
+                    break
+                continue
+            t1, t2 = (a - o) / v, (b - o) / v
+            if t1 > t2:
+                t1, t2 = t2, t1
+            lo, hi = max(lo, t1), min(hi, t2)
+        if lo <= hi and lo > EPS:
+            best = lo
+        if self.post:
+            # vertical cylinder below the plate
+            nh = V.unit((n[0], 0.0, n[2])) if math.hypot(n[0], n[2]) > 1e-9 else (1.0, 0.0, 0.0)
+            cx, cz = self.center[0] - K.POST_BEHIND * nh[0], self.center[2] - K.POST_BEHIND * nh[2]
+            top = self.center[1] - K.MOUNT_HALF
+            ox, oz = p[0] - cx, p[2] - cz
+            A = d[0] ** 2 + d[2] ** 2
+            if A > 1e-15:
+                B = 2 * (ox * d[0] + oz * d[2])
+                C = ox * ox + oz * oz - K.POST_R ** 2
+                disc = B * B - 4 * A * C
+                if disc >= 0:
+                    for t in sorted(((-B - math.sqrt(disc)) / (2 * A), (-B + math.sqrt(disc)) / (2 * A))):
+                        y = p[1] + t * d[1]
+                        if t > EPS and 0.0 <= y <= top:
+                            if best is None or t < best:
+                                best = t
+                            break
+        if best is None:
+            return None
+        return Hit(best, V.add(p, V.mul(d, best)), self)
 
 
 def _box_entry(p: Vec, d: Vec, box) -> float | None:
@@ -239,6 +295,7 @@ class BeamResult:
     lens_hit: tuple[float, float] | None = None  # (h, v) on the lens, mm
     lens_role: str | None = None  # which lens of the mount ("lens", or L2 "lens-A"/"lens-B")
     path_geom: float = 0.0  # geometric length travelled on the table (tape measure)
+    pol: float = 1.0  # cos^2 of the polarisation angle from horizontal at the sample (type-I SFG projection)
 
     @property
     def at_sample(self) -> bool:
@@ -251,6 +308,7 @@ def trace(arm: str, origin: Vec, direction: Vec, elements: list, housings: list)
     opl = 0.0
     T = 1.0
     skip = None
+    E = V.unit(V.cross(V.Y, d)) if abs(d[1]) < 0.999 else (1.0, 0.0, 0.0)  # horizontal polarisation
     for _ in range(MAX_BOUNCES):
         best: Hit | None = None
         for e in elements:
@@ -301,8 +359,16 @@ def trace(arm: str, origin: Vec, direction: Vec, elements: list, housings: list)
             T *= tr
             res.hits.append(HitRecord(e.part_id, e.role, off, tr))
             p, d = q, V.unit(V.reflect(d, e.normal))
+            # perfect-conductor reflection of the field: tangential part flips, normal part kept
+            E = V.sub(V.mul(e.normal, 2 * V.dot(E, e.normal)), E)
+            E = V.unit(V.sub(E, V.mul(d, V.dot(E, d))))
             skip = e
             continue
+        if isinstance(e, MountBody):
+            res.hits.append(HitRecord(e.part_id, "mount", V.sub(q, e.center), 0.0))
+            res.end, res.end_note = "absorbed", f"mount of {e.part_id}"
+            T = 0.0
+            break
         if isinstance(e, Retro):
             off = V.sub(q, e.center)
             if V.dot(d, e.u) <= 0:
@@ -332,6 +398,11 @@ def trace(arm: str, origin: Vec, direction: Vec, elements: list, housings: list)
                 res.end, res.end_note = "absorbed", "back of the sample mount"
                 T = 0.0
                 break
+            if V.norm(off) > K.LENS_R:
+                res.hits.append(HitRecord(e.part_id, "mount", off, 0.0))
+                res.end, res.end_note = "absorbed", "lens mount"
+                T = 0.0
+                break
             tr = clip_transmission(V.norm(off), K.LENS_CLIP_START, K.LENS_R)
             T *= tr
             res.hits.append(HitRecord(e.part_id, e.role, off, tr))
@@ -342,6 +413,7 @@ def trace(arm: str, origin: Vec, direction: Vec, elements: list, housings: list)
             f, dz = K.LENS_F, e.defocus
             res.lens_hit = rho
             res.lens_role = e.role
+            res.pol = V.dot(E, e1) ** 2  # horizontal field component at the sample
             if e.sample_pt is None:
                 res.spot = tuple(f * th[i] + dz * th[i] - dz * rho[i] / f for i in range(2))
                 opl = opl - V.dot(off, d) + f + dz

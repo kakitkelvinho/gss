@@ -9,11 +9,15 @@ from sim import catalogue as cat
 from sim import constants as K
 from sim import physics as P
 
-# Cheapest design that can physically reach overlap: cheapest delay stage + 4 mirrors (a beam can be
-# sloped with pitch knobs, so a periscope is not strictly needed) + the cheapest diagnostic (with
-# filter, if it is read by the signal camera) that can show the cross term at this OPA wavelength
-# + an alignment camera that sees both beams.
-N_MIN_MIRRORS = 4
+# Cheapest design that can physically reach overlap: cheapest delay stage + the minimum number of
+# mirrors + the cheapest diagnostic (with filter, if it is read by the signal camera) that can show the
+# cross term at this OPA wavelength + an alignment camera that sees both beams.
+# Mirrors: heights can be matched with pitch knobs or a vertical offset at the retroreflector, so no
+# periscope is needed. L1: two turns (e.g. both beams turned once into a lens facing -z, or the 800 nm
+# beam turned 180 deg while the OPA beam goes straight); blind playthroughs found both. L2: one turn
+# (OPA beam straight into one lens along -x, the 800 nm return from the retroreflector turned once onto
+# the other lens axis, +z).
+N_MIN_MIRRORS = {1: 2, 2: 1}
 
 
 def _of_slot(slot):
@@ -41,7 +45,7 @@ def c_min(lam_o: float, level: int = 1) -> float:
     stage = min(cat.PARTS[k]["price"] for k in _of_slot("delay_stage"))
     det = detection_routes(lam_o, level)[0][2]
     cam = min(cat.PARTS[k]["price"] for k in _of_slot("camera")) if needs_camera(lam_o) else 0.0
-    return float(stage + det + cam + N_MIN_MIRRORS * cat.PARTS["MIR-1"]["price"])
+    return float(stage + det + cam + N_MIN_MIRRORS[level] * cat.PARTS["MIR-1"]["price"])
 
 
 def reward(eta: float, cost: float, time_frac: float, c_min_eur: float) -> float:
@@ -55,4 +59,4 @@ def design_viable(bought: dict[str, int], lam_o: float, level: int = 1) -> bool:
     optics = bought.get("MIR-1", 0) + 2 * bought.get("PER-1", 0)
     det = any(d in owned and (f is None or f in owned) for d, f, _ in detection_routes(lam_o, level))
     cam = not needs_camera(lam_o) or any(cat.PARTS[p]["slot"] == "camera" for p in owned)
-    return has_stage and optics >= N_MIN_MIRRORS and det and cam
+    return has_stage and optics >= N_MIN_MIRRORS[level] and det and cam

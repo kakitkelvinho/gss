@@ -88,6 +88,30 @@ Q-numbers refer to the grilling session.
 ## Implementation notes (step 1)
 - `install(part_id)` (2 min, at the sample mount) swaps between owned diagnostics; buying a diagnostic installs it.
 - The stage starts at position 0 after purchase. The reference layout puts time zero near mid-travel, so the stop-early baseline (overlap, no timing) scores 0.
+- C_min = cheapest stage + correct-cut BBO + 2 mirrors = EUR 1900 (same for every seed). Originally 4 mirrors (EUR 2200); blind playthroughs found working 2-mirror layouts.
+- Separate random streams: lab (`gss-lab-<seed>`), per-mount tilt errors (`gss-mount-<seed>-<part>`), placement errors and measurement noise.
+
+## De-hint pass (after blind playthroughs 2-3 succeeded)
+- Manuals and datasheets give specifications and conventions only, no procedures (removed e.g. "the 800 nm arm
+  must be longer by this amount", "overlapping the foci means matching angles", "enter 10-15 mm off the apex",
+  "block one arm to measure the background", "path added = 2 x displacement", expected peak counts).
+- Relative timing is no longer stated as "path-matched except the OPA": the table manual gives the per-seed paths
+  from the amplifier's split to the pump port and to the OPA input; the OPA manual gives its internal path.
+  Time zero needs pump table path + split_pump = probe table path + split_opa + opa_internal.
+- Crystal part ids/names no longer name the process: BBO-T236 (theta 23.6 deg, 450-550 nm filter) and BBO-T292
+  (theta 29.2 deg, 380-420 nm filter). The agent has to work out which one detects 800 + 1300 nm SFG (495 nm).
+- Corrected the SFG cut angle to 23.6 deg (BBO Sellmeier); it was wrongly 26.5 deg.
+
+## Buildability (physical, not a separate score)
+- Mount bodies block beams: every mirror has a 38 mm square plate 0.5-12 mm behind the optic and a 1/2" post
+  from the table up to the plate; periscope mirrors have plates; the lens sits in a 2" mount ring. A beam that
+  passes behind or under another optic's mount is absorbed (logged as "mount of ..."), as on a real table.
+- Polarisation is tracked through every reflection (perfect-conductor rule). The type-I SFG cross term scales
+  with cos^2 of each beam's angle from horizontal, so out-of-plane routing (e.g. a 90-degree image-rotating
+  turn) kills the signal. Gently sloped paths rotate it only slightly, as in reality. The reward (eta) is unchanged.
+- The reference layout had to change: the probe now hits the lens at z = 592 and the pump at 608, so the probe
+  passes the pump's last mirror on its reflecting side, and the pump enters the retro 15 mm off the apex
+  (30 mm separation) so the return clears the pick-off mirror's mount.
 - ~~C_min = cheapest stage + correct-cut BBO + 4 mirrors = EUR 2200 (same for every seed).~~ Superseded: see "Richer catalogue" below.
 - Separate random streams: lab (`gss-lab-<seed>`), per-mount tilt errors (`gss-mount-<seed>-<part>`), placement errors and measurement noise.
 
@@ -124,3 +148,12 @@ Takes precedence over the L1 catalogue, signal model and C_min above.
 - **Tracer:** the lens → focus segment is now recorded, so the IR card sees the converging beam near the sample (L1 too).
 - **Camera field of view** widened from ±2.5 to ±4 mm (both levels): the ±0.5° sample-mount yaw error, magnified by the 45° tilt, put L2 spots ~3 mm off-centre.
 - **Expert L2 layout:** last mirror of each arm 300–580 mm from the sample on its lens axis (long lever arm), the mirror before it turns the beam onto that axis; pre-aligns at a nearer point when the first IR reading is > 20 mm off. Scan kernel and fine-scan window scale with the window stated in the manual.
+
+## Merge of the richer catalogue / L2 with PR #8 (de-hint, buildability)
+
+PR #8 landed on main first; both are combined:
+- **Kept from PR #8:** mount plates, posts and lens-mount rings block beams; polarisation tracking (the BBO cross term is now multiplied by both beams' horizontal-field fraction `pol`); unlabelled camera spots (sorted by position; the expert identifies the OPA spot by blocking the 800 nm arm); split paths inside the laser housing in the table manual (`Lab.opa_extra_path = split_opa + opa_path - split_800`); specs-only datasheets and manuals.
+- **Part IDs follow PR #8's naming by cut angle**, with Sellmeier type-I angles for the new cuts: BBO-T292 (800 SHG), BBO-T236 (800+1300), BBO-T341 (800+600), BBO-T408 (800+450). The fast InGaAs photodiode keeps the ID PD-FAST; PD-SI is added. My earlier 37.0 / 47.5 deg angles were wrong.
+- **Datasheets de-hinted:** no signal sizes or explanations; band gaps, emission bands, passbands, spectral ranges and noise only. The L2 manual no longer states the broadened window (~186 fs) or the reduced peak; it states the geometry and the requirement. The OPA manual states the visible extension adds ~580 mm and gives the calibrated internal path for the current configuration.
+- **Minimum mirrors:** PR #8 found 2 suffice in L1; by the same argument L2 needs 1 (OPA beam straight into one lens, the 800 nm return from the retroreflector turned once onto the other). `N_MIN_MIRRORS = {1: 2, 2: 1}`. C_min: L1 €7450 / €950 / €1700 (1300 / 600 / 450 nm); L2 €7300 / €1550 / €1550.
+- The alignment camera's field of view is ±4 mm (was ±2.5 in PR #8's manual text, which now reads the constant).

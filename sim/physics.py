@@ -42,8 +42,8 @@ def spatial_overlap(a: BeamResult, b: BeamResult, level: int = 1) -> float:
 
 
 def delay_fs(b8: BeamResult, bo: BeamResult, opa_path: float) -> float | None:
-    """Delta t = t_800 - t_opa at the sample, fs. Both ports are path-matched at the amplifier
-    split except for the OPA's internal path, which delays the OPA pulse."""
+    """Delta t = t_800 - t_opa at the sample, fs. `opa_path` is the OPA pulse's extra path before its
+    port relative to the 800 nm pulse's (split-to-OPA + OPA internal - split-to-800-port)."""
     if not (b8.at_sample and bo.at_sample):
         return None
     return (b8.opl - (bo.opl + opa_path)) / K.C_MM_PER_FS
@@ -189,6 +189,8 @@ def nonlinear_signal(d: dict, f: dict | None, lam_o: float, b8: BeamResult | Non
     cross = 0.0
     if T8 > 0 and To > 0:
         cross = T8 * To * spatial_overlap(b8, bo, level) * temporal_factor(delay_fs(b8, bo, opa_path), level)
+        if d["model"] == "bbo":  # type-I SFG uses the field components along the crystal's horizontal o-axis
+            cross *= b8.pol * bo.pol
     S, sigma, _ = mean_and_sigma(d, f, lam_o, T8, To, cross, t_int, level)
     v = S + rng.gauss(0.0, sigma)
     if d["readout"] == "camera" and S > K.SIG_CAM_SAT:
@@ -247,7 +249,7 @@ def camera_sample(beams: dict[str, BeamResult | None], lams: dict[str, float], r
             q = val / K.CAM_PIXEL + rng.gauss(0.0, K.CAM_NOISE_PX)
             return round(round(q, 1) * K.CAM_PIXEL * 1000.0, 2)
 
-        r = {"beam": arm, "h_um": px(h), "v_um": px(v)}
+        r = {"h_um": px(h), "v_um": px(v)}
         if stretch == 1.0:
             r["radius_um"] = round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1)
         else:
@@ -255,7 +257,7 @@ def camera_sample(beams: dict[str, BeamResult | None], lams: dict[str, float], r
             r["radius_v_um"] = round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1)
         r["relative_power"] = _power(b.T, rng)
         spots.append(r)
-    return spots
+    return sorted(spots, key=lambda d: (d["h_um"], d["v_um"]))  # unlabelled: a camera can't tell the beams apart
 
 
 def camera_lens(beams: dict[str, BeamResult | None], lams: dict[str, float], range_nm: tuple[float, float],
@@ -265,7 +267,7 @@ def camera_lens(beams: dict[str, BeamResult | None], lams: dict[str, float], ran
         if b is None or not b.at_sample or b.T < 0.01 or not sees(range_nm, lams[arm]):
             continue
         h, v = b.lens_hit
-        spots.append({"beam": arm, **({"lens": b.lens_role[-1]} if b.lens_role and b.lens_role != "lens" else {}),
+        spots.append({**({"lens": b.lens_role[-1]} if b.lens_role and b.lens_role != "lens" else {}),
                       "h_mm": round(h + rng.gauss(0.0, 0.03), 2),
                       "v_mm": round(v + rng.gauss(0.0, 0.03), 2), "relative_power": _power(b.T, rng)})
-    return spots
+    return sorted(spots, key=lambda d: (d.get("lens", ""), d["h_mm"], d["v_mm"]))

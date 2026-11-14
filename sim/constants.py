@@ -55,6 +55,12 @@ LENS_R = 12.7
 LENS_CLIP_START = 10.5
 STAGE_APEX_OFFSET = 90.0  # apex is 90 mm beyond the stage reference point at position 0
 RETRO_FRONT = 40.0  # entrance face is 40 mm in front of the apex
+# Mount bodies (they block beams): kinematic mount plate behind each 1" optic, posts, lens-mount ring
+MOUNT_HALF = 19.0  # 38 mm square plate around the optic
+MOUNT_DEPTH = (0.5, 12.0)  # plate occupies this range behind the reflecting surface
+POST_R = 6.35  # 1/2" post
+POST_BEHIND = 6.0  # post axis sits this far behind the reflecting surface
+LENS_MOUNT_R = 25.4  # 2" lens-mount ring around the 1" lens
 
 # Episode
 BUDGET_S = 4 * 3600.0

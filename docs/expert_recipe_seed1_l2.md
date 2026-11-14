@@ -2,9 +2,9 @@
 
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
-- OPA wavelength 1300 nm. Parts bought: DL-C25 delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7750)
-- Lab time: 152.7 min of 240 (63.6%), 115 tool calls
-- Result: eta = 0.9815, R = 0.8961, O = 0.9931, |dt| = 20.2 fs
+- OPA wavelength 1300 nm. Parts bought: DL-C25 delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7300)
+- Lab time: 152.0 min of 240 (63.3%), 115 tool calls
+- Result: eta = 0.9969, R = 0.9070, O = 0.9972, |dt| = 3.2 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|
@@ -54,72 +54,72 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 43 | 72.6 | knob | `{"part": "mirror-2", "axis": "pitch", "delta_mrad": 2.5912}` |
 | 44 | 73.1 | ir_card | `{"x": 1270.7106781186546, "z": 670.7106781186548, "height": 120.0}` |
 | 45 | 73.3 | unblock | `{"arm": "800nm"}` |
-| 46 | 78.3 | place | `{"part": "stage", "x": 891.6828996322961, "z": 306.0, "height": 120.0, "yaw_deg": 180.0}` |
-| 47 | 78.8 | ir_card | `{"x": 1553.5533905932737, "z": 318.0, "height": 120.0}` |
-| 48 | 83.8 | place | `{"part": "mirror-3", "x": 1553.5533905932737, "z": 319.9, "height": 119.3, "yaw_deg": 225.0}` |
-| 49 | 84.3 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
-| 50 | 84.8 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
-| 51 | 85.3 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": 40.8422}` |
-| 52 | 85.8 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
-| 53 | 86.3 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": 40.8422}` |
-| 54 | 86.8 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
+| 46 | 78.3 | place | `{"part": "stage", "x": 873.6118318204308, "z": 309.0, "height": 120.0, "yaw_deg": 180.0}` |
+| 47 | 78.8 | ir_card | `{"x": 1546.4823227814081, "z": 324.0, "height": 120.0}` |
+| 48 | 83.8 | place | `{"part": "mirror-3", "x": 1546.4823227814081, "z": 325.9, "height": 119.3, "yaw_deg": 225.0}` |
+| 49 | 84.3 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
+| 50 | 84.8 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
+| 51 | 85.3 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": 41.4466}` |
+| 52 | 85.8 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
+| 53 | 86.3 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": 41.4466}` |
+| 54 | 86.8 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
 | 55 | 87.3 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": -20.0}` |
 | 56 | 87.8 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": -20.0}` |
-| 57 | 88.3 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
-| 58 | 88.8 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": -17.8145}` |
-| 59 | 89.3 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": -15.4902}` |
-| 60 | 89.8 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
-| 61 | 90.3 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": 2.3908}` |
-| 62 | 90.8 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": -4.5823}` |
-| 63 | 91.3 | ir_card | `{"x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0}` |
-| 64 | 96.3 | place | `{"part": "mirror-4", "x": 1553.5533905932737, "z": 246.44660940672628, "height": 120.0, "yaw_deg": 112.5}` |
+| 57 | 88.3 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
+| 58 | 88.8 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": -18.8026}` |
+| 59 | 89.3 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": -15.7699}` |
+| 60 | 89.8 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
+| 61 | 90.3 | knob | `{"part": "mirror-3", "axis": "yaw", "delta_mrad": 3.1506}` |
+| 62 | 90.8 | knob | `{"part": "mirror-3", "axis": "pitch", "delta_mrad": -4.5996}` |
+| 63 | 91.3 | ir_card | `{"x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0}` |
+| 64 | 96.3 | place | `{"part": "mirror-4", "x": 1546.4823227814081, "z": 253.51767721859176, "height": 120.0, "yaw_deg": 112.5}` |
 | 65 | 96.9 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
 | 66 | 97.4 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 67 | 97.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 7.5}` |
+| 67 | 97.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 7.6923}` |
 | 68 | 98.4 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 69 | 98.9 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 7.5}` |
+| 69 | 98.9 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 7.6923}` |
 | 70 | 99.4 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 71 | 99.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 10.6848}` |
-| 72 | 100.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -6.956}` |
+| 71 | 99.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 10.9505}` |
+| 72 | 100.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -7.3816}` |
 | 73 | 100.9 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 74 | 101.4 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.7422}` |
-| 75 | 101.9 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.2337}` |
+| 74 | 101.4 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.7611}` |
+| 75 | 101.9 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.2437}` |
 | 76 | 102.4 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 77 | 102.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.6506}` |
-| 78 | 103.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.4811}` |
+| 77 | 102.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.7526}` |
+| 78 | 103.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.5003}` |
 | 79 | 103.9 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 80 | 104.5 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -0.9131}` |
-| 81 | 105.0 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.108}` |
+| 80 | 104.5 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -1.0219}` |
+| 81 | 105.0 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.1112}` |
 | 82 | 105.5 | ir_card | `{"x": 1270.7106781186546, "z": 529.2893218813452, "height": 120.0}` |
-| 83 | 105.7 | view_camera | `{"plane": "sample"}` |
-| 84 | 105.9 | view_camera | `{"plane": "sample"}` |
-| 85 | 106.5 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.3}` |
-| 86 | 106.7 | view_camera | `{"plane": "sample"}` |
-| 87 | 106.9 | view_camera | `{"plane": "sample"}` |
-| 88 | 107.5 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.3}` |
-| 89 | 107.7 | view_camera | `{"plane": "sample"}` |
-| 90 | 107.9 | view_camera | `{"plane": "sample"}` |
-| 91 | 108.5 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -0.4532}` |
-| 92 | 109.0 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.0067}` |
-| 93 | 109.3 | view_camera | `{"plane": "sample"}` |
-| 94 | 109.4 | view_camera | `{"plane": "sample"}` |
-| 95 | 110.0 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -0.0074}` |
-| 96 | 110.5 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.0288}` |
-| 97 | 110.8 | view_camera | `{"plane": "sample"}` |
-| 98 | 110.9 | view_camera | `{"plane": "sample"}` |
-| 99 | 113.9 | measure_path | `{"arm": "800nm"}` |
-| 100 | 116.9 | measure_path | `{"arm": "opa"}` |
-| 101 | 117.0 | status | `{}` |
-| 102 | 145.3 | scan | `{"start_mm": 10.1, "end_mm": 22.1, "step_mm": 0.005, "t_int": 0.4}` |
-| 103 | 149.6 | scan | `{"start_mm": 15.3285, "end_mm": 15.5515, "step_mm": 0.002, "t_int": 2.0}` |
-| 104 | 149.7 | move_stage | `{"position_mm": 15.43691}` |
-| 105 | 149.9 | view_camera | `{"plane": "sample"}` |
-| 106 | 150.1 | view_camera | `{"plane": "sample"}` |
-| 107 | 150.7 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.0158}` |
-| 108 | 150.9 | view_camera | `{"plane": "sample"}` |
-| 109 | 151.1 | view_camera | `{"plane": "sample"}` |
-| 110 | 151.7 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -0.0229}` |
-| 111 | 152.2 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.0256}` |
-| 112 | 152.4 | view_camera | `{"plane": "sample"}` |
-| 113 | 152.6 | view_camera | `{"plane": "sample"}` |
-| 114 | 152.7 | submit | `{}` |
+| 83 | 105.6 | block | `{"arm": "800nm"}` |
+| 84 | 105.8 | view_camera | `{"plane": "sample"}` |
+| 85 | 105.9 | unblock | `{"arm": "800nm"}` |
+| 86 | 106.0 | view_camera | `{"plane": "sample"}` |
+| 87 | 106.2 | view_camera | `{"plane": "sample"}` |
+| 88 | 106.8 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.3}` |
+| 89 | 107.1 | view_camera | `{"plane": "sample"}` |
+| 90 | 107.2 | view_camera | `{"plane": "sample"}` |
+| 91 | 107.8 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.3}` |
+| 92 | 108.1 | view_camera | `{"plane": "sample"}` |
+| 93 | 108.2 | view_camera | `{"plane": "sample"}` |
+| 94 | 108.8 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -0.5351}` |
+| 95 | 109.3 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.0537}` |
+| 96 | 109.6 | view_camera | `{"plane": "sample"}` |
+| 97 | 109.8 | view_camera | `{"plane": "sample"}` |
+| 98 | 110.4 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.0683}` |
+| 99 | 110.9 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.0429}` |
+| 100 | 111.1 | view_camera | `{"plane": "sample"}` |
+| 101 | 111.3 | view_camera | `{"plane": "sample"}` |
+| 102 | 111.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -0.0099}` |
+| 103 | 112.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.0106}` |
+| 104 | 112.6 | view_camera | `{"plane": "sample"}` |
+| 105 | 112.8 | view_camera | `{"plane": "sample"}` |
+| 106 | 115.8 | measure_path | `{"arm": "800nm"}` |
+| 107 | 118.8 | measure_path | `{"arm": "opa"}` |
+| 108 | 118.9 | status | `{}` |
+| 109 | 147.1 | scan | `{"start_mm": 8.6, "end_mm": 20.6, "step_mm": 0.005, "t_int": 0.4}` |
+| 110 | 151.5 | scan | `{"start_mm": 15.3185, "end_mm": 15.5415, "step_mm": 0.002, "t_int": 2.0}` |
+| 111 | 151.5 | move_stage | `{"position_mm": 15.43749}` |
+| 112 | 151.7 | view_camera | `{"plane": "sample"}` |
+| 113 | 151.9 | view_camera | `{"plane": "sample"}` |
+| 114 | 152.0 | submit | `{}` |

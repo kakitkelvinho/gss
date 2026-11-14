@@ -59,7 +59,7 @@ The beams must cross at a full angle of 90° at the sample (each 45° from the n
 - Short lever arms near the two lenses, and a ±0.5° sample-mount yaw error magnified by the tilt, make
   beam steering harder.
 
-Scripted expert, seeds 1–20: L1 R = 0.91–0.92, L2 R = 0.89–0.92 (η ≥ 0.97), both within 65% of the budget.
+Scripted expert, seeds 1–10 over MCP: L1 R = 0.91–0.92, L2 R = 0.89–0.92, both within 65% of the budget.
 
 ## Why it's hard (and fair)
 
@@ -82,7 +82,7 @@ R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}} - 0.
 - $O$ is the normalised overlap of the two focal spots.
 - $\Delta t$ is the true delay error, and $\tau_c \approx 70$ fs.
 - $T$ is the clipping transmission of each arm.
-- $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength (€7,750 at 1300 nm, €1,250 at 600 nm, €2,000 at 450 nm; brute-forced from the catalogue with the detector model), and $C_\text{cap}$ = €30k.
+- $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength and level (L1: €7,450 at 1300 nm, €950 at 600 nm, €1,700 at 450 nm; L2: €7,300 / €1,550 / €1,550; brute-forced from the catalogue with the detector model: stage, the minimum mirrors (2 in L1, 1 in L2), diagnostic + filter, and a camera that sees 1300 nm), and $C_\text{cap}$ = €30k.
 - $t_\text{lab}$ is the lab time used: every action takes physical time, so brute-force iteration (swarm-style knob searches, blind scans) is penalised softly here and hard-capped by the 4 h budget.
 
 Diagnostics go to `reward.json` but are not part of the reward: O, |Δt|, T per arm, design
@@ -120,7 +120,7 @@ Without Docker:
 
 ```bash
 uv sync
-uv run pytest                          # 72 tests: physics, routes, L2, ledger, exploits, MCP server, Harbor flow
+uv run pytest                          # 76 tests: physics, routes, L2, ledger, exploits, MCP server, Harbor flow
 uv run python solution/expert.py 1 2 3 # in-process expert on seeds 1-3
 uv run python scripts/baselines.py     # reference / do-nothing / stop-early over MCP -> docs/results.md
 uv run python scripts/baselines.py --level 2   # same for L2 -> docs/results_l2.md
@@ -135,12 +135,17 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 
 | level | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|---|
-| 1 | reference (scripted expert) | 0.917 | 0.912 | 62.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | reference (scripted expert) | 0.912 | 0.906 | 63.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 1 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| 1 | stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 46.7% | R < 0.05 ✅ |
-| 2 | reference (scripted expert) | 0.912 | 0.896 | 63.8% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.6% | R < 0.05 ✅ |
+| 2 | reference (scripted expert) | 0.910 | 0.891 | 63.3% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| 2 | stop-early | 0.000 | 0.000 | 47.5% | R < 0.05 ✅ |
+| 2 | stop-early | 0.000 | 0.000 | 47.0% | R < 0.05 ✅ |
+
+Blind playthroughs by fresh Claude agents with no access to the code ([docs/playthroughs.md](docs/playthroughs.md)):
+on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
+(R ≈ 0.93); after the de-hint and buildability changes, 2 runs scored R = 0.88 and 0.72 (slower, with partial
+failures such as clipping at the lens edge and timing off by backlash).
 
 Frontier-agent runs (OpenCode): *TODO, these need inference credits.* After the runs,
 `python scripts/summarise_jobs.py jobs/` writes `jobs/summary.md` (scores plus a failure diagnosis per run).

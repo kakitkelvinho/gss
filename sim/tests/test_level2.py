@@ -81,8 +81,9 @@ def test_same_lens_is_not_the_required_geometry():
 
 def test_spot_is_stretched_on_the_tilted_sample():
     ep = perfect_l2(2)
-    s = {x["beam"]: x for x in ep.call("view_camera", {"plane": "sample"})["spots"]}
-    assert s["800nm"]["radius_h_um"] / s["800nm"]["radius_v_um"] == pytest.approx(math.sqrt(2), rel=0.1)
+    ep.call("block", {"arm": "opa"})
+    (s,) = ep.call("view_camera", {"plane": "sample"})["spots"]
+    assert s["radius_h_um"] / s["radius_v_um"] == pytest.approx(math.sqrt(2), rel=0.1)
     # a horizontal angle error of the 800 nm beam moves its spot along h by ~ f theta / cos45
     m = ep.inv["mirror-4"]["part"]
     m.knob_yaw += 0.0005
@@ -94,19 +95,21 @@ def test_spot_is_stretched_on_the_tilted_sample():
 def test_l2_routes():
     def viable(d, f, lam):
         return P.detection_viable(cat.PARTS[d], None if f is None else cat.filter_spec(f), lam, 2)
-    assert not viable("BBO-SFG-1300", "F-BP495", 1300.0)  # no phase matching at 90 deg
+    assert not viable("BBO-T236", "F-BP495", 1300.0)  # no phase matching at 90 deg
     assert viable("GAP-TPA", None, 1300.0)
     assert not viable("GAP-TPA", None, 600.0)  # reduced peak vs two single-beam TPA backgrounds
     assert viable("GAN-1", "F-BP550", 600.0)
     assert viable("GAN-1", "F-VIS495", 450.0)
-    assert RW.c_min(1300.0, 2) == 7750 and RW.c_min(600.0, 2) == 2000 and RW.c_min(450.0, 2) == 2000
+    # one mirror suffices at 90 deg (OPA straight into one lens, the 800 nm return turned onto the other)
+    assert RW.c_min(1300.0, 2) == 400 + 150 + 250 + 6500
+    assert RW.c_min(600.0, 2) == RW.c_min(450.0, 2) == 400 + 150 + 800 + 200
 
 
 def test_l2_manuals():
     ep = Episode(1, level=2)
     m = ep.call("read_manual", {"device": "sample_mount"})["manual"]
-    assert "90-degree crossing" in m and f"{K.TAU_C_L2:.0f} fs" in m
-    assert "phase-matched" in ep.call("read_manual", {"device": "nonlinear"})["manual"]
+    assert "90-degree crossing" in m and "its own lens" in m
+    assert "fs" not in m  # specs only: the broadened window is for the agent to work out
     with pytest.raises(ValueError):
         Episode(1, level=3)
 

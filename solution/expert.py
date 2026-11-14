@@ -4,12 +4,14 @@ so the same code runs in-process (`sim.Episode`) and over MCP (step 3).
 Every per-seed fact comes from manuals and measurements (tool outputs), never from the sim's state.
 Layout geometry (mm; x along the table, z across, height = y; yaw from +x toward +z):
 
-  opa:   port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 608)
-         -> lens at (1300, 600, h_p), hitting it at z = 608
-  800nm: port -> delay stage (yaw 180, apex line z_p + 12) -> returns +x at z_p + 24
-         -> M_q1 (1500, z_p + 24) -> M_q2 (1500, 592) -> lens, hitting it at z = 592
-  The stage is placed so time zero sits near mid-travel:
-  apex A_x = (4518 - z_p - opa_total) / 2, reference point P_x = A_x + 90 + x_mid.
+Level 1:
+  opa:   port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 592)
+         -> lens at (1300, 600, h_p), hitting it at z = 592
+  800nm: port -> delay stage (yaw 180, apex line z_p + 15) -> returns +x at z_p + 30
+         -> M_q1 (1500, z_p + 30) -> M_q2 (1500, 608) -> lens, hitting it at z = 608
+  The OPA beam passes M_q2 on its reflecting side, clear of the mount plate behind it.
+  The stage is placed so time zero sits near mid-travel.
+Level 2 (90 deg crossing): see layout_l2.
 """
 
 from __future__ import annotations
@@ -20,9 +22,9 @@ import statistics
 from typing import Callable
 
 LENS = (1300.0, 600.0)
-P800_LENS_Z, OPA_LENS_Z = 592.0, 608.0
+P800_LENS_Z, OPA_LENS_Z = 608.0, 592.0
 X_PERI, X_P, X_Q = 2050.0, 1700.0, 1500.0
-STAGE_OFF = 12.0
+STAGE_OFF = 15.0
 
 
 class EpisodeOver(Exception):
@@ -57,15 +59,21 @@ class Expert:
         self.c("read_manual", device="delay_stage")
         sm = self.c("read_manual", device="sample_mount")["manual"]
         self.level = 2 if "90-degree crossing" in sm else 1
-        m = re.search(r"1/e half-width of ~(\d+) fs", sm)
-        tau_fs = float(m.group(1)) if m else 70.0
+        # 1/e half-width of the cross-correlation: sqrt(100^2 + 60^2) / (2 sqrt(ln 2)) = 70 fs; at 90 deg
+        # crossing the arrival-time smear across the ~50 um spot (stretched by 1/cos45) broadens it to
+        # sqrt(70^2 + (2 a sin45 / c)^2) with a = sqrt2 * 52 um / 2, i.e. ~186 fs.
+        tau_fs = 186.0 if self.level == 2 else 70.0
         self.tau_stage = tau_fs * 2.99792458e-4 / 2.0  # 1/e half-width of the peak in stage travel
         ports = {}
         for arm, key in (("800nm", "800 nm output port"), ("opa", "OPA output port")):
             m = re.search(key + r".*?:\s*x=([\d.]+),\s*z=([\d.]+),\s*height=([\d.]+)", t)
             ports[arm] = tuple(float(v) for v in m.groups())
         self.lam_o = float(re.search(r"OPA output port \(arm 'opa'; OPA, ([\d.]+) nm", t).group(1))
-        self.L_opa = float(re.search(r"this unit[^:]*:\s*([\d.]+)\s*mm", o).group(1))
+        opa_internal = float(re.search(r"this unit:\s*([\d.]+)\s*mm", o).group(1))
+        s_800 = float(re.search(r"800 nm port \(([\d.]+) mm of path from the split\)", t).group(1))
+        s_opa = float(re.search(r"OPA\s+input \(([\d.]+) mm of path from the split\)", t).group(1))
+        # extra path the OPA pulse has before its port, relative to the 800 nm pulse
+        self.L_opa = s_opa + opa_internal - s_800
         _, self.z_p, self.h_p = ports["800nm"]
         _, self.z_o, self.h_o = ports["opa"]
         self.port_x = ports["800nm"][0]
@@ -168,13 +176,28 @@ class Expert:
         return parts
 
     # -- camera overlap ----------------------------------------------------------------------
+    def find_opa_spot(self):
+        """The camera doesn't label beams: block the 800 nm arm to see where the OPA beam focuses. Only
+        the 800 nm beam is steered afterwards, so the OPA spot stays put."""
+        self.c("block", arm="800nm")
+        spots = self.c("view_camera", plane="sample")["spots"]
+        self.c("unblock", arm="800nm")
+        self.opa_spot = (spots[0]["h_um"], spots[0]["v_um"]) if spots else None
+
     def cam_diff(self, frames=2):
         acc = []
         for _ in range(frames):
-            spots = {s["beam"]: s for s in self.c("view_camera", plane="sample")["spots"]}
-            if "800nm" not in spots or "opa" not in spots:
+            spots = self.c("view_camera", plane="sample")["spots"]
+            if len(spots) < 2 or self.opa_spot is None:
                 return None
-            acc.append((spots["800nm"]["h_um"] - spots["opa"]["h_um"], spots["800nm"]["v_um"] - spots["opa"]["v_um"]))
+            pts = [(s["h_um"], s["v_um"]) for s in spots[:2]]
+            if math.dist(*pts) < 5.0:
+                # on top of each other: which is which is ambiguous and doesn't matter
+                acc.append((0.0, 0.0))
+                continue
+            pts.sort(key=lambda p: math.dist(p, self.opa_spot))
+            opa, b8 = pts
+            acc.append((b8[0] - opa[0], b8[1] - opa[1]))
         return (statistics.fmean(a[0] for a in acc), statistics.fmean(a[1] for a in acc))
 
     # -- the procedure -----------------------------------------------------------------------
@@ -197,6 +220,7 @@ class Expert:
             self.layout_l1(x_mid)
 
         # Spatial overlap at the focus: steer the 800 nm beam (mirror-4) onto the OPA beam
+        self.find_opa_spot()
         ok, self.J_cam = self.steer("mirror-4", self.cam_diff, 3.0, 0.3)
         if not ok:
             self.note("camera overlap did not converge")
@@ -269,10 +293,13 @@ class Expert:
         self.c("place", part="mirror-2", x=X_P, z=OPA_LENS_Z, height=hp, yaw_deg=135.0)
         self.aim_at_point("mirror-2", "opa", (X_P, OPA_LENS_Z, hp), (LENS[0], OPA_LENS_Z, hp), "x")
 
-        # Pump arm: stage placed so time zero is near mid-travel (the stage itself stays at 0)
+        # 800 nm arm: stage placed so time zero is near mid-travel (the stage itself stays at 0)
         opa_total = self.port_x - X_PERI + abs(hp - ho) + (X_PERI - X_P) + abs(zo - OPA_LENS_Z) \
             + (X_P - LENS[0]) + self.L_opa
-        a_x = (4518.0 - zp - opa_total) / 2.0
+        # 800 nm path to the lens = (port - entrance) + 80 inside the retro + (M_q1 - entrance)
+        #   + (M_q2 - M_q1 in z) + (M_q2 - lens); retro entrance face 40 mm before the apex A_x
+        p800_const = (self.port_x - 40.0) + 80.0 + (X_Q - 40.0) + (X_Q - LENS[0])
+        a_x = (p800_const + P800_LENS_Z - 2 * STAGE_OFF - zp - opa_total) / 2.0
         p_x = a_x + 90.0 + x_mid
         self.note(f"OPA arm table+internal path {opa_total:.0f} mm, stage apex {a_x:.0f}, reference x {p_x:.0f}")
         self.c("unblock", arm="800nm")
