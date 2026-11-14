@@ -17,30 +17,62 @@ function at(p) { const q = project(p); return `${q.x.toFixed(1)},${q.y.toFixed(1
 function partSvg(part) {
   const p = project(part.pos), id = esc(part.id), kind = part.kind;
   const tableY = project({ x: part.pos.x, z: part.pos.z, h: 0 }).y - p.y;
-  const base = `<ellipse cx="0" cy="${tableY.toFixed(1)}" rx="18" ry="5" fill="#0d2228"/><path d="M-4 8 L-4 ${tableY - 2} H4 L4 8 Z" fill="#10242b"/><rect x="-10" y="5" width="20" height="10" fill="#122832"/>`;
+  const base = `<ellipse cx="0" cy="${tableY.toFixed(1)}" rx="17" ry="6" fill="#172630" stroke="#c7d0cb" stroke-width="1.5"/>
+    <path d="M-4 10 V${(tableY - 2).toFixed(1)} H4 V10 Z" fill="#27353e" stroke="#aab9bc" stroke-width="1"/>
+    <ellipse cx="0" cy="${(tableY - 2).toFixed(1)}" rx="7" ry="3" fill="#34464e"/>
+    <rect x="-8" y="6" width="16" height="8" fill="#25343c" stroke="#aebfc1" stroke-width="1"/>`;
   let head = '';
-  if (kind === 'mirror') head = `<g transform="rotate(${(part.yaw_deg || 0) * .35})"><path d="M-19 -16 L12 -16 L20 -9 L20 15 L-19 15 Z" fill="#10242b"/><circle cx="-2" cy="-1" r="12" fill="#deded2" stroke="#10242b" stroke-width="2"/><path d="M-11 -6 Q-2 -12 7 -6" stroke="#8ab7bf" stroke-width="2" fill="none"/><circle cx="19" cy="-12" r="4" fill="#10242b"/><circle cx="19" cy="11" r="4" fill="#10242b"/></g>`;
-  if (kind === 'stage') head = `<g><path d="M-38 -10 H38 V13 H-38 Z" fill="#10242b"/><path d="M-34 -5 H34 M-34 7 H34" stroke="#d8ded6" stroke-width="2"/><rect x="-9" y="-16" width="27" height="22" fill="#224657" stroke="#d8ded6" stroke-width="2"/><path d="M-3 -16 L5 -27 L13 -16" stroke="#e8e9db" stroke-width="3" fill="none"/></g>`;
-  if (kind === 'periscope') head = `<g><rect x="-8" y="-35" width="16" height="44" fill="#10242b"/><ellipse cx="-2" cy="-32" rx="12" ry="7" fill="#e3e6dd" stroke="#10242b" stroke-width="2"/><ellipse cx="-2" cy="3" rx="12" ry="7" fill="#e3e6dd" stroke="#10242b" stroke-width="2"/><circle cx="12" cy="-16" r="4" fill="#10242b"/></g>`;
+  if (kind === 'mirror') head = `<g transform="rotate(${(part.yaw_deg || 0) * .35})">
+    <path d="M-17 -15 L10 -16 L17 -10 V13 L-17 14 Z" fill="#293842" stroke="#d5dcd8" stroke-width="1.5"/>
+    <circle cx="-2" cy="-1" r="12" fill="#d5e5e4" stroke="#eef0e8" stroke-width="2.5"/>
+    <path d="M-9 -7 Q-2 -11 5 -7" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+    <path d="M17 -11 H24 M17 10 H24" stroke="#b9c8c9" stroke-width="3"/>
+    <circle cx="25" cy="-11" r="3" fill="#e8ede8" stroke="#26343c"/><circle cx="25" cy="10" r="3" fill="#e8ede8" stroke="#26343c"/>
+  </g>`;
+  if (kind === 'stage') head = `<g>
+    <path d="M-33 8 L32 8 L39 15 L-26 15 Z" fill="#1e2e38" stroke="#c4ceca" stroke-width="1.5"/>
+    <path d="M-35 -10 L28 -10 L35 -4 L-28 -4 Z" fill="#c9d3d0" stroke="#f3f3e9" stroke-width="1.5"/>
+    <path d="M-28 -4 H35 V8 H-28 Z" fill="#34454e" stroke="#c4ceca" stroke-width="1.5"/>
+    <path d="M-22 1 H29 M-22 5 H29" stroke="#94a8ac" stroke-width="1"/>
+    <circle cx="-35" cy="4" r="5" fill="#d6ddda" stroke="#33424b" stroke-width="2"/>
+    <rect x="-8" y="-20" width="20" height="21" fill="#303f48" stroke="#d9e0dc" stroke-width="1.5"/>
+    <circle cx="2" cy="-9" r="6" fill="#dce8e5" stroke="#778d92" stroke-width="2"/>
+  </g>`;
+  if (kind === 'periscope') head = `<g>
+    <rect x="-8" y="-35" width="16" height="42" fill="#283941" stroke="#c9d4d2" stroke-width="1.5"/>
+    <path d="M-13 -38 L4 -38 L13 -32 L-4 -32 Z" fill="#e6eae3" stroke="#f8f8ef" stroke-width="1.5"/>
+    <ellipse cx="-2" cy="-31" rx="11" ry="7" fill="#d4e5e4" stroke="#eff2eb" stroke-width="2"/>
+    <ellipse cx="-2" cy="3" rx="11" ry="7" fill="#d4e5e4" stroke="#eff2eb" stroke-width="2"/>
+    <path d="M9 -17 H17" stroke="#b9c6c6" stroke-width="3"/><circle cx="18" cy="-17" r="3" fill="#e9ede7" stroke="#293841"/>
+  </g>`;
   if (kind === 'sample') {
-    const secondLens = (part.lenses || []).length > 1 ? `<path d="M26 -17 V7" stroke="#10242b" stroke-width="5"/><ellipse cx="26" cy="-15" rx="7" ry="15" fill="#afd7d2" stroke="#10242b" stroke-width="2"/>` : '';
-    head = `<g><path d="M-34 11 H34" stroke="#10242b" stroke-width="6"/><path d="M-8 -17 V7" stroke="#10242b" stroke-width="5"/><ellipse cx="-8" cy="-15" rx="7" ry="15" fill="#afd7d2" stroke="#10242b" stroke-width="2"/>${secondLens}<rect x="8" y="-11" width="11" height="18" fill="#e78134" stroke="#10242b" stroke-width="2"/></g>`;
+    const secondLens = (part.lenses || []).length > 1 ? `<path d="M26 -17 V7" stroke="#b7c6c6" stroke-width="5"/><ellipse cx="26" cy="-15" rx="7" ry="15" fill="#afdbdd" stroke="#e8f3ef" stroke-width="2"/>` : '';
+    head = `<g><path d="M-34 11 H34" stroke="#d4dcda" stroke-width="5"/><path d="M-8 -17 V7" stroke="#c3d1d0" stroke-width="5"/><ellipse cx="-8" cy="-15" rx="7" ry="15" fill="#afdbdd" stroke="#f2f5ed" stroke-width="2"/>${secondLens}<rect x="8" y="-11" width="11" height="18" fill="#d6ad70" stroke="#f2e4ce" stroke-width="2"/></g>`;
   }
   return `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})" aria-label="${id} ${kind}">${base}${head}<title>${id}</title></g>`;
 }
-function housingSvg(x, z, label, color) {
-  const p = project({ x, z, h: 140 });
-  return `<g transform="translate(${p.x} ${p.y})"><path d="M-66 -26 L-18 -50 L70 -18 L20 6 Z" fill="#e1e1d6" stroke="#f7f5e9" stroke-width="2"/><path d="M-66 -26 L20 6 L20 42 L-66 10 Z" fill="#aeb7b0"/><path d="M20 6 L70 -18 L70 17 L20 42 Z" fill="#85989a"/><path d="M-35 0 L-35 99 M40 23 L40 111" stroke="#465963" stroke-width="9"/><ellipse cx="-36" cy="99" rx="22" ry="7" fill="#2a3d45"/><ellipse cx="40" cy="111" rx="22" ry="7" fill="#2a3d45"/><rect x="-62" y="-15" width="28" height="14" rx="2" fill="${color}"/><circle cx="-61" cy="-8" r="7" fill="${color}" stroke="#ffede1" stroke-width="1"/><text class="label tag" x="-4" y="-21" text-anchor="middle">${label}</text></g>`;
+function housingSvg(port, label, color) {
+  const pos = port?.pos || { x: 2250, z: label === 'OPA' ? 935 : 294, h: label === 'OPA' ? 158 : 120 };
+  const p = project(pos), tableY = project({ x: pos.x, z: pos.z, h: 0 }).y - p.y;
+  return `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})">
+    <path d="M-8 -27 L38 -50 L119 -22 L73 1 Z" fill="#f2f1e9" stroke="#ffffff" stroke-width="1.5"/>
+    <path d="M-8 -27 L73 1 V27 L-8 -1 Z" fill="#c6cbca" stroke="#e8ece9" stroke-width="1.5"/>
+    <path d="M73 1 L119 -22 V4 L73 27 Z" fill="#89969b" stroke="#d7dedb" stroke-width="1.5"/>
+    <path d="M16 8 V${tableY.toFixed(1)} M73 27 V${(tableY + 5).toFixed(1)}" stroke="#293940" stroke-width="8"/>
+    <ellipse cx="16" cy="${tableY.toFixed(1)}" rx="16" ry="5" fill="#1b2b33"/><ellipse cx="73" cy="${(tableY + 5).toFixed(1)}" rx="16" ry="5" fill="#1b2b33"/>
+    <circle r="8" fill="${color}" stroke="#f3efea" stroke-width="2"/><circle r="3" fill="#f1efe8"/>
+    <text class="label tag" x="64" y="-25" text-anchor="middle">${label}</text>
+  </g>`;
 }
 function mannequinSvg(pose, targetPart) {
   const x = pose === 'manual' || pose === 'buy' ? 180 : Math.max(370, Math.min(720, project(targetPart?.pos || { x: 1200, z: 600 }).x));
   const y = Math.min(655, Math.max(550, 445 + .28 * x));
-  const ink = '#13252c';
+  const ink = '#e4e2d9';
   const desk = ['manual', 'buy', 'measure'].includes(pose)
-    ? `<g><path d="M48 -67 L121 -91 L174 -73 L100 -47 Z" fill="#e4e5d8" stroke="${ink}" stroke-width="3"/><path d="M48 -67 L100 -47 L100 -40 L48 -59 Z" fill="${ink}"/><path d="M100 -47 L174 -73 L174 -66 L100 -40 Z" fill="#1b3a43"/><path d="M66 -53 V4 M151 -67 V3" stroke="${ink}" stroke-width="6"/></g>` : '';
-  const book = pose === 'manual' ? `<g transform="translate(110,-66)"><path d="M-33 0 L0 -12 L34 0 L0 10 Z" fill="#f0ede1" stroke="${ink}" stroke-width="2"/><path d="M0 -12 V10 M-24 -1 L-7 -6 M7 -5 L25 -1" stroke="${ink}" stroke-width="1.5"/></g>` : '';
+    ? `<g><path d="M48 -67 L121 -91 L174 -73 L100 -47 Z" fill="#56717b" stroke="${ink}" stroke-width="3"/><path d="M48 -67 L100 -47 L100 -40 L48 -59 Z" fill="#22363f"/><path d="M100 -47 L174 -73 L174 -66 L100 -40 Z" fill="#1b303a"/><path d="M66 -53 V4 M151 -67 V3" stroke="${ink}" stroke-width="6"/></g>` : '';
+  const book = pose === 'manual' ? `<g transform="translate(110,-66)"><path d="M-33 0 L0 -12 L34 0 L0 10 Z" fill="#263b44" stroke="${ink}" stroke-width="2"/><path d="M0 -12 V10 M-24 -1 L-7 -6 M7 -5 L25 -1" stroke="${ink}" stroke-width="1.5"/></g>` : '';
   const buying = pose === 'buy' ? `<g transform="translate(106,-75)"><rect x="-24" y="-17" width="48" height="30" fill="${ink}"/><text x="0" y="6" text-anchor="middle" fill="#ec8135" font-size="21">€</text></g><g transform="translate(22,-184)"><path d="M-19 -22 H19 V21 H-19 Z" fill="#ed8232"/><text x="0" y="10" text-anchor="middle" fill="${ink}" font-size="30">€</text></g>` : '';
-  const measuring = pose === 'measure' ? `<g transform="translate(108,-77)"><rect x="-26" y="-22" width="52" height="37" fill="${ink}"/><path d="M-20 0 L-9 -5 L0 2 L11 -13 L20 -7" fill="none" stroke="#e5eadd" stroke-width="2"/></g>` : '';
+  const measuring = pose === 'measure' ? `<g transform="translate(108,-77)"><rect x="-26" y="-22" width="52" height="37" fill="${ink}"/><path d="M-20 0 L-9 -5 L0 2 L11 -13 L20 -7" fill="none" stroke="#263b44" stroke-width="2"/></g>` : '';
   const arm = pose === 'manual'
     ? `<path d="M-24 -109 L20 -89 M24 -86 L78 -77 M27 -110 L62 -79 M67 -75 L97 -68" stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"/>`
     : pose === 'adjust'
@@ -54,7 +86,7 @@ function mannequinSvg(pose, targetPart) {
     <path d="M-34 -5 L-11 -5 L-9 1 L-40 1 Z M20 -5 L45 -5 L50 1 L19 1 Z" fill="${ink}"/>
     ${arm}
     <path d="M-29 -121 L21 -126 L36 -102 L27 -66 L-24 -64 L-35 -99 Z" fill="${ink}"/>
-    <path d="M-29 -80 L23 -80" stroke="#e4e5d8" stroke-width="3" opacity=".65"/>
+    <path d="M-29 -80 L23 -80" stroke="#263b44" stroke-width="3" opacity=".65"/>
     <g transform="translate(${pose === 'manual' || pose === 'adjust' ? 18 : 2} -150) rotate(${pose === 'manual' || pose === 'adjust' ? 18 : 0})">
       <path d="M-17 -22 L10 -25 L22 -12 L17 13 L-13 18 L-23 5 L-24 -11 Z" fill="${ink}"/>
     </g>
@@ -73,17 +105,10 @@ function actionCoordinates(call) {
 function sceneSvg(call) {
   const snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {}, action = contextFor(call);
   const target = /place|knob|move_stage|steer/.test(call.tool) ? parts.find(p => Object.values(call.args || {}).includes(p.id)) || parts[parts.length - 1] : parts.find(p => p.kind === 'sample');
-  const dots = [];
-  for (let x = 0; x <= 2400; x += 100) for (let z = 0; z <= 1200; z += 100) { const p = project({ x, z, h: 0 }); dots.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="1.1" fill="#b2d1ce" opacity=".45"/>`); }
-  const lines = [['800nm', '#ea8131'], ['opa', '#d8e7df']].map(([key, color]) => (beams[key]?.open ? (beams[key].segments || []).map(segment => `<path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="6" opacity=".2"/><path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>`).join('') : '')).join('');
-  const table = `<path d="M${at({x:0,z:0})} L${at({x:2400,z:0})} L${at({x:2400,z:1200})} L${at({x:0,z:1200})} Z" fill="#115c70" stroke="#0e3440" stroke-width="3"/><path d="M${at({x:0,z:1200})} L${at({x:2400,z:1200})} l0 22 L${at({x:0,z:1200})} Z" fill="#0a4052"/>${dots.join('')}`;
-  const cx = 520, cy = 321, rx = 252, ry = 193;
-  const ring = Array.from({ length: 17 }, (_, i) => {
-    const a0 = i * Math.PI * 2 / 17 + .025, a1 = (i + 1) * Math.PI * 2 / 17 - .025;
-    const outer = 1 + (i % 4 === 0 ? .09 : 0), inner = .79 + (i % 5 === 0 ? .05 : 0);
-    const point = (a, r) => `${(cx + Math.cos(a) * rx * r).toFixed(1)},${(cy + Math.sin(a) * ry * r).toFixed(1)}`;
-    return `<polygon points="${point(a0, outer)} ${point(a1, outer)} ${point(a1, inner)} ${point(a0, inner)}" fill="${i % 6 === 0 ? '#6aaebb' : '#348aa2'}"/>`;
-  }).join('');
+  const lines = [['800nm', '#ff626f'], ['opa', '#ae9eff']].map(([key, color]) => (beams[key]?.open ? (beams[key].segments || []).map(segment => `<path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="7" opacity=".22"/><path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="2.8" stroke-linecap="round"/>`).join('') : '')).join('');
+  const top = [{x:0,z:0,h:0},{x:2400,z:0,h:0},{x:2400,z:1200,h:0},{x:0,z:1200,h:0}];
+  const below = top.map(point => ({...point,h:-40}));
+  const table = `<path d="M${at(top[3])} L${at(top[2])} L${at(below[2])} L${at(below[3])} Z" fill="#4a626b" stroke="#172830" stroke-width="1.5"/><path d="M${at(top[1])} L${at(top[2])} L${at(below[2])} L${at(below[1])} Z" fill="#38525d" stroke="#172830" stroke-width="1.5"/><g transform="matrix(.246 .070 -.204 .140 347.2 167)"><rect width="2400" height="1200" fill="#8098a0"/><rect width="2400" height="1200" fill="url(#breadboardHoles)"/></g><path d="M${top.map(at).join(' L')} Z" fill="none" stroke="#e1e9e6" stroke-width="2"/>`;
   const targetPosition = actionCoordinates(call);
   const coordinate = targetPosition ? (() => {
     const q = project({ x: targetPosition.x, z: targetPosition.z, h: 0 });
@@ -91,18 +116,18 @@ function sceneSvg(call) {
     return `<g transform="translate(${q.x.toFixed(1)} ${q.y.toFixed(1)})"><circle r="13" fill="none" stroke="#ee8134" stroke-width="2"/><path d="M-20 0 H20 M0 -20 V20" stroke="#ee8134" stroke-width="1.5"/><rect x="${boxX}" y="-29" width="132" height="20" fill="#073a49"/><text x="${boxX + 6}" y="-15" fill="#f1e9dc" font-family="Avenir Next, Arial" font-size="10">x ${Math.round(targetPosition.x)} · z ${Math.round(targetPosition.z)} mm</text></g>`;
   })() : '';
   return `<svg viewBox="0 0 1040 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Optical table and a cut-paper mannequin working beside it">
-    <rect width="1040" height="700" fill="#0a829f"/>
-    <path d="M0 96 H1040 M0 470 H1040" stroke="#53a8b9" stroke-width="1" opacity=".18"/>
-    <g opacity=".5">${ring}</g>
-    <ellipse cx="525" cy="520" rx="445" ry="88" fill="#075c74" opacity=".33"/>
-    ${table}<text x="347" y="156" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">0</text><text x="77" y="346" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">z 1200 mm</text><text x="705" y="519" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">x 2400 mm</text>${lines}${housingSvg(2320,294,'800 nm','#9b896a')}${housingSvg(2320,935,'OPA','#b9ddd9')}${parts.map(partSvg).join('')}${coordinate}${mannequinSvg(action.pose,target)}
+    <defs><pattern id="breadboardHoles" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="3.5" fill="#304650"/><circle cx="11.5" cy="11.5" r="1.2" fill="#b8c9c9"/></pattern></defs>
+    <rect width="1040" height="700" fill="#181b1c"/>
+    <ellipse cx="525" cy="420" rx="480" ry="286" fill="#2b3335" opacity=".65"/>
+    <ellipse cx="525" cy="526" rx="445" ry="86" fill="#080c0d" opacity=".6"/>
+    ${table}<text x="347" y="156" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">0</text><text x="77" y="346" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">z 1200 mm</text><text x="705" y="519" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">x 2400 mm</text>${lines}${housingSvg(currentRun()?.meta?.ports?.['800nm'], '800 nm', '#c7777c')}${housingSvg(currentRun()?.meta?.ports?.opa, 'OPA', '#9c95c7')}${parts.map(partSvg).join('')}${coordinate}${mannequinSvg(action.pose,target)}
   </svg>`;
 }
 function mapSvg(call) {
   const snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {};
-  const sx = x => 12 + x / 2400 * 306, sz = z => 10 + z / 1200 * 150;
-  const beam = [['800nm','#ea8131'],['opa','#d8e7df']].map(([key,color]) => beams[key]?.open ? (beams[key].segments || []).map(seg => `<path d="M${sx(seg[0].x)},${sz(seg[0].z)} L${sx(seg[1].x)},${sz(seg[1].z)}" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`).join('') : '').join('');
-  return `<svg class="map-svg" viewBox="0 0 330 170" role="img" aria-label="Top down layout of the optical table"><rect x="12" y="10" width="306" height="150" rx="2" fill="#12647a" stroke="#a8c9c9"/><path d="M88.5 10 V160 M165 10 V160 M241.5 10 V160 M12 47.5 H318 M12 85 H318 M12 122.5 H318" stroke="#77b6bf" stroke-width=".6" opacity=".5"/>${beam}${parts.map(p=>`<g><circle cx="${sx(p.pos.x)}" cy="${sz(p.pos.z)}" r="4.5" fill="#e8e9df" stroke="#10252b" stroke-width="1.3"/><title>${esc(p.id)}</title></g>`).join('')}<rect x="299" y="29" width="19" height="35" fill="#e8e9df"/><rect x="299" y="108" width="19" height="35" fill="#e8e9df"/></svg>`;
+  const sx = x => 15 + x / 2400 * 300, sz = z => 10 + z / 1200 * 150;
+  const beam = [['800nm','#ff626f'],['opa','#ae9eff']].map(([key,color]) => beams[key]?.open ? (beams[key].segments || []).map(seg => `<path d="M${sx(seg[0].x)},${sz(seg[0].z)} L${sx(seg[1].x)},${sz(seg[1].z)}" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`).join('') : '').join('');
+  return `<svg class="map-svg" viewBox="0 0 330 170" role="img" aria-label="Top down layout of the optical table"><rect x="15" y="10" width="300" height="150" fill="#8098a0" stroke="#e1e9e6"/><path d="M90 10 V160 M165 10 V160 M240 10 V160 M15 47.5 H315 M15 85 H315 M15 122.5 H315" stroke="#aec2c4" stroke-width=".6" opacity=".6"/>${beam}${parts.map(p=>`<g><circle cx="${sx(p.pos.x)}" cy="${sz(p.pos.z)}" r="4.5" fill="#e8e9df" stroke="#10252b" stroke-width="1.3"/><title>${esc(p.id)}</title></g>`).join('')}<rect x="296" y="29" width="19" height="35" fill="#e8e9df"/><rect x="296" y="108" width="19" height="35" fill="#e8e9df"/></svg>`;
 }
 function scoreSvg(run, step) {
   const trajectory = run.trajectory, end = Math.max(1, step), values = trajectory.slice(0, end + 1).map(t => Math.max(0, Math.min(1, Number(t.truth?.reward || 0))));

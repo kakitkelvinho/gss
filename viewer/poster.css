@@ -1,30 +1,30 @@
-/* Screen-printed blue/orange cut-paper direction, inspired by the supplied Portal poster. */
+/* A quiet dark room around the measured breadboard and its two beam paths. */
 :root {
   font-family: 'Avenir Next', 'Century Gothic', Arial, sans-serif;
   color: #e8e9e2;
-  background: #063d4b;
+  background: #111a20;
 }
 .app {
-  --line: #37788a;
+  --line: #526871;
   --accent: #ee8134;
-  background: #06475b;
+  background: #111a20;
 }
-.scene-shell { background: #087b99; }
+.scene-shell { background: #11191e; }
 .player, .call-panel, .score-panel, .corner-button, .flyout {
-  background: #063d4b;
-  border-color: #39798a;
+  background: #1c2b33;
+  border-color: #536a73;
   border-radius: 1px;
   color: #e8e9e2;
 }
 .player button, .corner-button, .run-picker, .player .speed {
-  background: #084d60;
-  border-color: #44899a;
+  background: #263943;
+  border-color: #607780;
   border-radius: 1px;
   color: #e8e9e2;
 }
-.player button:hover, .corner-button:hover, .flyout-item:hover, .flyout-item:focus-visible { background: #12647a; }
+.player button:hover, .corner-button:hover, .flyout-item:hover, .flyout-item:focus-visible { background: #354d58; }
 .player button[aria-pressed=true], .corner-button[aria-expanded=true] {
-  background: #265769;
+  background: #344a55;
   border-bottom-color: var(--accent);
   color: #fff2d9;
 }
@@ -35,11 +35,11 @@
   letter-spacing: .18em;
   text-transform: uppercase;
 }
-.panel-heading small, .score-line small, .totals span, .flyout-title, .hint { color: #9fc5c9; }
-.call-row { color: #c5d9d8; }
-.call-row .number { color: #87b5be; }
-.call-row:hover { background: #11566a; color: #f8f8ed; }
-.call-row.active { background: #1b5868; color: #f6f0df; border-bottom-color: var(--accent); }
+.panel-heading small, .score-line small, .totals span, .flyout-title, .hint { color: #acc1c4; }
+.call-row { color: #d0ddda; }
+.call-row .number { color: #a5b9bd; }
+.call-row:hover { background: #2e4650; color: #f8f8ed; }
+.call-row.active { background: #344b54; color: #f6f0df; border-bottom-color: var(--accent); }
 .call-row .mark { color: var(--accent); }
 .score-line strong {
   font-family: 'Avenir Next', 'Century Gothic', Arial, sans-serif;
@@ -47,38 +47,38 @@
   font-weight: 500;
   letter-spacing: -.05em;
 }
-.totals div, .mini-icon { border-color: #39798a; border-radius: 1px; }
+.totals div, .mini-icon { border-color: #536a73; border-radius: 1px; }
 .flyout-item { color: #e8e9e2; }
-.badge { background: #063d4b; color: #e8e9e2; border-color: #39798a; }
+.badge { background: #1c2b33; color: #e8e9e2; border-color: #536a73; }
 button:focus-visible, select:focus-visible, input:focus-visible { outline-color: #ee8134; }
 .run-label { color: #e8e9e2; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; flex: none; }
 .current-call { height: 34px; padding: 9px 12px; border-bottom: 1px solid var(--line); color: #d3e1dc; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.phase-row { width: 100%; height: 38px; display: grid; grid-template-columns: minmax(0,1fr) auto 12px; align-items: center; gap: 7px; padding: 0 8px; border: 0; border-bottom: 1px solid #245e70; background: transparent; color: #c9dedb; text-align: left; font: inherit; font-size: 12px; }
-.phase-row:hover { background: #11566a; }
-.phase-row.active { border-bottom: 2px solid var(--accent); box-shadow: inset 3px 0 #e8e9e2; background: #1b5868; color: #f6f0df; }
+.phase-row { width: 100%; height: 38px; display: grid; grid-template-columns: minmax(0,1fr) auto 12px; align-items: center; gap: 7px; padding: 0 8px; border: 0; border-bottom: 1px solid #344b54; background: transparent; color: #d0ddda; text-align: left; font: inherit; font-size: 12px; }
+.phase-row:hover { background: #2e4650; }
+.phase-row.active { border-bottom: 2px solid var(--accent); box-shadow: inset 3px 0 #e8e9e2; background: #344b54; color: #f6f0df; }
 .phase-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.phase-count { color: #9fc5c9; font-size: 10px; white-space: nowrap; }
+.phase-count { color: #acc1c4; font-size: 10px; white-space: nowrap; }
 .phase-arrow { font-size: 17px; line-height: 1; text-align: center; }
-.call-row.child { padding-left: 16px; background: #0a4658; }
-.call-row.child.active { background: #1b5868; }
+.call-row.child { padding-left: 16px; background: #233742; }
+.call-row.child.active { background: #344b54; }
 .score-panel { gap: 6px; }
 .score-panel .totals { margin-top: 0; gap: 10px; }
 .score-panel .totals div { padding: 5px 0 8px; border: 0; border-bottom: 1px solid var(--line); }
 .score-panel .totals strong { font-size: 19px; font-weight: 600; }
-.score-secondary { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; color: #9fc5c9; font-size: 10px; }
+.score-secondary { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; color: #acc1c4; font-size: 10px; }
 .score-secondary strong { color: #e8e9e2; font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .score-panel .graph { height: 18px; margin-top: auto; }
-.rail-toggle { position: absolute; z-index: 7; top: 18px; right: 19px; width: 34px; height: 34px; padding: 0; display: grid; place-items: center; background: #084d60; border: 1px solid #44899a; border-radius: 1px; color: #e8e9e2; cursor: pointer; font-size: 20px; }
-.rail-toggle:hover { background: #12647a; }
+.rail-toggle { position: absolute; z-index: 7; top: 18px; right: 19px; width: 34px; height: 34px; padding: 0; display: grid; place-items: center; background: #263943; border: 1px solid #607780; border-radius: 1px; color: #e8e9e2; cursor: pointer; font-size: 20px; }
+.rail-toggle:hover { background: #354d58; }
 .panel-heading { padding-right: 47px; }
 .app.rail-closed .scene-shell { right: 0; }
 .app.rail-closed .sidebar { display: none; }
 .app.rail-closed .player { right: 60px; }
 .app.rail-closed .view-trigger { right: 14px; }
 .app.rail-closed .view-flyout { right: 14px; }
-.view-hint { position: absolute; z-index: 6; bottom: 21px; right: calc(var(--aside) + 56px); color: #9fc5c9; font-size: 11px; pointer-events: none; }
+.view-hint { position: absolute; z-index: 6; bottom: 21px; right: calc(var(--aside) + 56px); color: #acc1c4; font-size: 11px; pointer-events: none; }
 .app.rail-closed .view-hint { right: 56px; }
-.shortcut-hints { position: absolute; z-index: 5; bottom: 21px; left: calc((100% - var(--aside)) / 2); transform: translateX(-50%); color: #a9cbd0; font-size: 10px; white-space: nowrap; pointer-events: none; }
+.shortcut-hints { position: absolute; z-index: 5; bottom: 21px; left: calc((100% - var(--aside)) / 2); transform: translateX(-50%); color: #aebfc2; font-size: 10px; white-space: nowrap; pointer-events: none; }
 .app.rail-closed .shortcut-hints { left: 50%; }
 .run-flyout, .speed-flyout { top: 71px; bottom: auto; }
 .run-flyout { left: 14px; min-width: 235px; }
