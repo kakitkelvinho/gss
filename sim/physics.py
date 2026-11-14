@@ -89,6 +89,11 @@ def photodiode(beams: dict[str, BeamResult | None], opa_path: float, rng: random
     return out
 
 
+def _power(T: float, rng: random.Random) -> float:
+    """Fraction of the beam's output power reaching the sample, with ~2% reading noise."""
+    return round(max(0.0, T * (1.0 + rng.gauss(0.0, 0.02))), 2)
+
+
 def camera_sample(beams: dict[str, BeamResult | None], rng: random.Random) -> list[dict]:
     spots = []
     for arm, b in beams.items():
@@ -104,7 +109,8 @@ def camera_sample(beams: dict[str, BeamResult | None], rng: random.Random) -> li
             return round(round(q, 1) * K.CAM_PIXEL * 1000.0, 2)
 
         spots.append({"beam": arm, "h_um": px(h), "v_um": px(v),
-                      "radius_um": round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1)})
+                      "radius_um": round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1),
+                      "relative_power": _power(b.T, rng)})
     return spots
 
 
@@ -115,5 +121,5 @@ def camera_lens(beams: dict[str, BeamResult | None], rng: random.Random) -> list
             continue
         h, v = b.lens_hit
         spots.append({"beam": arm, "h_mm": round(h + rng.gauss(0.0, 0.03), 2),
-                      "v_mm": round(v + rng.gauss(0.0, 0.03), 2)})
+                      "v_mm": round(v + rng.gauss(0.0, 0.03), 2), "relative_power": _power(b.T, rng)})
     return spots

@@ -98,9 +98,9 @@ Seeds 1–10, played over MCP and scored through the verifier route (full table 
 
 | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|
-| reference (scripted expert) | 0.918 | 0.916 | 62.8% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| reference (scripted expert) | 0.919 | 0.915 | 63.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.1% | R < 0.05 ✅ |
+| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.7% | R < 0.05 ✅ |
 
 Frontier-agent runs (OpenCode): *TODO, these need inference credits.* Add the Harbor job logs and
 scores here.
