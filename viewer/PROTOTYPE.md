@@ -8,10 +8,10 @@ Start it from the repository root with one command:
 python3 -m http.server 8766 --directory viewer
 ```
 
-Open `http://localhost:8766/prototype.html`. The player floats at the top left, tool calls at the right, and score, money, and lab time below the calls. Parts and top view open from small edge buttons.
+Open `http://localhost:8766/prototype.html`. Playback floats at the top left. The call rail groups each optic's setup and can be collapsed to give the scene more room. Expand a group to inspect its individual calls. Money and lab time lead the telemetry; the private replay score is secondary. Run, speed, parts, and top view use the same small menu pattern.
 
-Left and right arrow keys step through calls; Space plays or pauses. Escape closes a menu. Within a menu, arrows, Home, and End move focus.
+Left and right arrow keys or comma and period step through calls; Space plays or pauses. Escape closes a menu. Within a menu, arrows, Home, and End move focus. The current call's coordinate marker and the table's axis labels use millimetres.
 
 The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the bundled real run snapshots. The robot pose is illustrative and inferred from the tool name; it stands beyond the front edge of the table. The score trace shows fractional values already present in the simulator's reward. No scoring code was changed.
 
-Visual reference: classic *Foundation* era science fiction cover art supplied by the user. The UI and scene use coral dusk, violet ink, parchment, orange, and condensed display type. The robot uses an anime mecha silhouette. Optical mounts are attached to the table plane and keep the beam height from the snapshots.
+Visual reference: the blue/orange *Portal* poster supplied by the user, with cut-paper composition associated with Saul Bass. The worker is a segmented ink-black mannequin inspired by the *Anatomy of a Murder* poster. The broken ring uses muted scene colour so orange is reserved for current state. The optical mounts and beam paths still come from replay positions. Mount bases attach to the table plane while optic heads remain at snapshot beam height.
