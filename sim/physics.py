@@ -72,7 +72,9 @@ def bbo_signal(model: str, pump: BeamResult | None, probe: BeamResult | None, pr
     if pump is not None and probe is not None:
         O = spatial_overlap(pump, probe)
         if O > 0:
-            s += p["A"] * pump.T * probe.T * O * temporal_factor(delay_fs(pump, probe, probe_extra))
+            # type-I SFG uses the field components along the crystal's (horizontal) o-axis
+            s += (p["A"] * pump.T * probe.T * pump.pol * probe.pol * O
+                  * temporal_factor(delay_fs(pump, probe, probe_extra)))
     s += rng.gauss(0.0, p["sigma"] / math.sqrt(t_int))
     return max(0, int(round(s)))
 

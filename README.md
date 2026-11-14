@@ -98,9 +98,9 @@ Seeds 1–10, played over MCP and scored through the verifier route (full table 
 
 | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|
-| reference (scripted expert) | 0.917 | 0.913 | 63.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| reference (scripted expert) | 0.915 | 0.906 | 63.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.7% | R < 0.05 ✅ |
+| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.6% | R < 0.05 ✅ |
 
 Blind playthroughs by fresh Claude agents with no access to the code ([docs/playthroughs.md](docs/playthroughs.md)):
 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 of 3 succeeded (R ≈ 0.93).

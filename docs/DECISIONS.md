@@ -101,3 +101,14 @@ Q-numbers refer to the grilling session.
 - Crystal part ids/names no longer name the process: BBO-T236 (theta 23.6 deg, 450-550 nm filter) and BBO-T292
   (theta 29.2 deg, 380-420 nm filter). The agent has to work out which one detects 800 + 1300 nm SFG (495 nm).
 - Corrected the SFG cut angle to 23.6 deg (BBO Sellmeier); it was wrongly 26.5 deg.
+
+## Buildability (physical, not a separate score)
+- Mount bodies block beams: every mirror has a 38 mm square plate 0.5-12 mm behind the optic and a 1/2" post
+  from the table up to the plate; periscope mirrors have plates; the lens sits in a 2" mount ring. A beam that
+  passes behind or under another optic's mount is absorbed (logged as "mount of ..."), as on a real table.
+- Polarisation is tracked through every reflection (perfect-conductor rule). The type-I SFG cross term scales
+  with cos^2 of each beam's angle from horizontal, so out-of-plane routing (e.g. a 90-degree image-rotating
+  turn) kills the signal. Gently sloped paths rotate it only slightly, as in reality. The reward (eta) is unchanged.
+- The reference layout had to change: the probe now hits the lens at z = 592 and the pump at 608, so the probe
+  passes the pump's last mirror on its reflecting side, and the pump enters the retro 15 mm off the apex
+  (30 mm separation) so the return clears the pick-off mirror's mount.

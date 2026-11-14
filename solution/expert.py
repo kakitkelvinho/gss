@@ -4,12 +4,13 @@ so the same code runs in-process (`sim.Episode`) and over MCP (step 3).
 Every per-seed fact comes from manuals and measurements (tool outputs), never from the sim's state.
 Layout geometry (mm; x along the table, z across, height = y; yaw from +x toward +z):
 
-  probe: port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 608)
-         -> lens at (1300, 600, h_p), hitting it at z = 608
-  pump:  port -> delay stage (yaw 180, apex line z_p + 12) -> returns +x at z_p + 24
-         -> M_q1 (1500, z_p + 24) -> M_q2 (1500, 592) -> lens, hitting it at z = 592
+  probe: port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 592)
+         -> lens at (1300, 600, h_p), hitting it at z = 592
+  pump:  port -> delay stage (yaw 180, apex line z_p + 15) -> returns +x at z_p + 30
+         -> M_q1 (1500, z_p + 30) -> M_q2 (1500, 608) -> lens, hitting it at z = 608
+  The probe passes M_q2 on its reflecting side, clear of the mount plate behind it.
   The stage is placed so time zero sits near mid-travel:
-  apex A_x = (4518 - z_p - probe_total) / 2, reference point P_x = A_x + 90 + x_mid.
+  apex A_x = (4528 - z_p - probe_total) / 2, reference point P_x = A_x + 90 + x_mid.
 """
 
 from __future__ import annotations
@@ -20,9 +21,9 @@ import statistics
 from typing import Callable
 
 LENS = (1300.0, 600.0)
-PUMP_LENS_Z, PROBE_LENS_Z = 592.0, 608.0
+PUMP_LENS_Z, PROBE_LENS_Z = 608.0, 592.0
 X_PERI, X_P, X_Q = 2050.0, 1700.0, 1500.0
-STAGE_OFF = 12.0
+STAGE_OFF = 15.0
 TAU_STAGE_MM = 0.0105  # 1/e half-width of the cross-correlation in stage travel (~70 fs)
 
 
@@ -197,7 +198,11 @@ class Expert:
         # Pump arm: stage placed so time zero is near mid-travel (the stage itself stays at 0)
         probe_total = self.port_x - X_PERI + abs(hp - ho) + (X_PERI - X_P) + abs(zo - PROBE_LENS_Z) \
             + (X_P - LENS[0]) + self.L_opa
-        a_x = (4518.0 - zp - probe_total) / 2.0
+        # pump path to the lens = (port - entrance) + 80 inside the retro + (M_q1 - entrance)
+        #   + (M_q2 - M_q1 in z) + (M_q2 - lens) = 3750 - 2 A_x + (PUMP_LENS_Z - 2 * 12 - z_p) + 200
+        #   (retro entrance face 40 mm before the apex; 80 mm in and out of the retro)
+        pump_const = (self.port_x - 40.0) + 80.0 + (X_Q - 40.0) + (X_Q - LENS[0])
+        a_x = (pump_const + PUMP_LENS_Z - 2 * STAGE_OFF - zp - probe_total) / 2.0
         p_x = a_x + 90.0 + x_mid
         self.note(f"probe table+OPA path {probe_total:.0f} mm, stage apex {a_x:.0f}, reference x {p_x:.0f}")
         self.c("unblock", arm="pump")

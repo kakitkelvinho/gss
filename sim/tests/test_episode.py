@@ -35,10 +35,10 @@ def perfect_layout(seed):
         "sample": Part("sample", "sample", (1300.0, h_p, 600.0), r(180)),
         "periscope-1": Part("periscope-1", "periscope", (2050.0, h_p, z_o), r(180), height_in=h_o),
         "mirror-1": Part("mirror-1", "mirror", (1700.0, h_p, z_o), r(315)),
-        "mirror-2": Part("mirror-2", "mirror", (1700.0, h_p, 608.0), r(135)),
-        "stage": Part("stage", "stage", (900.0, h_p, z_p + 12), r(180), travel=25.0),
-        "mirror-3": Part("mirror-3", "mirror", (1500.0, h_p, z_p + 24), r(135)),
-        "mirror-4": Part("mirror-4", "mirror", (1500.0, h_p, 592.0), r(225)),
+        "mirror-2": Part("mirror-2", "mirror", (1700.0, h_p, 592.0), r(135)),
+        "stage": Part("stage", "stage", (900.0, h_p, z_p + 15), r(180), travel=25.0),
+        "mirror-3": Part("mirror-3", "mirror", (1500.0, h_p, z_p + 30), r(135)),
+        "mirror-4": Part("mirror-4", "mirror", (1500.0, h_p, 608.0), r(225)),
     }
     for k, p in parts.items():
         ep.inv[k]["part"] = p
