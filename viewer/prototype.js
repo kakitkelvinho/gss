@@ -1,7 +1,11 @@
 // Throwaway UI prototype. The viewer uses verifier-only snapshots from runs_bundle.js.
 const runs = window.GSS_RUNS_BUNDLE?.runs.filter(run => run.trajectory?.length) ?? [];
 const app = document.getElementById('app');
-const state = { run: 3, step: Math.max(0, Number(new URLSearchParams(location.search).get('step') ?? 108)), playing: false, speed: 1, timer: null, menu: null, railOpen: new URLSearchParams(location.search).get('rail') !== 'closed', expanded: new Set(), selectedPart: null };
+const query = new URLSearchParams(location.search), num = (key, fallback) => Number.isFinite(Number(query.get(key))) && query.get(key) !== null ? Number(query.get(key)) : fallback;
+const DEFAULT_CAM = { yaw: -14, pitch: 38, zoom: 1, panX: 0, panY: 0 };
+const CAM_LIMITS = { yaw: [-80, 20], pitch: [15, 85], zoom: [0.6, 6] };
+const clamp = (v, [lo, hi]) => Math.max(lo, Math.min(hi, v));
+const state = { cam: { yaw: clamp(num('yaw', DEFAULT_CAM.yaw), CAM_LIMITS.yaw), pitch: clamp(num('pitch', DEFAULT_CAM.pitch), CAM_LIMITS.pitch), zoom: clamp(num('zoom', 1), CAM_LIMITS.zoom), panX: num('panx', 0), panY: num('pany', 0) }, run: 3, step: Math.max(0, Number(new URLSearchParams(location.search).get('step') ?? 108)), playing: false, speed: 1, timer: null, menu: null, railOpen: new URLSearchParams(location.search).get('rail') !== 'closed', expanded: new Set(), selectedPart: null };
 
 function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
 function fmtTime(seconds) { const n = Math.round(seconds || 0); return `${Math.floor(n / 3600)}:${String(Math.floor(n % 3600 / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`; }
@@ -25,10 +29,12 @@ function actionCoordinates(call) {
 // World axes follow sim/vec.py: x along the 2400 mm table, z across the 1200 mm table, h up from the table top.
 // Every optic is drawn from the replay pose with the simulator's own mount dimensions (sim/constants.py).
 const DEG = Math.PI / 180;
-const C = { ink: '#16120F', ink2: '#2B231D', ink3: '#413629', room: '#1E1915', floor: '#0E0B09', paper: '#EDE3CC', paper2: '#F7F0DF', kraft: '#9C927E', kraft2: '#776E5C', orange: '#E8742A', blue: '#4A8FC4' };
+const C = { ink: '#16120F', ink2: '#2B231D', ink3: '#413629', room: '#1E1915', floor: '#0E0B09', paper: '#EDE3CC', paper2: '#F7F0DF', table: '#D3C6A8', tableHole: '#3A3027', house: '#DCCFB2', house2: '#C9BB9C', figure: '#A99A7C', figureEdge: '#16120F', kraft: '#9C927E', kraft2: '#776E5C', orange: '#E8742A', blue: '#4A8FC4' };
 const BEAMS = [['800nm', C.orange, '800 nm'], ['opa', C.blue, 'OPA']];
-const VIEW = { c: Math.cos(-14 * DEG), s: Math.sin(-14 * DEG), sf: Math.sin(38 * DEG), cf: Math.cos(38 * DEG) };
-const TOWARD_VIEWER = { x: VIEW.s * VIEW.cf, z: VIEW.c * VIEW.cf, h: VIEW.sf };
+// Orthographic camera: yaw about the vertical axis, then pitch down. The drawing stays a true projection at any setting.
+const VIEW = {}, TOWARD_VIEWER = {};
+function setView(yaw, pitch) { Object.assign(VIEW, { c: Math.cos(yaw * DEG), s: Math.sin(yaw * DEG), sf: Math.sin(pitch * DEG), cf: Math.cos(pitch * DEG) }); Object.assign(TOWARD_VIEWER, { x: VIEW.s * VIEW.cf, z: VIEW.c * VIEW.cf, h: VIEW.sf }); }
+setView(DEFAULT_CAM.yaw, DEFAULT_CAM.pitch);
 const LIGHT = norm({ x: -0.55, z: 0.8, h: 0 });
 const MM = { table: { x: 2400, z: 1200 }, slab: 60, floor: -760, robot: 1050, mountHalf: 19, mountDepth: [0.5, 12], postR: 6.35, postBehind: 6, lensRing: 25.4, retroR: 19.05, apex: 90, retroFront: 40, minPost: 50 };
 const SCENE = { w: 1200, h: 800, fit: { x0: 40, y0: 96, x1: 1160, y1: 600 } };
@@ -48,6 +54,7 @@ function line(a, b, attrs) { const p = proj(a), q = proj(b); return `<line x1="$
 function px(mm) { return (mm * FIT.k).toFixed(2); }
 
 function fitScene(meta) {
+  setView(DEFAULT_CAM.yaw, DEFAULT_CAM.pitch);
   const T = MM.table, pts = [];
   for (const x of [0, T.x]) for (const z of [0, T.z]) for (const h of [0, -MM.slab]) pts.push({ x, z, h });
   for (const b of meta?.housings_mm || []) for (const x of [b.x0, b.x1]) for (const z of [b.z0, b.z1]) pts.push({ x, z, h: b.h1 });
@@ -55,7 +62,10 @@ function fitScene(meta) {
   const r = pts.map(raw), xs = r.map(p => p.x), ys = r.map(p => p.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys), f = SCENE.fit;
   const k = Math.min((f.x1 - f.x0) / (maxX - minX), (f.y1 - f.y0) / (maxY - minY));
-  FIT = { k, ox: (f.x0 + f.x1) / 2 - k * (minX + maxX) / 2, oy: f.y0 - k * minY };
+  const ox = (f.x0 + f.x1) / 2 - k * (minX + maxX) / 2, oy = f.y0 - k * minY, centre = { x: T.x / 2, z: T.z / 2, h: 0 }, rc0 = raw(centre);
+  const ax = ox + k * rc0.x, ay = oy + k * rc0.y, cam = state.cam, z = cam.zoom, cx = SCENE.w / 2, cy = SCENE.h / 2;
+  setView(cam.yaw, cam.pitch); const rc = raw(centre);
+  FIT = { k: k * z, ox: (ax - k * rc.x - cx) * z + cx + cam.panX, oy: (ay - k * rc.y - cy) * z + cy + cam.panY };
 }
 
 // A convex block: centre on its base, yaw of its length axis, length L, width W, from h0 to h1.
@@ -123,7 +133,7 @@ function sampleSvg(part, hit) {
 }
 function housingSvg(box, port, label, color) {
   const c = { x: (box.x0 + box.x1) / 2, z: (box.z0 + box.z1) / 2 };
-  const body = block({ c, yaw: 0, L: box.x1 - box.x0, W: box.z1 - box.z0, h0: box.h0, h1: box.h1 }, { top: C.paper2, light: C.paper, dark: C.kraft }, 'filter="url(#pcutS)"');
+  const body = block({ c, yaw: 0, L: box.x1 - box.x0, W: box.z1 - box.z0, h0: box.h0, h1: box.h1 }, { top: C.house, light: C.house2, dark: C.kraft }, 'filter="url(#pcutS)"');
   const aperture = port ? disc(port.pos, { x: -1, z: 0, h: 0 }, 13, `fill="${C.ink}"`) + disc(add(port.pos, { x: -1, z: 0, h: 0 }, 1), { x: -1, z: 0, h: 0 }, 8, `fill="${color}"`) : '';
   const q = proj({ x: box.x0, z: box.z0, h: box.h1 }), w = label.length * 11 + 34, x = q.x - w - 8, y = q.y - 8;
   return { body: body + aperture, label: `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w}" height="28" fill="${C.ink}"/><rect x="${(x + 8).toFixed(1)}" y="${(y + 9).toFixed(1)}" width="10" height="10" fill="${color}"/><text x="${(x + 25).toFixed(1)}" y="${(y + 22).toFixed(1)}" class="sc-house">${label}</text>` };
@@ -133,9 +143,9 @@ function tableSvg() {
   const shadow = poly(at(MM.floor).map(p => ({ ...p, x: p.x + (p.x ? 60 : -60), z: p.z + (p.z ? 60 : -60) })), `fill="${C.floor}"`);
   const legs = [[250, 220], [T.x - 250, 220], [250, T.z - 220], [T.x - 250, T.z - 220]].sort((a, b) => depth({ x: a[0], z: a[1] }) - depth({ x: b[0], z: b[1] }))
     .map(([x, z]) => block({ c: { x, z }, L: 170, W: 170, h0: MM.floor, h1: -MM.slab }, { top: C.ink, light: C.ink3, dark: C.ink2 })).join('');
-  const slab = block({ c: { x: T.x / 2, z: T.z / 2 }, L: T.x, W: T.z, h0: -MM.slab, h1: 0 }, { top: C.paper, light: C.kraft, dark: C.kraft2 }, 'filter="url(#pcutS)"');
+  const slab = block({ c: { x: T.x / 2, z: T.z / 2 }, L: T.x, W: T.z, h0: -MM.slab, h1: 0 }, { top: C.table, light: C.kraft, dark: C.kraft2 }, 'filter="url(#pcutS)"');
   const k = FIT.k, m = [k * VIEW.c, k * VIEW.s * VIEW.sf, -k * VIEW.s, k * VIEW.c * VIEW.sf, FIT.ox, FIT.oy].map(v => v.toFixed(5)).join(' ');
-  const holes = `<defs><pattern id="holes" width="25" height="25" patternUnits="userSpaceOnUse" patternTransform="matrix(${m})"><circle cx="12.5" cy="12.5" r="3.3" fill="${C.ink}" opacity=".42"/></pattern></defs>${poly(at(0), 'fill="url(#holes)"')}`;
+  const holes = `<defs><pattern id="holes" width="25" height="25" patternUnits="userSpaceOnUse" patternTransform="matrix(${m})"><circle cx="12.5" cy="12.5" r="3.3" fill="${C.tableHole}" opacity=".5"/></pattern></defs>${poly(at(0), 'fill="url(#holes)"')}`;
   const ticks = [];
   for (let x = 0; x <= T.x; x += 100) { const major = x % 600 === 0; ticks.push(line({ x, z: T.z, h: -MM.slab }, { x, z: T.z + (major ? 70 : 35), h: -MM.slab }, `stroke="${C.paper}" stroke-width="${major ? 1.6 : 0.9}"`)); if (major) { const q = proj({ x, z: T.z + 150, h: -MM.slab }); ticks.push(`<text x="${q.x.toFixed(1)}" y="${(q.y + 4).toFixed(1)}" text-anchor="middle" class="sc-tick">${x === T.x ? 'X 2400 MM' : x}</text>`); } }
   for (let z = 0; z <= T.z; z += 100) { const major = z % 600 === 0; ticks.push(line({ x: 0, z, h: -MM.slab }, { x: major ? -70 : -35, z, h: -MM.slab }, `stroke="${C.paper}" stroke-width="${major ? 1.6 : 0.9}"`)); if (major && z) { const q = proj({ x: -120, z, h: -MM.slab }); ticks.push(`<text x="${q.x.toFixed(1)}" y="${(q.y + 4).toFixed(1)}" text-anchor="end" class="sc-tick">${z === T.z ? 'Z 1200 MM' : z}</text>`); } }
@@ -150,8 +160,8 @@ function deskSvg(meta) {
 }
 function mannequinSvg(pose, you, targetX, outline) {
   const foot = proj({ x: you.x, z: you.z, h: MM.floor }), scale = MM.robot * FIT.k * VIEW.cf / 182;
-  const flip = targetX < foot.x ? -1 : 1, ink = C.paper;
-  const key = outline ? ` stroke="${C.ink}" stroke-width="${(2 / scale).toFixed(2)}" stroke-linejoin="round"` : '';
+  const flip = targetX < foot.x ? -1 : 1, ink = C.figure;
+  const key = outline ? ` stroke="${C.figureEdge}" stroke-width="${(2 / scale).toFixed(2)}" stroke-linejoin="round"` : '';
   const paint = `fill="${ink}"${key}`, limb = `stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"`;
   const limbKey = outline ? `<path d="ARM" stroke="${C.ink}" stroke-width="${(14 + 4 / scale).toFixed(2)}" fill="none" stroke-linecap="square"/>` : '';
   const arm = pose === 'manual' ? 'M-24 -109 L20 -89 M24 -86 L78 -77 M27 -110 L62 -79 M67 -75 L97 -68'
@@ -174,13 +184,13 @@ function headlineText(call, action) { return [action.verb.toUpperCase(), `${clea
 function layoutScene(call, action) {
   const shell = app.querySelector('.scene-shell'), w = Math.max(320, shell?.clientWidth || innerWidth), h = Math.max(300, shell?.clientHeight || innerHeight);
   const [first, detail] = headlineText(call, action), room = w - 80, fitSize = (text, max) => Math.min(max, room / (Math.max(text.length, 8) * 0.42));
-  const big = fitSize(first, Math.min(96, w * .075)), small = fitSize(detail, Math.min(58, w * .045)), line2 = h - 74, line1 = line2 - small - 6;
+  const big = fitSize(first, Math.min(46, w * .036)), small = fitSize(detail, Math.min(24, w * .019)), line2 = h - 72, line1 = line2 - small - 8;
   Object.assign(SCENE, { w, h, big, small, line1, line2, fit: { x0: 24, y0: w < 700 ? 64 : 104, x1: w - 96, y1: line1 - big - 4 } });
 }
 function headline(call, action) {
   const [first, detail] = headlineText(call, action), x = SCENE.w - 40;
-  return `<text x="${x}" y="${SCENE.line1.toFixed(0)}" text-anchor="end" class="sc-big" style="font-size:${SCENE.big.toFixed(0)}px;fill:${C.paper}">${esc(first)}</text>
-    <text x="${x}" y="${SCENE.line2.toFixed(0)}" text-anchor="end" class="sc-big" style="font-size:${SCENE.small.toFixed(0)}px;fill:${C.orange}">${esc(detail)}</text>`;
+  return `<text x="${x}" y="${SCENE.line1.toFixed(0)}" text-anchor="end" class="sc-big" style="font-size:${SCENE.big.toFixed(0)}px;fill:${C.paper}" opacity=".82">${esc(first)}</text>
+    <text x="${x}" y="${SCENE.line2.toFixed(0)}" text-anchor="end" class="sc-big sc-detail" style="font-size:${SCENE.small.toFixed(0)}px;fill:${C.orange}">${esc(detail)}</text>`;
 }
 function shortId(id) { return String(id).replace(/^mirror-/, 'M').replace(/^periscope-/, 'P').toUpperCase(); }
 function partLabel(part) {
@@ -203,13 +213,14 @@ function sceneSvg(call) {
     return disc(g, { x: 0, z: 0, h: 1 }, 48, `fill="none" stroke="${C.orange}" stroke-width="2.4"`) + line(add(g, { x: 1, z: 0 }, -80), add(g, { x: 1, z: 0 }, 80), `stroke="${C.orange}" stroke-width="1.4"`) + line(add(g, { x: 0, z: 1 }, -80), add(g, { x: 0, z: 1 }, 80), `stroke="${C.orange}" stroke-width="1.4"`) + lift
       + `<rect x="${bx.toFixed(1)}" y="${(q.y - 44).toFixed(1)}" width="166" height="26" fill="${C.ink}"/><text x="${(bx + 10).toFixed(1)}" y="${(q.y - 25).toFixed(1)}" class="sc-coord">X ${Math.round(target.x)} · Z ${Math.round(target.z)} MM</text>`;
   })() : '';
-  const you = snap.you_mm || meta.desk_mm || { x: -300, z: 600 }, behind = you.z < 0, front = you.z > MM.table.z;
+  const you = snap.you_mm || meta.desk_mm || { x: -300, z: 600 }, behind = depth({ x: you.x, z: you.z, h: 0 }) < depth({ x: MM.table.x / 2, z: MM.table.z / 2, h: 0 }), front = !behind;
   const tx = proj(targetPart?.pos || target || { x: 1200, z: 600 }).x, figure = mannequinSvg(action.pose, you, you.at_desk ? 1e4 : tx, front);
+  const deskAt = meta.desk_mm || { x: -300, z: 600 }, deskBehind = depth({ x: deskAt.x - 260, z: deskAt.z, h: 0 }) < depth({ x: MM.table.x / 2, z: MM.table.z / 2, h: 0 }), desk = deskSvg(meta);
   return `<svg viewBox="0 0 ${SCENE.w} ${SCENE.h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Optical table in millimetre-true projection, with the worker beside it">
     <rect width="${SCENE.w}" height="${SCENE.h}" fill="${C.room}"/>
-    ${deskSvg(meta)}${behind ? figure : ''}${table.under}${table.slab}${table.ticks}${beamShadow}
+    ${deskBehind ? desk : ''}${behind ? figure : ''}${table.under}${table.slab}${table.ticks}${beamShadow}
     ${objects.map(o => o.svg).join('')}${beamSvg}${labels.join('')}${marker}
-    ${behind ? '' : figure}${headline(call, action)}
+    ${deskBehind ? '' : desk}${behind ? '' : figure}${headline(call, action)}
   </svg>`;
 }
 function mapSvg(call) {
@@ -262,7 +273,7 @@ function menuMarkup(call) {
     const parts = call.snapshot?.parts || [];
     return `<div class="flyout parts-flyout" role="menu" aria-label="Parts"><div class="flyout-title">Parts · ${parts.length}</div>${parts.map((part, i) => `<button class="flyout-item" role="menuitem" tabindex="${i === 0 ? 0 : -1}" data-part="${esc(part.id)}"><span class="mini-icon">${part.id === state.selectedPart ? '●' : part.kind === 'mirror' ? '◉' : part.kind === 'stage' ? '▤' : '◇'}</span><span>${esc(part.id)}</span></button>`).join('')}</div>`;
   }
-  if (state.menu === 'view') return `<div class="flyout view-flyout" role="menu" aria-label="View"><div class="flyout-title">Top view</div><button class="flyout-item" role="menuitem" tabindex="0" data-action="close-menu"><span class="mini-icon">▣</span><span>Isometric view</span></button>${mapSvg(call)}</div>`;
+  if (state.menu === 'view') return `<div class="flyout view-flyout" role="menu" aria-label="View"><div class="flyout-title">Top view</div><button class="flyout-item" role="menuitem" tabindex="0" data-action="reset-view"><span class="mini-icon">▣</span><span>Reset camera</span></button>${mapSvg(call)}</div>`;
   return '';
 }
 function render() {
@@ -280,7 +291,7 @@ function render() {
     <button class="rail-toggle" data-action="rail" aria-label="${state.railOpen ? 'Hide steps' : 'Show steps'}" title="${state.railOpen ? 'Hide steps' : 'Show steps'}">${state.railOpen ? '‹' : '›'}</button>
     <button class="corner-button parts-trigger" data-action="parts" aria-label="Parts" aria-expanded="${state.menu === 'parts'}" aria-haspopup="menu">≡</button><span class="hint">Parts</span>
     <button class="corner-button view-trigger" data-action="view" aria-label="View" aria-expanded="${state.menu === 'view'}" aria-haspopup="menu">▣</button><span class="view-hint">View</span>
-    <div class="shortcut-hints">Space play · ← → / , . step</div>${menuMarkup(call)}</main>`;
+    <div class="shortcut-hints">Space play · ← → step · drag orbit · shift-drag pan · scroll zoom · double-click reset</div>${menuMarkup(call)}</main>`;
   const active = app.querySelector('.phase-row.active'), stack = app.querySelector('.call-stack');
   if (active && stack) { const top = active.offsetTop - stack.offsetTop, bottom = top + active.offsetHeight; if (top < stack.scrollTop) stack.scrollTop = top; else if (bottom > stack.scrollTop + stack.clientHeight) stack.scrollTop = bottom - stack.clientHeight; }
 }
@@ -305,6 +316,7 @@ app.addEventListener('click', e => {
     case 'view': setMenu('view'); break;
     case 'rail': state.railOpen = !state.railOpen; state.menu = null; render(); break;
     case 'close-menu': setMenu(state.menu); break;
+    case 'reset-view': state.cam = { ...DEFAULT_CAM }; state.menu = null; render(); break;
   }
 });
 app.addEventListener('change', e => { if (e.target.matches('input[type=range]')) changeStep(Number(e.target.value)); });
@@ -324,6 +336,24 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === '.') changeStep(state.step + 1);
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });
+let sceneFrame = 0, drag = null;
+function redrawScene() { if (sceneFrame) return; sceneFrame = requestAnimationFrame(() => { sceneFrame = 0; const el = app.querySelector('.scene'), call = currentCall(); if (el && call) el.innerHTML = sceneSvg(call); }); }
+app.addEventListener('pointerdown', e => { if (e.button !== 0 || !e.target.closest('.scene')) return; drag = { x: e.clientX, y: e.clientY, pan: e.shiftKey, id: e.pointerId }; e.target.closest('.scene').setPointerCapture(e.pointerId); });
+app.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y, cam = state.cam; drag.x = e.clientX; drag.y = e.clientY;
+  if (drag.pan) { cam.panX += dx; cam.panY += dy; } else { cam.yaw = clamp(cam.yaw - dx * 0.3, CAM_LIMITS.yaw); cam.pitch = clamp(cam.pitch + dy * 0.25, CAM_LIMITS.pitch); }
+  redrawScene();
+});
+app.addEventListener('pointerup', () => { drag = null; });
+app.addEventListener('pointercancel', () => { drag = null; });
+app.addEventListener('wheel', e => {
+  const scene = e.target.closest('.scene'); if (!scene) return; e.preventDefault();
+  const cam = state.cam, rect = scene.getBoundingClientRect(), mx = e.clientX - rect.left - rect.width / 2, my = e.clientY - rect.top - rect.height / 2;
+  const next = clamp(cam.zoom * Math.exp(-e.deltaY * 0.0015), CAM_LIMITS.zoom), ratio = next / cam.zoom;
+  cam.panX = mx - (mx - cam.panX) * ratio; cam.panY = my - (my - cam.panY) * ratio; cam.zoom = next; redrawScene();
+}, { passive: false });
+app.addEventListener('dblclick', e => { if (e.target.closest('.scene')) { state.cam = { ...DEFAULT_CAM }; redrawScene(); } });
 addEventListener('resize', () => render());
 render();
 render(); // second pass sizes the drawing to the scene pane that the first pass created

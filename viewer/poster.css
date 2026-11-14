@@ -9,7 +9,10 @@ body { background: var(--ink); }
 .paper-fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
 .app { --line: var(--ink); --accent: var(--orange); background: var(--ink); }
 .scene-shell { background: #1E1915; }
-.scene .sc-big { font-family: var(--display); letter-spacing: .01em; }
+.scene .sc-big { font-family: var(--display); letter-spacing: .03em; }
+.scene .sc-detail { letter-spacing: .08em; }
+.scene { cursor: grab; touch-action: none; }
+.scene:active { cursor: grabbing; }
 .scene .sc-tick { font: 500 12px var(--label); fill: var(--paper); letter-spacing: .08em; }
 .scene .sc-house { font: 400 21px var(--display); fill: var(--paper); letter-spacing: .04em; }
 .scene .sc-coord { font: 500 13px var(--label); fill: var(--paper); letter-spacing: .08em; }
@@ -106,5 +109,5 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
   .app.rail-closed .player { right: 8px; }
   .view-hint, .shortcut-hints, .hint { display: none; }
 }
-.scene .sc-part { font: 600 11px var(--label); fill: var(--ink); letter-spacing: .08em; paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.scene .sc-part { font: 600 11px var(--label); fill: var(--ink); letter-spacing: .08em; paint-order: stroke; stroke: #D3C6A8; stroke-width: 3px; stroke-linejoin: round; }
 .app { width: 100%; }
