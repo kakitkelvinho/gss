@@ -1,10 +1,12 @@
 <!doctype html>
-<!-- Throwaway UI study: three retrofuturist run-viewer layouts, switched with ?variant=A|B|C. -->
+<!-- Throwaway UI study: a screen-print poster viewer over a millimetre-true optical table. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Optical bench — viewer prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="prototype.css">
   <link rel="stylesheet" href="poster.css">
   <script src="runs_bundle.js" defer></script>
@@ -12,5 +14,16 @@
 </head>
 <body>
   <div id="app"></div>
+  <!-- Paper effects shared with the pitch deck: cut edges for large shapes, then grain and wear over everything. -->
+  <svg class="paper-fx" aria-hidden="true">
+    <defs>
+      <filter id="pcut" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="7"/></filter>
+      <filter id="pcutS" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+      <filter id="pgrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .08  0 0 0 0 .06  0 0 0 0 .05  0 0 0 -1.6 1.05"/></filter>
+      <filter id="pwear" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="3" seed="2"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 .97  0 0 0 0 .9  0 0 0 -2.2 1.25"/></filter>
+    </defs>
+    <rect width="100%" height="100%" filter="url(#pgrain)" opacity=".38"/>
+    <rect width="100%" height="100%" filter="url(#pwear)" opacity=".08"/>
+  </svg>
 </body>
 </html>

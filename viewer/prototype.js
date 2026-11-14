@@ -12,87 +12,6 @@ function shortArgs(args) { const parts = Object.entries(args || {}).slice(0, 2).
 function cleanTool(tool) { return (tool || 'tool').replaceAll('_', ' '); }
 function contextFor(call) { const t = call.tool || ''; if (/read_manual|get_datasheet/.test(t)) return { verb: 'Reading the optics manual', pose: 'manual' }; if (/buy|catalogue/.test(t)) return { verb: 'Choosing lab equipment', pose: 'buy' }; if (/place|knob|move_stage|steer/.test(t)) return { verb: 'Adjusting the optical path', pose: 'adjust' }; if (/scan|signal|camera|ir_card|measure/.test(t)) return { verb: 'Taking a measurement', pose: 'measure' }; return { verb: 'Working through the run', pose: 'observe' }; }
 
-function project(p) { return { x: 520 + (p.x - 1200) * .246 - (p.z - 600) * .204, y: 335 + (p.x - 1200) * .070 + (p.z - 600) * .140 - (p.h || 0) * .39 }; }
-function at(p) { const q = project(p); return `${q.x.toFixed(1)},${q.y.toFixed(1)}`; }
-function partSvg(part) {
-  const p = project(part.pos), id = esc(part.id), kind = part.kind;
-  const tableY = project({ x: part.pos.x, z: part.pos.z, h: 0 }).y - p.y;
-  const base = `<ellipse cx="0" cy="${tableY.toFixed(1)}" rx="17" ry="6" fill="#172630" stroke="#c7d0cb" stroke-width="1.5"/>
-    <path d="M-4 10 V${(tableY - 2).toFixed(1)} H4 V10 Z" fill="#27353e" stroke="#aab9bc" stroke-width="1"/>
-    <ellipse cx="0" cy="${(tableY - 2).toFixed(1)}" rx="7" ry="3" fill="#34464e"/>
-    <rect x="-8" y="6" width="16" height="8" fill="#25343c" stroke="#aebfc1" stroke-width="1"/>`;
-  let head = '';
-  if (kind === 'mirror') head = `<g transform="rotate(${(part.yaw_deg || 0) * .35})">
-    <path d="M-17 -15 L10 -16 L17 -10 V13 L-17 14 Z" fill="#293842" stroke="#d5dcd8" stroke-width="1.5"/>
-    <circle cx="-2" cy="-1" r="12" fill="#d5e5e4" stroke="#eef0e8" stroke-width="2.5"/>
-    <path d="M-9 -7 Q-2 -11 5 -7" stroke="#ffffff" stroke-width="1.5" fill="none"/>
-    <path d="M17 -11 H24 M17 10 H24" stroke="#b9c8c9" stroke-width="3"/>
-    <circle cx="25" cy="-11" r="3" fill="#e8ede8" stroke="#26343c"/><circle cx="25" cy="10" r="3" fill="#e8ede8" stroke="#26343c"/>
-  </g>`;
-  if (kind === 'stage') head = `<g>
-    <path d="M-33 8 L32 8 L39 15 L-26 15 Z" fill="#1e2e38" stroke="#c4ceca" stroke-width="1.5"/>
-    <path d="M-35 -10 L28 -10 L35 -4 L-28 -4 Z" fill="#c9d3d0" stroke="#f3f3e9" stroke-width="1.5"/>
-    <path d="M-28 -4 H35 V8 H-28 Z" fill="#34454e" stroke="#c4ceca" stroke-width="1.5"/>
-    <path d="M-22 1 H29 M-22 5 H29" stroke="#94a8ac" stroke-width="1"/>
-    <circle cx="-35" cy="4" r="5" fill="#d6ddda" stroke="#33424b" stroke-width="2"/>
-    <rect x="-8" y="-20" width="20" height="21" fill="#303f48" stroke="#d9e0dc" stroke-width="1.5"/>
-    <circle cx="2" cy="-9" r="6" fill="#dce8e5" stroke="#778d92" stroke-width="2"/>
-  </g>`;
-  if (kind === 'periscope') head = `<g>
-    <rect x="-8" y="-35" width="16" height="42" fill="#283941" stroke="#c9d4d2" stroke-width="1.5"/>
-    <path d="M-13 -38 L4 -38 L13 -32 L-4 -32 Z" fill="#e6eae3" stroke="#f8f8ef" stroke-width="1.5"/>
-    <ellipse cx="-2" cy="-31" rx="11" ry="7" fill="#d4e5e4" stroke="#eff2eb" stroke-width="2"/>
-    <ellipse cx="-2" cy="3" rx="11" ry="7" fill="#d4e5e4" stroke="#eff2eb" stroke-width="2"/>
-    <path d="M9 -17 H17" stroke="#b9c6c6" stroke-width="3"/><circle cx="18" cy="-17" r="3" fill="#e9ede7" stroke="#293841"/>
-  </g>`;
-  if (kind === 'sample') {
-    const secondLens = (part.lenses || []).length > 1 ? `<path d="M26 -17 V7" stroke="#b7c6c6" stroke-width="5"/><ellipse cx="26" cy="-15" rx="7" ry="15" fill="#afdbdd" stroke="#e8f3ef" stroke-width="2"/>` : '';
-    head = `<g><path d="M-34 11 H34" stroke="#d4dcda" stroke-width="5"/><path d="M-8 -17 V7" stroke="#c3d1d0" stroke-width="5"/><ellipse cx="-8" cy="-15" rx="7" ry="15" fill="#afdbdd" stroke="#f2f5ed" stroke-width="2"/>${secondLens}<rect x="8" y="-11" width="11" height="18" fill="#d6ad70" stroke="#f2e4ce" stroke-width="2"/></g>`;
-  }
-  return `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})" aria-label="${id} ${kind}">${base}${head}<title>${id}</title></g>`;
-}
-function housingSvg(port, label, color) {
-  const pos = port?.pos || { x: 2250, z: label === 'OPA' ? 935 : 294, h: label === 'OPA' ? 158 : 120 };
-  const p = project(pos), tableY = project({ x: pos.x, z: pos.z, h: 0 }).y - p.y;
-  return `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})">
-    <path d="M-8 -27 L38 -50 L119 -22 L73 1 Z" fill="#f2f1e9" stroke="#ffffff" stroke-width="1.5"/>
-    <path d="M-8 -27 L73 1 V27 L-8 -1 Z" fill="#c6cbca" stroke="#e8ece9" stroke-width="1.5"/>
-    <path d="M73 1 L119 -22 V4 L73 27 Z" fill="#89969b" stroke="#d7dedb" stroke-width="1.5"/>
-    <path d="M16 8 V${tableY.toFixed(1)} M73 27 V${(tableY + 5).toFixed(1)}" stroke="#293940" stroke-width="8"/>
-    <ellipse cx="16" cy="${tableY.toFixed(1)}" rx="16" ry="5" fill="#1b2b33"/><ellipse cx="73" cy="${(tableY + 5).toFixed(1)}" rx="16" ry="5" fill="#1b2b33"/>
-    <circle r="8" fill="${color}" stroke="#f3efea" stroke-width="2"/><circle r="3" fill="#f1efe8"/>
-    <text class="label tag" x="64" y="-25" text-anchor="middle">${label}</text>
-  </g>`;
-}
-function mannequinSvg(pose, targetPart) {
-  const x = pose === 'manual' || pose === 'buy' ? 180 : Math.max(370, Math.min(720, project(targetPart?.pos || { x: 1200, z: 600 }).x));
-  const y = Math.min(655, Math.max(550, 445 + .28 * x));
-  const ink = '#e4e2d9';
-  const desk = ['manual', 'buy', 'measure'].includes(pose)
-    ? `<g><path d="M48 -67 L121 -91 L174 -73 L100 -47 Z" fill="#56717b" stroke="${ink}" stroke-width="3"/><path d="M48 -67 L100 -47 L100 -40 L48 -59 Z" fill="#22363f"/><path d="M100 -47 L174 -73 L174 -66 L100 -40 Z" fill="#1b303a"/><path d="M66 -53 V4 M151 -67 V3" stroke="${ink}" stroke-width="6"/></g>` : '';
-  const book = pose === 'manual' ? `<g transform="translate(110,-66)"><path d="M-33 0 L0 -12 L34 0 L0 10 Z" fill="#263b44" stroke="${ink}" stroke-width="2"/><path d="M0 -12 V10 M-24 -1 L-7 -6 M7 -5 L25 -1" stroke="${ink}" stroke-width="1.5"/></g>` : '';
-  const buying = pose === 'buy' ? `<g transform="translate(106,-75)"><rect x="-24" y="-17" width="48" height="30" fill="${ink}"/><text x="0" y="6" text-anchor="middle" fill="#ec8135" font-size="21">€</text></g><g transform="translate(22,-184)"><path d="M-19 -22 H19 V21 H-19 Z" fill="#ed8232"/><text x="0" y="10" text-anchor="middle" fill="${ink}" font-size="30">€</text></g>` : '';
-  const measuring = pose === 'measure' ? `<g transform="translate(108,-77)"><rect x="-26" y="-22" width="52" height="37" fill="${ink}"/><path d="M-20 0 L-9 -5 L0 2 L11 -13 L20 -7" fill="none" stroke="#263b44" stroke-width="2"/></g>` : '';
-  const arm = pose === 'manual'
-    ? `<path d="M-24 -109 L20 -89 M24 -86 L78 -77 M27 -110 L62 -79 M67 -75 L97 -68" stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"/>`
-    : pose === 'adjust'
-      ? `<path d="M-24 -112 L17 -122 M21 -124 L51 -151 M27 -111 L60 -123 M64 -125 L88 -143" stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"/>`
-      : `<path d="M-24 -111 L-33 -74 M-31 -69 L-15 -58 M26 -110 L58 -78 M62 -76 L93 -84" stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"/>`;
-  return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(1.08)">
-    <ellipse cx="0" cy="5" rx="49" ry="8" fill="${ink}" opacity=".18"/>
-    ${desk}
-    <path d="M-22 -64 L-4 -64 L-9 -37 L-28 -35 Z M8 -64 L27 -64 L36 -35 L17 -34 Z" fill="${ink}"/>
-    <path d="M-28 -30 L-10 -30 L-13 -5 L-33 -5 Z M18 -29 L37 -29 L43 -5 L22 -5 Z" fill="${ink}"/>
-    <path d="M-34 -5 L-11 -5 L-9 1 L-40 1 Z M20 -5 L45 -5 L50 1 L19 1 Z" fill="${ink}"/>
-    ${arm}
-    <path d="M-29 -121 L21 -126 L36 -102 L27 -66 L-24 -64 L-35 -99 Z" fill="${ink}"/>
-    <path d="M-29 -80 L23 -80" stroke="#263b44" stroke-width="3" opacity=".65"/>
-    <g transform="translate(${pose === 'manual' || pose === 'adjust' ? 18 : 2} -150) rotate(${pose === 'manual' || pose === 'adjust' ? 18 : 0})">
-      <path d="M-17 -22 L10 -25 L22 -12 L17 13 L-13 18 L-23 5 L-24 -11 Z" fill="${ink}"/>
-    </g>
-    ${book}${buying}${measuring}
-  </g>`;
-}
 function actionCoordinates(call) {
   const args = call.args || {}, parts = call.snapshot?.parts || [];
   if (state.selectedPart) { const selected = parts.find(part => part.id === state.selectedPart); if (selected) return selected.pos; }
@@ -102,37 +21,208 @@ function actionCoordinates(call) {
   if (args.plane === 'sample') return parts.find(part => part.kind === 'sample')?.pos || null;
   return null;
 }
+// ---- Scene geometry: a true orthographic view of the simulator's millimetre coordinates. ----
+// World axes follow sim/vec.py: x along the 2400 mm table, z across the 1200 mm table, h up from the table top.
+// Every optic is drawn from the replay pose with the simulator's own mount dimensions (sim/constants.py).
+const DEG = Math.PI / 180;
+const C = { ink: '#16120F', ink2: '#2B231D', ink3: '#413629', room: '#1E1915', floor: '#0E0B09', paper: '#EDE3CC', paper2: '#F7F0DF', kraft: '#9C927E', kraft2: '#776E5C', orange: '#E8742A', blue: '#4A8FC4' };
+const BEAMS = [['800nm', C.orange, '800 nm'], ['opa', C.blue, 'OPA']];
+const VIEW = { c: Math.cos(-14 * DEG), s: Math.sin(-14 * DEG), sf: Math.sin(38 * DEG), cf: Math.cos(38 * DEG) };
+const TOWARD_VIEWER = { x: VIEW.s * VIEW.cf, z: VIEW.c * VIEW.cf, h: VIEW.sf };
+const LIGHT = norm({ x: -0.55, z: 0.8, h: 0 });
+const MM = { table: { x: 2400, z: 1200 }, slab: 60, floor: -760, robot: 1050, mountHalf: 19, mountDepth: [0.5, 12], postR: 6.35, postBehind: 6, lensRing: 25.4, retroR: 19.05, apex: 90, retroFront: 40, minPost: 50 };
+const SCENE = { w: 1200, h: 800, fit: { x0: 40, y0: 96, x1: 1160, y1: 600 } };
+let FIT = { k: 0.4, ox: 0, oy: 0 };
+
+function norm(v) { const l = Math.hypot(v.x, v.z, v.h || 0) || 1; return { x: v.x / l, z: v.z / l, h: (v.h || 0) / l }; }
+function dot(a, b) { return a.x * b.x + a.z * b.z + (a.h || 0) * (b.h || 0); }
+function cross(a, b) { return { x: a.z * b.h - a.h * b.z, z: a.h * b.x - a.x * b.h, h: a.x * b.z - a.z * b.x }; }
+function add(p, v, t = 1) { return { x: p.x + v.x * t, z: p.z + v.z * t, h: (p.h || 0) + (v.h || 0) * t }; }
+function yawVec(deg) { return { x: Math.cos(deg * DEG), z: Math.sin(deg * DEG), h: 0 }; }
+function raw(p) { return { x: p.x * VIEW.c - p.z * VIEW.s, y: (p.x * VIEW.s + p.z * VIEW.c) * VIEW.sf - (p.h || 0) * VIEW.cf }; }
+function depth(p) { return (p.x * VIEW.s + p.z * VIEW.c) * VIEW.cf + (p.h || 0) * VIEW.sf; }
+function proj(p) { const r = raw(p); return { x: FIT.ox + FIT.k * r.x, y: FIT.oy + FIT.k * r.y }; }
+function pt(p) { const q = proj(p); return `${q.x.toFixed(1)},${q.y.toFixed(1)}`; }
+function poly(list, attrs) { return `<polygon points="${list.map(pt).join(' ')}" ${attrs}/>`; }
+function line(a, b, attrs) { const p = proj(a), q = proj(b); return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" ${attrs}/>`; }
+function px(mm) { return (mm * FIT.k).toFixed(2); }
+
+function fitScene(meta) {
+  const T = MM.table, pts = [];
+  for (const x of [0, T.x]) for (const z of [0, T.z]) for (const h of [0, -MM.slab]) pts.push({ x, z, h });
+  for (const b of meta?.housings_mm || []) for (const x of [b.x0, b.x1]) for (const z of [b.z0, b.z1]) pts.push({ x, z, h: b.h1 });
+  const desk = meta?.desk_mm || { x: -300, z: 600 }; pts.push({ x: desk.x - 380, z: desk.z - 300, h: 0 });
+  const r = pts.map(raw), xs = r.map(p => p.x), ys = r.map(p => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys), f = SCENE.fit;
+  const k = Math.min((f.x1 - f.x0) / (maxX - minX), (f.y1 - f.y0) / (maxY - minY));
+  FIT = { k, ox: (f.x0 + f.x1) / 2 - k * (minX + maxX) / 2, oy: f.y0 - k * minY };
+}
+
+// A convex block: centre on its base, yaw of its length axis, length L, width W, from h0 to h1.
+function block({ c, yaw = 0, L, W, h0, h1 }, fills, extra = '') {
+  const a = yawVec(yaw), b = { x: -a.z, z: a.x, h: 0 };
+  const corner = (sa, sb, h) => ({ x: c.x + a.x * sa * L / 2 + b.x * sb * W / 2, z: c.z + a.z * sa * L / 2 + b.z * sb * W / 2, h });
+  const faces = [
+    { n: a, q: [corner(1, -1, h0), corner(1, 1, h0), corner(1, 1, h1), corner(1, -1, h1)] },
+    { n: { x: -a.x, z: -a.z, h: 0 }, q: [corner(-1, -1, h0), corner(-1, 1, h0), corner(-1, 1, h1), corner(-1, -1, h1)] },
+    { n: b, q: [corner(-1, 1, h0), corner(1, 1, h0), corner(1, 1, h1), corner(-1, 1, h1)] },
+    { n: { x: -b.x, z: -b.z, h: 0 }, q: [corner(-1, -1, h0), corner(1, -1, h0), corner(1, -1, h1), corner(-1, -1, h1)] },
+  ];
+  const sides = faces.filter(f => dot(f.n, TOWARD_VIEWER) > 1e-6).map(f => poly(f.q, `fill="${dot(f.n, LIGHT) > 0 ? fills.light : fills.dark}" ${extra}`)).join('');
+  return sides + poly([corner(-1, -1, h1), corner(1, -1, h1), corner(1, 1, h1), corner(-1, 1, h1)], `fill="${fills.top}" ${extra}`);
+}
+function disc(center, normal, r, attrs, n = 30) {
+  const nn = norm(normal), u = Math.abs(nn.h) > 0.95 ? { x: 1, z: 0, h: 0 } : norm({ x: -nn.z, z: nn.x, h: 0 }), v = cross(nn, u), list = [];
+  for (let i = 0; i < n; i++) { const t = i / n * Math.PI * 2; list.push(add(add(center, u, Math.cos(t) * r), v, Math.sin(t) * r)); }
+  return poly(list, attrs);
+}
+function post(at, h1) { return line({ ...at, h: 0 }, { ...at, h: h1 }, `stroke="${C.ink}" stroke-width="${px(MM.postR * 2)}"`); }
+function postBase(at, yaw) { return block({ c: { x: at.x, z: at.z }, yaw, L: 25, W: 64, h0: 0, h1: 10 }, INK_FILLS); }
+const INK_FILLS = { top: C.ink3, light: C.ink2, dark: C.ink };
+const MOUNT_FILLS = { top: '#5A4B3C', light: C.ink3, dark: C.ink };
+const OPTIC = `fill="${C.paper2}" stroke="${C.ink}" stroke-width="1"`;
+
+function mirrorSvg(part) {
+  const yaw = part.eff_yaw_deg ?? part.yaw_deg ?? 0, n = yawVec(yaw), p = part.pos, stem = add(p, n, -MM.postBehind);
+  const [d0, d1] = MM.mountDepth, plate = block({ c: add(p, n, -(d0 + d1) / 2), yaw, L: d1 - d0, W: MM.mountHalf * 2, h0: p.h - MM.mountHalf, h1: p.h + MM.mountHalf }, MOUNT_FILLS);
+  const face = disc(add(p, n, 0.4), n, 12.7, OPTIC);
+  return postBase(stem, yaw) + post(stem, p.h - MM.mountHalf) + (dot(n, TOWARD_VIEWER) > 0 ? plate + face : face + plate);
+}
+function periscopeSvg(part) {
+  const d = yawVec(part.eff_yaw_deg ?? part.yaw_deg ?? 180), u = { x: -d.z, z: d.x, h: 0 }, p = part.pos, top = part.h_in ?? p.h + 40;
+  const tower = add({ x: p.x, z: p.z }, u, 30);
+  const upper = { x: p.x, z: p.z, h: top }, lower = { x: p.x, z: p.z, h: p.h };
+  const mirror = (at, n) => disc(at, n, MM.mountHalf, `fill="${C.ink2}"`) + disc(add(at, n, 0.5), n, 12.7, OPTIC);
+  const body = postBase(tower, part.yaw_deg) + block({ c: tower, yaw: part.yaw_deg, L: 26, W: 26, h0: 10, h1: top + 24 }, MOUNT_FILLS);
+  const arms = line(add(upper, u, 4), add(upper, u, 24), `stroke="${C.ink}" stroke-width="${px(10)}"`) + line(add(lower, u, 4), add(lower, u, 24), `stroke="${C.ink}" stroke-width="${px(10)}"`);
+  const mirrors = mirror(upper, { x: -d.x, z: -d.z, h: -1 }) + mirror(lower, { x: d.x, z: d.z, h: 1 });
+  return depth(tower) < depth(p) ? body + arms + mirrors : mirrors + arms + body;
+}
+function stageSvg(part) {
+  const yaw = part.eff_yaw_deg ?? part.yaw_deg ?? 180, d = yawVec(yaw), p = part.pos, sp = part.stage_pos_mm ?? 0, travel = part.travel_mm ?? 25;
+  const apex = add(p, d, MM.apex + sp), face = add(apex, d, -MM.retroFront);
+  const rail = block({ c: add({ x: p.x, z: p.z }, d, (MM.apex - MM.retroFront + MM.apex + travel + 16) / 2), yaw, L: MM.retroFront + travel + 40, W: 72, h0: 0, h1: 34 }, INK_FILLS);
+  const carriage = block({ c: add({ x: face.x, z: face.z }, d, MM.retroFront / 2 + 6), yaw, L: MM.retroFront + 12, W: 56, h0: 34, h1: p.h + MM.retroR + 6 }, MOUNT_FILLS);
+  const knob = line(add({ ...apex, h: 17 }, d, 28), add({ ...apex, h: 17 }, d, 58), `stroke="${C.ink2}" stroke-width="${px(18)}"`);
+  const n = { x: -d.x, z: -d.z, h: 0 }, mouth = disc(add(face, n, 0.5), n, MM.retroR, `fill="${C.paper2}" stroke="${C.ink}" stroke-width="1"`) + disc(add(face, n, 0.6), n, MM.retroR * 0.45, `fill="${C.kraft}"`);
+  return dot(n, TOWARD_VIEWER) > 0 ? knob + rail + carriage + mouth : mouth + knob + rail + carriage;
+}
+function sampleSvg(part, hit) {
+  const lenses = part.lenses?.length ? part.lenses : [{ pos: part.pos, dir: yawVec(part.yaw_deg + 180), radius_mm: 12.7, sample_pos: part.pos }];
+  const sampleAt = lenses[0].sample_pos || part.pos, n = yawVec(part.yaw_deg ?? 180), u = norm({ x: -n.z, z: n.x, h: 0 }), up = { x: 0, z: 0, h: 1 };
+  const lensSvg = lenses.map(lens => {
+    const at = lens.pos, ring = disc(at, lens.dir, lens.mount_radius_mm ?? MM.lensRing, `fill="${C.ink2}"`), glass = disc(add(at, lens.dir, 0.4), lens.dir, lens.radius_mm ?? 12.7, `fill="#CFE0E4" stroke="${C.ink}" stroke-width="1"`);
+    const stand = { x: at.x, z: at.z };
+    return postBase(stand, lens.yaw_deg ?? part.yaw_deg) + post(stand, at.h - (lens.mount_radius_mm ?? MM.lensRing)) + ring + glass;
+  }).join('');
+  const corner = (a, b) => add(add(sampleAt, u, a), up, b), half = 22, facing = dot(n, TOWARD_VIEWER) > 0;
+  const plate = poly([corner(-half, -half), corner(half, -half), corner(half, half), corner(-half, half)], `fill="${facing ? C.paper : C.kraft}" stroke="${C.ink}" stroke-width="1.2"`);
+  const star = facing && hit ? poly([[0, 17], [3, 3], [17, 0], [3, -3], [0, -17], [-3, -3], [-17, 0], [-3, 3]].map(([a, b]) => corner(a, b)), `fill="${C.orange}"`) + disc(add(sampleAt, n, 0.5), n, 2.6, `fill="${C.ink}"`) : '';
+  const holder = postBase({ x: sampleAt.x, z: sampleAt.z }, part.yaw_deg) + post({ x: sampleAt.x, z: sampleAt.z }, sampleAt.h - half);
+  return holder + plate + star + lensSvg;
+}
+function housingSvg(box, port, label, color) {
+  const c = { x: (box.x0 + box.x1) / 2, z: (box.z0 + box.z1) / 2 };
+  const body = block({ c, yaw: 0, L: box.x1 - box.x0, W: box.z1 - box.z0, h0: box.h0, h1: box.h1 }, { top: C.paper2, light: C.paper, dark: C.kraft }, 'filter="url(#pcutS)"');
+  const aperture = port ? disc(port.pos, { x: -1, z: 0, h: 0 }, 13, `fill="${C.ink}"`) + disc(add(port.pos, { x: -1, z: 0, h: 0 }, 1), { x: -1, z: 0, h: 0 }, 8, `fill="${color}"`) : '';
+  const q = proj({ x: box.x0, z: box.z0, h: box.h1 }), w = label.length * 11 + 34, x = q.x - w - 8, y = q.y - 8;
+  return { body: body + aperture, label: `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w}" height="28" fill="${C.ink}"/><rect x="${(x + 8).toFixed(1)}" y="${(y + 9).toFixed(1)}" width="10" height="10" fill="${color}"/><text x="${(x + 25).toFixed(1)}" y="${(y + 22).toFixed(1)}" class="sc-house">${label}</text>` };
+}
+function tableSvg() {
+  const T = MM.table, top = [{ x: 0, z: 0 }, { x: T.x, z: 0 }, { x: T.x, z: T.z }, { x: 0, z: T.z }], at = h => top.map(p => ({ ...p, h }));
+  const shadow = poly(at(MM.floor).map(p => ({ ...p, x: p.x + (p.x ? 60 : -60), z: p.z + (p.z ? 60 : -60) })), `fill="${C.floor}"`);
+  const legs = [[250, 220], [T.x - 250, 220], [250, T.z - 220], [T.x - 250, T.z - 220]].sort((a, b) => depth({ x: a[0], z: a[1] }) - depth({ x: b[0], z: b[1] }))
+    .map(([x, z]) => block({ c: { x, z }, L: 170, W: 170, h0: MM.floor, h1: -MM.slab }, { top: C.ink, light: C.ink3, dark: C.ink2 })).join('');
+  const slab = block({ c: { x: T.x / 2, z: T.z / 2 }, L: T.x, W: T.z, h0: -MM.slab, h1: 0 }, { top: C.paper, light: C.kraft, dark: C.kraft2 }, 'filter="url(#pcutS)"');
+  const k = FIT.k, m = [k * VIEW.c, k * VIEW.s * VIEW.sf, -k * VIEW.s, k * VIEW.c * VIEW.sf, FIT.ox, FIT.oy].map(v => v.toFixed(5)).join(' ');
+  const holes = `<defs><pattern id="holes" width="25" height="25" patternUnits="userSpaceOnUse" patternTransform="matrix(${m})"><circle cx="12.5" cy="12.5" r="3.3" fill="${C.ink}" opacity=".42"/></pattern></defs>${poly(at(0), 'fill="url(#holes)"')}`;
+  const ticks = [];
+  for (let x = 0; x <= T.x; x += 100) { const major = x % 600 === 0; ticks.push(line({ x, z: T.z, h: -MM.slab }, { x, z: T.z + (major ? 70 : 35), h: -MM.slab }, `stroke="${C.paper}" stroke-width="${major ? 1.6 : 0.9}"`)); if (major) { const q = proj({ x, z: T.z + 150, h: -MM.slab }); ticks.push(`<text x="${q.x.toFixed(1)}" y="${(q.y + 4).toFixed(1)}" text-anchor="middle" class="sc-tick">${x === T.x ? 'X 2400 MM' : x}</text>`); } }
+  for (let z = 0; z <= T.z; z += 100) { const major = z % 600 === 0; ticks.push(line({ x: 0, z, h: -MM.slab }, { x: major ? -70 : -35, z, h: -MM.slab }, `stroke="${C.paper}" stroke-width="${major ? 1.6 : 0.9}"`)); if (major && z) { const q = proj({ x: -120, z, h: -MM.slab }); ticks.push(`<text x="${q.x.toFixed(1)}" y="${(q.y + 4).toFixed(1)}" text-anchor="end" class="sc-tick">${z === T.z ? 'Z 1200 MM' : z}</text>`); } }
+  return { under: shadow + legs, slab: slab + holes, ticks: ticks.join('') };
+}
+function deskSvg(meta) {
+  const at = meta?.desk_mm || { x: -300, z: 600 }, c = { x: at.x - 260, z: at.z - 120 };
+  const desk = block({ c, L: 200, W: 420, h0: MM.floor, h1: -120 }, { top: C.kraft, light: C.kraft2, dark: C.ink3 }, 'filter="url(#pcutS)"');
+  const screen = block({ c: { x: c.x - 40, z: c.z }, L: 20, W: 300, h0: -120, h1: 120 }, INK_FILLS);
+  const s = [{ x: c.x - 29, z: c.z - 130, h: -100 }, { x: c.x - 29, z: c.z + 130, h: -100 }, { x: c.x - 29, z: c.z + 130, h: 100 }, { x: c.x - 29, z: c.z - 130, h: 100 }];
+  return desk + screen + poly(s, `fill="${C.paper}"`);
+}
+function mannequinSvg(pose, you, targetX, outline) {
+  const foot = proj({ x: you.x, z: you.z, h: MM.floor }), scale = MM.robot * FIT.k * VIEW.cf / 182;
+  const flip = targetX < foot.x ? -1 : 1, ink = C.paper;
+  const key = outline ? ` stroke="${C.ink}" stroke-width="${(2 / scale).toFixed(2)}" stroke-linejoin="round"` : '';
+  const paint = `fill="${ink}"${key}`, limb = `stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"`;
+  const limbKey = outline ? `<path d="ARM" stroke="${C.ink}" stroke-width="${(14 + 4 / scale).toFixed(2)}" fill="none" stroke-linecap="square"/>` : '';
+  const arm = pose === 'manual' ? 'M-24 -109 L20 -89 M24 -86 L78 -77 M27 -110 L62 -79 M67 -75 L97 -68'
+    : pose === 'adjust' ? 'M-24 -112 L17 -122 M21 -124 L51 -151 M27 -111 L60 -123 M64 -125 L88 -143'
+    : 'M-24 -111 L-33 -74 M-31 -69 L-15 -58 M26 -110 L58 -78 M62 -76 L93 -84';
+  const prop = pose === 'manual' ? `<path d="M80 -86 L112 -96 L122 -64 L90 -54 Z" fill="${C.orange}"/><path d="M101 -91 L106 -59" stroke="${C.ink}" stroke-width="2"/>`
+    : pose === 'buy' ? `<rect x="-20" y="-224" width="40" height="40" fill="${C.orange}"/><text x="0" y="-194" text-anchor="middle" class="sc-euro">€</text>`
+    : pose === 'measure' ? `<rect x="84" y="-104" width="46" height="34" fill="${C.orange}"/><path d="M89 -84 L98 -88 L106 -80 L115 -96 L125 -90" fill="none" stroke="${C.ink}" stroke-width="2.4"/>` : '';
+  const headTilt = pose === 'manual' || pose === 'adjust';
+  return `<g transform="translate(${foot.x.toFixed(1)} ${foot.y.toFixed(1)}) scale(${(flip * scale).toFixed(3)} ${scale.toFixed(3)})" filter="url(#pcutS)">
+    <path d="M-22 -64 L-4 -64 L-9 -37 L-28 -35 Z M8 -64 L27 -64 L36 -35 L17 -34 Z M-28 -30 L-10 -30 L-13 -5 L-33 -5 Z M18 -29 L37 -29 L43 -5 L22 -5 Z M-34 -5 L-11 -5 L-9 1 L-40 1 Z M20 -5 L45 -5 L50 1 L19 1 Z" ${paint}/>
+    ${limbKey.replace('ARM', arm)}<path d="${arm}" ${limb}/>
+    <path d="M-29 -121 L21 -126 L36 -102 L27 -66 L-24 -64 L-35 -99 Z" ${paint}/>
+    <path d="M-17 -22 L10 -25 L22 -12 L17 13 L-13 18 L-23 5 L-24 -11 Z" transform="translate(${headTilt ? 18 : 2} -150) rotate(${headTilt ? 18 : 0})" ${paint}/>
+    ${prop}
+  </g>`;
+}
+function headlineText(call, action) { return [action.verb.toUpperCase(), `${cleanTool(call.tool)}${Object.keys(call.args || {}).length ? ' · ' + shortArgs(call.args) : ''}`.toUpperCase()]; }
+// Size the drawing to the real pane so the table never letterboxes; the poster headline takes a fixed band at the bottom.
+function layoutScene(call, action) {
+  const shell = app.querySelector('.scene-shell'), w = Math.max(320, shell?.clientWidth || innerWidth), h = Math.max(300, shell?.clientHeight || innerHeight);
+  const [first, detail] = headlineText(call, action), room = w - 80, fitSize = (text, max) => Math.min(max, room / (Math.max(text.length, 8) * 0.42));
+  const big = fitSize(first, Math.min(96, w * .075)), small = fitSize(detail, Math.min(58, w * .045)), line2 = h - 74, line1 = line2 - small - 6;
+  Object.assign(SCENE, { w, h, big, small, line1, line2, fit: { x0: 24, y0: w < 700 ? 64 : 104, x1: w - 96, y1: line1 - big - 4 } });
+}
+function headline(call, action) {
+  const [first, detail] = headlineText(call, action), x = SCENE.w - 40;
+  return `<text x="${x}" y="${SCENE.line1.toFixed(0)}" text-anchor="end" class="sc-big" style="font-size:${SCENE.big.toFixed(0)}px;fill:${C.paper}">${esc(first)}</text>
+    <text x="${x}" y="${SCENE.line2.toFixed(0)}" text-anchor="end" class="sc-big" style="font-size:${SCENE.small.toFixed(0)}px;fill:${C.orange}">${esc(detail)}</text>`;
+}
+function shortId(id) { return String(id).replace(/^mirror-/, 'M').replace(/^periscope-/, 'P').toUpperCase(); }
+function partLabel(part) {
+  const top = part.kind === 'periscope' ? (part.h_in ?? part.pos.h) + 30 : part.pos.h + (part.kind === 'sample' ? 34 : 26), q = proj({ ...part.pos, h: top });
+  return `<text x="${q.x.toFixed(1)}" y="${(q.y - 6).toFixed(1)}" text-anchor="middle" class="sc-part">${esc(shortId(part.id))}</text>`;
+}
 function sceneSvg(call) {
-  const snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {}, action = contextFor(call);
-  const target = /place|knob|move_stage|steer/.test(call.tool) ? parts.find(p => Object.values(call.args || {}).includes(p.id)) || parts[parts.length - 1] : parts.find(p => p.kind === 'sample');
-  const lines = [['800nm', '#ff626f'], ['opa', '#ae9eff']].map(([key, color]) => (beams[key]?.open ? (beams[key].segments || []).map(segment => `<path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="7" opacity=".22"/><path d="M${at(segment[0])} L${at(segment[1])}" stroke="${color}" stroke-width="2.8" stroke-linecap="round"/>`).join('') : '')).join('');
-  const top = [{x:0,z:0,h:0},{x:2400,z:0,h:0},{x:2400,z:1200,h:0},{x:0,z:1200,h:0}];
-  const below = top.map(point => ({...point,h:-40}));
-  const table = `<path d="M${at(top[3])} L${at(top[2])} L${at(below[2])} L${at(below[3])} Z" fill="#4a626b" stroke="#172830" stroke-width="1.5"/><path d="M${at(top[1])} L${at(top[2])} L${at(below[2])} L${at(below[1])} Z" fill="#38525d" stroke="#172830" stroke-width="1.5"/><g transform="matrix(.246 .070 -.204 .140 347.2 167)"><rect width="2400" height="1200" fill="#8098a0"/><rect width="2400" height="1200" fill="url(#breadboardHoles)"/></g><path d="M${top.map(at).join(' L')} Z" fill="none" stroke="#e1e9e6" stroke-width="2"/>`;
-  const targetPosition = actionCoordinates(call);
-  const coordinate = targetPosition ? (() => {
-    const q = project({ x: targetPosition.x, z: targetPosition.z, h: 0 });
-    const left = q.x > 750, boxX = left ? -150 : 18;
-    return `<g transform="translate(${q.x.toFixed(1)} ${q.y.toFixed(1)})"><circle r="13" fill="none" stroke="#ee8134" stroke-width="2"/><path d="M-20 0 H20 M0 -20 V20" stroke="#ee8134" stroke-width="1.5"/><rect x="${boxX}" y="-29" width="132" height="20" fill="#073a49"/><text x="${boxX + 6}" y="-15" fill="#f1e9dc" font-family="Avenir Next, Arial" font-size="10">x ${Math.round(targetPosition.x)} · z ${Math.round(targetPosition.z)} mm</text></g>`;
+  const run = currentRun(), meta = run?.meta || {}, snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {}, action = contextFor(call);
+  layoutScene(call, action); fitScene(meta);
+  const table = tableSvg(), hit = BEAMS.every(([key]) => beams[key]?.open && beams[key]?.end === 'sample');
+  const labels = [], objects = parts.map(part => ({ d: depth(part.pos), svg: part.kind === 'mirror' ? mirrorSvg(part) : part.kind === 'stage' ? stageSvg(part) : part.kind === 'periscope' ? periscopeSvg(part) : part.kind === 'sample' ? sampleSvg(part, hit) : '' }));
+  (meta.housings_mm || []).forEach((box, i) => { const [key, color, label] = BEAMS[i === 0 ? 0 : 1]; const h = housingSvg(box, meta.ports?.[key], label, color); labels.push(h.label); objects.push({ d: depth({ x: box.x0, z: (box.z0 + box.z1) / 2 }), svg: h.body }); });
+  objects.sort((a, b) => a.d - b.d); parts.forEach(part => labels.push(partLabel(part)));
+  const beamSvg = BEAMS.map(([key, color]) => beams[key]?.open ? (beams[key].segments || []).map(([a, b]) => line(a, b, `stroke="${color}" stroke-width="3.4" stroke-linecap="round"`)).join('') : '').join('');
+  const beamShadow = BEAMS.map(([key]) => beams[key]?.open ? (beams[key].segments || []).map(([a, b]) => line({ ...a, h: 0 }, { ...b, h: 0 }, `stroke="${C.ink}" stroke-width="1.6" opacity=".22"`)).join('') : '').join('');
+  const target = actionCoordinates(call), targetPart = parts.find(p => target && p.pos.x === target.x && p.pos.z === target.z);
+  const marker = target ? (() => {
+    const g = { x: target.x, z: target.z, h: 0 }, q = proj(g), left = q.x > SCENE.w * .62, bx = left ? q.x - 196 : q.x + 30;
+    const lift = targetPart ? line(g, { ...g, h: targetPart.pos.h }, `stroke="${C.orange}" stroke-width="1.4" stroke-dasharray="4 3"`) : '';
+    return disc(g, { x: 0, z: 0, h: 1 }, 48, `fill="none" stroke="${C.orange}" stroke-width="2.4"`) + line(add(g, { x: 1, z: 0 }, -80), add(g, { x: 1, z: 0 }, 80), `stroke="${C.orange}" stroke-width="1.4"`) + line(add(g, { x: 0, z: 1 }, -80), add(g, { x: 0, z: 1 }, 80), `stroke="${C.orange}" stroke-width="1.4"`) + lift
+      + `<rect x="${bx.toFixed(1)}" y="${(q.y - 44).toFixed(1)}" width="166" height="26" fill="${C.ink}"/><text x="${(bx + 10).toFixed(1)}" y="${(q.y - 25).toFixed(1)}" class="sc-coord">X ${Math.round(target.x)} · Z ${Math.round(target.z)} MM</text>`;
   })() : '';
-  return `<svg viewBox="0 0 1040 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Optical table and a cut-paper mannequin working beside it">
-    <defs><pattern id="breadboardHoles" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="12.5" cy="12.5" r="3.5" fill="#304650"/><circle cx="11.5" cy="11.5" r="1.2" fill="#b8c9c9"/></pattern></defs>
-    <rect width="1040" height="700" fill="#181b1c"/>
-    <ellipse cx="525" cy="420" rx="480" ry="286" fill="#2b3335" opacity=".65"/>
-    <ellipse cx="525" cy="526" rx="445" ry="86" fill="#080c0d" opacity=".6"/>
-    ${table}<text x="347" y="156" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">0</text><text x="77" y="346" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">z 1200 mm</text><text x="705" y="519" font-family="Avenir Next, Arial" font-size="10" fill="#d7e8e4">x 2400 mm</text>${lines}${housingSvg(currentRun()?.meta?.ports?.['800nm'], '800 nm', '#c7777c')}${housingSvg(currentRun()?.meta?.ports?.opa, 'OPA', '#9c95c7')}${parts.map(partSvg).join('')}${coordinate}${mannequinSvg(action.pose,target)}
+  const you = snap.you_mm || meta.desk_mm || { x: -300, z: 600 }, behind = you.z < 0, front = you.z > MM.table.z;
+  const tx = proj(targetPart?.pos || target || { x: 1200, z: 600 }).x, figure = mannequinSvg(action.pose, you, you.at_desk ? 1e4 : tx, front);
+  return `<svg viewBox="0 0 ${SCENE.w} ${SCENE.h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Optical table in millimetre-true projection, with the worker beside it">
+    <rect width="${SCENE.w}" height="${SCENE.h}" fill="${C.room}"/>
+    ${deskSvg(meta)}${behind ? figure : ''}${table.under}${table.slab}${table.ticks}${beamShadow}
+    ${objects.map(o => o.svg).join('')}${beamSvg}${labels.join('')}${marker}
+    ${behind ? '' : figure}${headline(call, action)}
   </svg>`;
 }
 function mapSvg(call) {
   const snap = call.snapshot || {}, parts = snap.parts || [], beams = snap.beams || {};
   const sx = x => 15 + x / 2400 * 300, sz = z => 10 + z / 1200 * 150;
-  const beam = [['800nm','#ff626f'],['opa','#ae9eff']].map(([key,color]) => beams[key]?.open ? (beams[key].segments || []).map(seg => `<path d="M${sx(seg[0].x)},${sz(seg[0].z)} L${sx(seg[1].x)},${sz(seg[1].z)}" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`).join('') : '').join('');
-  return `<svg class="map-svg" viewBox="0 0 330 170" role="img" aria-label="Top down layout of the optical table"><rect x="15" y="10" width="300" height="150" fill="#8098a0" stroke="#e1e9e6"/><path d="M90 10 V160 M165 10 V160 M240 10 V160 M15 47.5 H315 M15 85 H315 M15 122.5 H315" stroke="#aec2c4" stroke-width=".6" opacity=".6"/>${beam}${parts.map(p=>`<g><circle cx="${sx(p.pos.x)}" cy="${sz(p.pos.z)}" r="4.5" fill="#e8e9df" stroke="#10252b" stroke-width="1.3"/><title>${esc(p.id)}</title></g>`).join('')}<rect x="296" y="29" width="19" height="35" fill="#e8e9df"/><rect x="296" y="108" width="19" height="35" fill="#e8e9df"/></svg>`;
+  const beam = BEAMS.map(([key, color]) => beams[key]?.open ? (beams[key].segments || []).map(seg => `<path d="M${sx(seg[0].x)},${sz(seg[0].z)} L${sx(seg[1].x)},${sz(seg[1].z)}" stroke="${color}" stroke-width="2.4" stroke-linecap="round"/>`).join('') : '').join('');
+  const houses = (currentRun()?.meta?.housings_mm || []).map(b => `<rect x="${sx(b.x0)}" y="${sz(b.z0)}" width="${sx(b.x1) - sx(b.x0)}" height="${sz(b.z1) - sz(b.z0)}" fill="${C.kraft}"/>`).join('');
+  return `<svg class="map-svg" viewBox="0 0 330 170" role="img" aria-label="Top down layout of the optical table"><defs><pattern id="mapHoles" width="${300 / 24}" height="${150 / 12}" patternUnits="userSpaceOnUse" x="15" y="10"><circle cx="${150 / 24}" cy="${75 / 12}" r=".9" fill="${C.ink}" opacity=".35"/></pattern></defs><rect x="15" y="10" width="300" height="150" fill="${C.paper}"/><rect x="15" y="10" width="300" height="150" fill="url(#mapHoles)"/>${houses}${beam}${parts.map(p => `<g><circle cx="${sx(p.pos.x)}" cy="${sz(p.pos.z)}" r="4" fill="${C.ink}"/><title>${esc(p.id)}</title></g>`).join('')}</svg>`;
 }
 function scoreSvg(run, step) {
   const trajectory = run.trajectory, end = Math.max(1, step), values = trajectory.slice(0, end + 1).map(t => Math.max(0, Math.min(1, Number(t.truth?.reward || 0))));
   const path = values.map((v, i) => `${i ? 'L' : 'M'}${(i / Math.max(end, 1) * 270).toFixed(1)},${(32 - v * 29).toFixed(1)}`).join(' ');
-  return `<svg class="graph" viewBox="0 0 270 34" preserveAspectRatio="none" aria-label="Score history"><path d="M0 32 H270" stroke="var(--line)"/><path d="${path}" fill="none" stroke="#8dbec3" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+  return `<svg class="graph" viewBox="0 0 270 34" preserveAspectRatio="none" aria-label="Score history"><path d="M0 32 H270" stroke="var(--line)"/><path d="${path}" fill="none" stroke="#16120F" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg>`;
 }
 function runName(run, index) { return `Run ${index + 1} · L${run.meta.level} · ${run.meta.opa_lambda_nm} nm`; }
 function groupCalls(trajectory) {
@@ -186,12 +276,13 @@ function render() {
       <input class="scrub" type="range" min="0" max="${trajectory.length-1}" value="${state.step}" aria-label="Scrub steps"><span class="counter">${state.step+1}/${trajectory.length}</span><button data-action="speed" aria-label="Playback speed" aria-expanded="${state.menu === 'speed'}" aria-haspopup="menu">${state.speed}×</button>
     </div>
     <aside class="sidebar"><section class="call-panel"><div class="panel-heading">Steps <small>${trajectory.length} calls</small></div><div class="current-call">${state.step + 1}/${trajectory.length} · ${esc(cleanTool(call.tool))}${Object.keys(call.args || {}).length ? ` · ${esc(shortArgs(call.args))}` : ''}</div><div class="call-stack">${stepsMarkup(trajectory)}</div></section>
-      <section class="score-panel"><div class="totals"><div><span>Money</span><strong>${money(call.snapshot?.cost_eur)}</strong></div><div><span>Lab time</span><strong>${fmtTime(call.t_s)}</strong></div></div><div class="score-secondary"><span>Score · private replay</span><strong>${score.toFixed(3)}</strong></div>${scoreSvg(run,state.step)}</section></aside>
+      <section class="score-panel"><div class="totals"><div><span>Money</span><strong>${money(call.snapshot?.cost_eur)}</strong><small>of ${money(run.meta.spend_cap_eur)}</small></div><div><span>Lab time</span><strong>${fmtTime(call.t_s)}</strong><small>of ${fmtTime(run.meta.budget_s)}</small></div></div><div class="score-secondary"><span>Score · private replay</span><strong>${score.toFixed(3)}</strong></div>${scoreSvg(run,state.step)}</section></aside>
     <button class="rail-toggle" data-action="rail" aria-label="${state.railOpen ? 'Hide steps' : 'Show steps'}" title="${state.railOpen ? 'Hide steps' : 'Show steps'}">${state.railOpen ? '‹' : '›'}</button>
     <button class="corner-button parts-trigger" data-action="parts" aria-label="Parts" aria-expanded="${state.menu === 'parts'}" aria-haspopup="menu">≡</button><span class="hint">Parts</span>
     <button class="corner-button view-trigger" data-action="view" aria-label="View" aria-expanded="${state.menu === 'view'}" aria-haspopup="menu">▣</button><span class="view-hint">View</span>
     <div class="shortcut-hints">Space play · ← → / , . step</div>${menuMarkup(call)}</main>`;
-  const active = app.querySelector('.phase-row.active'); active?.scrollIntoView({ block: 'nearest' });
+  const active = app.querySelector('.phase-row.active'), stack = app.querySelector('.call-stack');
+  if (active && stack) { const top = active.offsetTop - stack.offsetTop, bottom = top + active.offsetHeight; if (top < stack.scrollTop) stack.scrollTop = top; else if (bottom > stack.scrollTop + stack.clientHeight) stack.scrollTop = bottom - stack.clientHeight; }
 }
 function changeStep(next) { const max = currentRun().trajectory.length - 1; state.step = Math.max(0, Math.min(max, next)); state.selectedPart = null; if (state.step === max && state.playing) stop(); render(); }
 function stop() { state.playing = false; clearInterval(state.timer); state.timer = null; }
@@ -233,4 +324,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === '.') changeStep(state.step + 1);
   if (e.key === ' ') { e.preventDefault(); togglePlay(); }
 });
+addEventListener('resize', () => render());
 render();
+render(); // second pass sizes the drawing to the scene pane that the first pass created
