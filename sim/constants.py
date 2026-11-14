@@ -80,6 +80,23 @@ CAM_SI_RANGE = (400.0, 1000.0)
 CAM_VSWIR_RANGE = (400.0, 1700.0)
 CAM_PIXEL = 0.0055
 CAM_NOISE_PX = 0.3
-CAM_HALF_FOV = 2.5
+CAM_HALF_FOV = 4.0
 SCOPE_QUANT_PS = 20.0
 SCOPE_JITTER_PS = 10.0
+
+# ----------------------------------------------------------------------------------------------
+# Level 2: beams cross at full angle 90 deg at the sample (each 45 deg from the sample normal), each
+# through its own f = 100 mm lens. On the tilted sample each spot is stretched by 1/cos45 along the
+# horizontal in-plane direction t. Across the overlap region the relative arrival time varies as
+# dt(x) = 2 x sin(phi/2) / c (x along t). The intensity product I_1 I_2 along t is Gaussian with
+# 1/e half-width a = W_t / 2 (W_t = sqrt2 * 52 um), so the measured cross-correlation is the 70 fs one
+# convolved with a Gaussian of 1/e half-width 2 a sin(phi/2) / c:
+#   tau_eff^2 = tau_c^2 + (2 a sin(phi/2) / c)^2  (~187 fs), peak scaled by tau_c / tau_eff (~0.37).
+# The reward uses tau_eff (the overlap window this geometry actually has).
+L2_HALF_ANGLE = math.radians(45.0)
+L2_STRETCH = 1.0 / math.cos(L2_HALF_ANGLE)
+_A_T = W0_OPA * L2_STRETCH / 2.0
+TAU_C_L2 = math.sqrt(TAU_C ** 2 + (2 * _A_T * math.sin(L2_HALF_ANGLE) / C_MM_PER_FS) ** 2)
+L2_PEAK = TAU_C / TAU_C_L2
+L2_SCATTER = 0.01  # signal camera looks head-on along the sample normal: only diffuse scatter
+L2_LENS_SEP = 100.0  # each lens sits f = 100 mm before the sample point along its own axis

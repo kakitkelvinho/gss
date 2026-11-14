@@ -21,16 +21,15 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 C_MM_PER_FS = 2.99792458e-4
-TAU_C_FS = 70.0
-PEAK_STAGE_MM = TAU_C_FS * C_MM_PER_FS / 2  # 1/e half-width of the peak in stage travel (~10 um)
+TAU_C_FS = {1: 70.0, 2: 186.0}  # overlap window (1/e half-width) per level
 STAGE_TRAVEL = {"DL-M25": 25.0, "DL-C25": 25.0, "DL-C100": 100.0}
 
 
-def _routes(lam):
+def _routes(lam, level=1):
     """Viable (diagnostic, filter) routes from the sim's own model, if the sim package is importable."""
     try:
         from sim import reward as RW
-        return {(d, f) for d, f, _ in RW.detection_routes(lam)}
+        return {(d, f) for d, f, _ in RW.detection_routes(lam, level)}
     except Exception:  # noqa: BLE001 - summariser must work without the sim
         return None
 
@@ -88,6 +87,9 @@ def analyse(res, traj):
     """Failure tags: (tag, explanation). Ordered roughly from design to execution."""
     tags = []
     tools = [s["tool"] for s in traj]
+    level = res.get("level", 1)
+    tau_fs = TAU_C_FS.get(level, 70.0)
+    PEAK_STAGE_MM = tau_fs * C_MM_PER_FS / 2  # 1/e half-width of the peak in stage travel
     calls = lambda t: [s for s in traj if s["tool"] == t]  # noqa: E731
     lam = res.get("opa_lambda_nm")
     manuals = {s["args"].get("device") for s in calls("read_manual")}
@@ -107,7 +109,7 @@ def analyse(res, traj):
         why = []
         if not any(k in STAGE_TRAVEL for k in bought):
             why.append("no delay stage")
-        routes = _routes(lam) if lam else None
+        routes = _routes(lam, level) if lam else None
         if routes is not None:
             owned = set(bought)
             if not any(d in owned and (f is None or f in owned) for d, f in routes):
@@ -169,7 +171,7 @@ def analyse(res, traj):
             miss = min(abs(lo), abs(hi)) * C_MM_PER_FS
             tags.append(("time-zero-unreachable", f"layout puts time zero {miss:.0f} mm of path outside the stage range "
                                                   "(coarse delay / OPA internal path not matched)"))
-    if dt is not None and dt > 3 * TAU_C_FS and not any(t[0] == "time-zero-unreachable" for t in tags):
+    if dt is not None and dt > 3 * tau_fs and not any(t[0] == "time-zero-unreachable" for t in tags):
         tags.append(("missed-time-zero", f"ended {dt:.0f} fs ({dt * C_MM_PER_FS * 1000:.0f} um of path) from time zero"))
     if dt is None:
         ends = [f"{k} -> {last.get('end_' + k.replace('nm', '')) or 'nothing placed / shutter closed'}" for k in ("800nm", "opa")]
@@ -217,10 +219,10 @@ def main():
 
     L = ["# GSS run summary", "",
          "R = reward; eta = overlap score before cost/time penalties; O = spot overlap; |dt| = timing error.",
-         "", "| run | model | seed | OPA nm | R | eta | O | abs dt (fs) | EUR (C_min) | min | calls | ended | tags |",
-         "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+         "", "| run | model | seed | level | OPA nm | R | eta | O | abs dt (fs) | EUR (C_min) | min | calls | ended | tags |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for name, model, r, tags in runs:
-        L.append(f"| {name} | {model} | {r.get('seed')} | {fmt(r.get('opa_lambda_nm'), 0)} | {fmt(r.get('reward'))} | "
+        L.append(f"| {name} | {model} | {r.get('seed')} | {r.get('level', 1)} | {fmt(r.get('opa_lambda_nm'), 0)} | {fmt(r.get('reward'))} | "
                  f"{fmt(r.get('eta'))} | {fmt(r.get('O'), 2)} | {fmt(r.get('abs_dt_fs'), 0)} | "
                  f"{r.get('cost_eur', 0):.0f} ({r.get('c_min_eur', 0):.0f}) | {fmt(r.get('lab_time_min'), 0)} | "
                  f"{r.get('tool_calls')} | {r.get('ended_by')} | {', '.join(t for t, _ in tags) or 'ok'} |")

@@ -19,6 +19,8 @@ Do it **as cheaply as possible** and within **4 hours of lab time**.
     Its output wavelength differs from lab to lab; this lab's is in the table manual.
 - Their positions, heights and directions, the table coordinates, and everything else about this
   particular lab are in the manuals (`read_manual`). Both shutters start closed.
+- The sample mount's manual says how the two beams have to arrive at the sample (this lab's required
+  geometry).
 - A sample mount with a lens, an alignment camera and a signal camera, an oscilloscope, an IR viewer card, and a desk.
 - A parts catalogue (`list_catalogue`, `get_datasheet`, `buy`). Total spend is capped at EUR 30,000.
 

@@ -23,7 +23,6 @@ LENS = (1300.0, 600.0)
 P800_LENS_Z, OPA_LENS_Z = 592.0, 608.0
 X_PERI, X_P, X_Q = 2050.0, 1700.0, 1500.0
 STAGE_OFF = 12.0
-TAU_STAGE_MM = 0.0105  # 1/e half-width of the cross-correlation in stage travel (~70 fs)
 
 
 class EpisodeOver(Exception):
@@ -56,7 +55,11 @@ class Expert:
         t = self.c("read_manual", device="table")["manual"]
         o = self.c("read_manual", device="opa")["manual"]
         self.c("read_manual", device="delay_stage")
-        self.c("read_manual", device="sample_mount")
+        sm = self.c("read_manual", device="sample_mount")["manual"]
+        self.level = 2 if "90-degree crossing" in sm else 1
+        m = re.search(r"1/e half-width of ~(\d+) fs", sm)
+        tau_fs = float(m.group(1)) if m else 70.0
+        self.tau_stage = tau_fs * 2.99792458e-4 / 2.0  # 1/e half-width of the peak in stage travel
         ports = {}
         for arm, key in (("800nm", "800 nm output port"), ("opa", "OPA output port")):
             m = re.search(key + r".*?:\s*x=([\d.]+),\s*z=([\d.]+),\s*height=([\d.]+)", t)
@@ -79,7 +82,12 @@ class Expert:
         r = self.c("ir_card", x=x, z=z, height=h)
         for b in r["beams"]:
             if b["beam"] == arm:
-                return (b["dz_mm"], b["dheight_mm"]) if along == "x" else (b["dx_mm"], b["dheight_mm"])
+                if along == "x":
+                    return (b["dz_mm"], b["dheight_mm"])
+                if along == "z":
+                    return (b["dx_mm"], b["dheight_mm"])
+                a = math.radians(along)  # travel yaw in degrees: horizontal offset across the beam
+                return (-math.sin(a) * b["dx_mm"] + math.cos(a) * b["dz_mm"], b["dheight_mm"])
         return None
 
     def ir_part(self, arm, part):
@@ -130,7 +138,8 @@ class Expert:
         L = math.dist((src[0], src[1]), (tgt[0], tgt[1]))
         for frac in (1.0, 0.5, 0.25):
             p = tuple(src[i] + frac * (tgt[i] - src[i]) for i in range(3))
-            if self.ir_point(arm, *p, along) is not None:
+            e = self.ir_point(arm, *p, along)
+            if e is not None and (frac < 1.0 or math.hypot(*e) <= 20.0):
                 break
         else:
             raise RuntimeError(f"lost the {arm} beam after {part}")
@@ -147,7 +156,9 @@ class Expert:
         tolerable); scattered laser light must be filtered away from the emission band."""
         e8, eo = 1239.84 / 800.0, 1239.84 / self.lam_o
         parts = {}
-        if eo < 2.26 and e8 + eo > 2.26:  # GaP two-photon photodiode: cheap, no filter, no camera
+        # GaP two-photon photodiode: cheap, no filter. At 90 deg crossing the cross term drops to ~0.37,
+        # which at 600 nm no longer stands well above the two single-beam TPA backgrounds.
+        if eo < 2.26 and e8 + eo > 2.26 and (self.level == 1 or 2 * eo < 2.26):
             parts["GAP-TPA"] = 1
         else:  # GaN two-photon yellow luminescence through a bandpass inside the yellow band
             parts.update({"GAN-1": 1, "F-BP550": 1})
@@ -180,8 +191,74 @@ class Expert:
         zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
         self.c("buy", items={"DL-C25": 1, "MIR-1": 4, "PER-1": 1, **self.detection_parts()})
         travel, x_mid = 25.0, 12.5
+        if self.level == 2:
+            self.layout_l2(x_mid)
+        else:
+            self.layout_l1(x_mid)
 
-        # Probe arm, in beam order
+        # Spatial overlap at the focus: steer the 800 nm beam (mirror-4) onto the OPA beam
+        ok, self.J_cam = self.steer("mirror-4", self.cam_diff, 3.0, 0.3)
+        if not ok:
+            self.note("camera overlap did not converge")
+        if stop_early:
+            return
+        self.find_time_zero(travel)
+
+    def layout_l2(self, x_mid):
+        """90 deg crossing. Sample point S = (1200, 600), front normal +x. Lens A (800 nm) takes beams
+        travelling at yaw 135, lens B (OPA) at yaw 225; each lens sits 100 mm before S on its axis.
+        The last mirror of each arm sits L = 300-480 mm from S on that axis (a long lever arm keeps the
+        angle error from placement small), and the mirror before it turns the beam onto that point:
+          opa:   port -> periscope (2050, z_o) -> M1 (x_m, z_o) turns +/-z -> M2 on the yaw-225 axis
+          800nm: port -> stage (yaw 180) -> back +x at z_p + 24 -> M3 (x_m, z_p + 24) turns +/-z
+                 -> M4 on the yaw-135 axis
+        """
+        zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
+        S = (1200.0, 600.0)
+        r2 = math.sqrt(2.0)
+        lens_a = (S[0] + 100 / r2, S[1] - 100 / r2)
+        lens_b = (S[0] + 100 / r2, S[1] + 100 / r2)
+        z_ret0 = zp + 2 * STAGE_OFF
+
+        def pick(z_from, sgn):
+            # closest to 400 mm with the turning mirror >= 70 mm from the last one
+            for L in sorted(range(300, 581, 10), key=lambda v: abs(v - 400)):
+                if abs(z_from - (S[1] + sgn * L / r2)) >= 70.0:
+                    return float(L)
+            return 400.0
+        Lo, L8 = pick(zo, 1.0), pick(z_ret0, -1.0)
+        xo, zq = S[0] + Lo / r2, S[1] + Lo / r2  # M2
+        x8, z8 = S[0] + L8 / r2, S[1] - L8 / r2  # M4
+        so = 1.0 if zq > zo else -1.0  # direction M1 sends the OPA beam along z
+        s8 = 1.0 if z8 > z_ret0 else -1.0
+
+        self.c("place", part="sample", x=S[0], z=S[1], height=hp, yaw_deg=0.0)
+        self.c("unblock", arm="opa")
+        self.c("place", part="periscope-1", x=X_PERI, z=zo, height=hp, yaw_deg=180.0, height_in=ho)
+        self.aim_at_point("periscope-1", "opa", (X_PERI, zo, hp), (xo, zo, hp), "x")
+        self.c("place", part="mirror-1", x=xo, z=zo, height=hp, yaw_deg=math.degrees(math.atan2(so, 1.0)))
+        self.aim_at_point("mirror-1", "opa", (xo, zo, hp), (xo, zq, hp), "z")
+        self.c("place", part="mirror-2", x=xo, z=zq, height=hp,
+               yaw_deg=math.degrees(math.atan2(-1 / r2 - so, -1 / r2)) % 360)
+        self.aim_at_point("mirror-2", "opa", (xo, zq, hp), (lens_b[0], lens_b[1], hp), 225.0)
+
+        opa_total = (self.port_x - X_PERI) + abs(hp - ho) + (X_PERI - xo) + abs(zq - zo) + Lo + self.L_opa
+        a_x = (self.port_x + x8 + abs(z8 - z_ret0) + L8 - opa_total) / 2.0
+        p_x = a_x + 90.0 + x_mid
+        self.note(f"OPA arm table+internal path {opa_total:.0f} mm, stage apex {a_x:.0f}, reference x {p_x:.0f}")
+        self.c("unblock", arm="800nm")
+        self.c("place", part="stage", x=p_x, z=zp + STAGE_OFF, height=hp, yaw_deg=180.0)
+        ret = self.ir_point("800nm", x8, z_ret0, hp, "x")
+        z_ret, h_ret = (z_ret0, hp) if ret is None else (z_ret0 + ret[0], hp + ret[1])
+        self.c("place", part="mirror-3", x=x8, z=z_ret, height=h_ret, yaw_deg=math.degrees(math.atan2(s8, -1.0)) % 360)
+        self.aim_at_point("mirror-3", "800nm", (x8, z_ret, h_ret), (x8, z8, hp), "z")
+        self.c("place", part="mirror-4", x=x8, z=z8, height=hp,
+               yaw_deg=math.degrees(math.atan2(1 / r2 - s8, -1 / r2)) % 360)
+        self.aim_at_point("mirror-4", "800nm", (x8, z8, hp), (lens_a[0], lens_a[1], hp), 135.0)
+
+    def layout_l1(self, x_mid):
+        zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
+        # OPA arm, in beam order
         self.c("place", part="sample", x=LENS[0], z=LENS[1], height=hp, yaw_deg=180.0)
         self.c("unblock", arm="opa")
         self.c("place", part="periscope-1", x=X_PERI, z=zo, height=hp, yaw_deg=180.0, height_in=ho)
@@ -207,13 +284,7 @@ class Expert:
         self.c("place", part="mirror-4", x=X_Q, z=P800_LENS_Z, height=hp, yaw_deg=225.0)
         self.aim_at_point("mirror-4", "800nm", (X_Q, P800_LENS_Z, hp), (LENS[0], P800_LENS_Z, hp), "x")
 
-        # Spatial overlap at the focus: steer the 800 nm beam (mirror-4) onto the OPA beam
-        ok, self.J_cam = self.steer("mirror-4", self.cam_diff, 3.0, 0.3)
-        if not ok:
-            self.note("camera overlap did not converge")
-        if stop_early:
-            return
-
+    def find_time_zero(self, travel):
         # Time zero: predict from tape measurements, coarse scan, fine scan
         lp = self.c("measure_path", arm="800nm")["path_mm"]
         lq = self.c("measure_path", arm="opa")["path_mm"]
@@ -225,21 +296,25 @@ class Expert:
         xs = [p[0] for p in coarse]
         ys = [p[1] for p in coarse]
         base = statistics.median(ys)
-        k = [math.exp(-((i * 0.005) / TAU_STAGE_MM) ** 2) for i in range(-6, 7)]
+        tau = self.tau_stage
+        n = max(6, round(1.2 * tau / 0.005))
+        k = [math.exp(-((i * 0.005) / tau) ** 2) for i in range(-n, n + 1)]
         best_i, best_v = 0, -math.inf
         for i in range(len(ys)):
-            v = sum(k[j + 6] * (ys[i + j] - base) for j in range(-6, 7) if 0 <= i + j < len(ys))
+            v = sum(k[j + n] * (ys[i + j] - base) for j in range(-n, n + 1) if 0 <= i + j < len(ys))
             if v > best_v:
                 best_i, best_v = i, v
         xc = xs[best_i]
         self.note(f"coarse peak at {xc:.4f} mm")
-        lo, hi = max(0.0, xc - 0.04), min(travel, xc + 0.04)
-        fine = self.c("scan", start_mm=round(lo, 4), end_mm=round(hi, 4), step_mm=0.001, t_int=2.0)["points"]
+        half = 4 * tau
+        step = 0.001 if tau < 0.015 else 0.002
+        lo, hi = max(0.0, xc - half), min(travel, xc + half)
+        fine = self.c("scan", start_mm=round(lo, 4), end_mm=round(hi, 4), step_mm=step, t_int=2.0)["points"]
         fx = [p[0] for p in fine]
         fy = [p[1] - base for p in fine]
         sm = [statistics.fmean(fy[max(0, i - 2):i + 3]) for i in range(len(fy))]
         imax = max(range(len(sm)), key=lambda i: sm[i])
-        sel = [i for i in range(len(fy)) if abs(fx[i] - fx[imax]) <= 0.015 and fy[i] > 0]
+        sel = [i for i in range(len(fy)) if abs(fx[i] - fx[imax]) <= 1.5 * tau and fy[i] > 0]
         w = sum(fy[i] for i in sel)
         x_peak = sum(fx[i] * fy[i] for i in sel) / w if w > 0 else fx[imax]
         self.note(f"fine peak at {x_peak:.5f} mm")
@@ -248,10 +323,10 @@ class Expert:
         ok, _ = self.steer("mirror-4", self.cam_diff, 3.0, 0.3, max_iter=2, J=self.J_cam)
 
 
-def run_in_process(seed: int, stop_early: bool = False, verbose: bool = False):
+def run_in_process(seed: int, stop_early: bool = False, verbose: bool = False, level: int = 1):
     from sim import Episode
 
-    ep = Episode(seed)
+    ep = Episode(seed, level)
     ex = Expert(lambda tool, **a: ep.call(tool, a), verbose=verbose)
     ex.run(stop_early=stop_early)
     return ep, ex

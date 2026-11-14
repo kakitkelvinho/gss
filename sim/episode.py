@@ -112,9 +112,12 @@ class Plan:
 
 
 class Episode:
-    def __init__(self, seed: int):
+    def __init__(self, seed: int, level: int = 1):
+        if level not in (1, 2):
+            raise ValueError("level must be 1 or 2")
         self.seed = int(seed)
-        self.lab = Lab(self.seed)
+        self.level = int(level)
+        self.lab = Lab(self.seed, self.level)
         self.rng_place = random.Random(f"gss-place-{self.seed}")
         self.rng_noise = random.Random(f"gss-noise-{self.seed}")
         self.t = 0.0
@@ -136,7 +139,7 @@ class Episode:
         self.filter: str | None = None
         self.align_cam: str | None = None  # None = the free Si camera
         self.lams = {"800nm": 800.0, "opa": self.lab.opa_lambda}
-        self.c_min = RW.c_min(self.lab.opa_lambda)
+        self.c_min = RW.c_min(self.lab.opa_lambda, self.level)
         self.shutter_open = {"800nm": False, "opa": False}
         self.tool_calls = 0
         self.malformed = 0
@@ -223,7 +226,8 @@ class Episode:
             "T_800": tr["T_800"],
             "T_opa": tr["T_opa"],
             "opa_lambda_nm": self.lab.opa_lambda,
-            "design_viable": RW.design_viable(self.bought, self.lab.opa_lambda),
+            "design_viable": RW.design_viable(self.bought, self.lab.opa_lambda, self.level),
+            "level": self.level,
             "diagnostics_bought": sorted(k for k in self.bought if cat.PARTS[k]["slot"] in ("diagnostic", "filter", "camera")),
             "cost_eur": self.cost,
             "c_min_eur": self.c_min,
@@ -299,7 +303,7 @@ class Episode:
                     "T_opa": b["opa"].T if vis["opa"] else 0.0, "eta": 0.0,
                     "end_800": "blocked" if vis["800nm"] is None else b["800nm"].end_note,
                     "end_opa": "blocked" if vis["opa"] is None else b["opa"].end_note}
-        return P.truth(vis["800nm"], vis["opa"], self.lab.opa_path)
+        return P.truth(vis["800nm"], vis["opa"], self.lab.opa_path, self.level)
 
     def _update_stray(self):
         vis = self._visible()
@@ -571,7 +575,7 @@ class Episode:
                 hin = height_in + r.uniform(-0.5, 0.5)
             p = Part(part, kind, (x + ex, height + eh, z + ez), yaw + eyaw, height_in=hin,
                      mount_err=self.lab.mount_error(part) if kind in ("mirror", "periscope") else (0.0, 0.0),
-                     travel=travel)
+                     travel=travel, level=self.level)
             if kind == "stage":
                 p.stage_pos = self.stage_true
             it["part"] = p
@@ -740,7 +744,8 @@ class Episode:
         vis = self._visible()
         rng = cat.PARTS[self.align_cam]["range_nm"] if self.align_cam else K.CAM_SI_RANGE
         if plane == "sample":
-            return P.camera_sample(vis, self.lams, rng, self.rng_noise)
+            return P.camera_sample(vis, self.lams, rng, self.rng_noise,
+                                   K.L2_STRETCH if self.level == 2 else 1.0)
         return P.camera_lens(vis, self.lams, rng, self.rng_noise)
 
     def _t_view_camera(self, plane):
@@ -818,7 +823,7 @@ class Episode:
             return P.photodiode(vis, self.lams, d["range_nm"], self.lab.opa_path, self.rng_noise)
         f = cat.filter_spec(self.filter) if (self.filter and d["readout"] == "camera") else None
         return P.nonlinear_signal(d, f, self.lab.opa_lambda, vis["800nm"], vis["opa"], self.lab.opa_path,
-                                  t_int, self.rng_noise)
+                                  t_int, self.rng_noise, self.level)
 
     def _t_read_signal(self, t_int):
         if not (0.01 <= t_int <= 10.0):

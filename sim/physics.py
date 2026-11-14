@@ -23,14 +23,22 @@ def photon_ev(lam_nm: float) -> float:
     return HC_EV_NM / lam_nm
 
 
-def spatial_overlap(a: BeamResult, b: BeamResult) -> float:
-    """O = (2 w1 w2 / (w1^2 + w2^2)) exp(-2 d^2 / (w1^2 + w2^2)) of the two focal spots (Q9, Q15')."""
+def spatial_overlap(a: BeamResult, b: BeamResult, level: int = 1) -> float:
+    """Normalised overlap of the two focal spots, a product over the two in-plane axes of
+    sqrt(2 w1 w2 / (w1^2 + w2^2)) exp(-2 d^2 / (w1^2 + w2^2)) (Q9, Q15'). In L2 both spots are
+    stretched by 1/cos45 along the sample's horizontal axis, and the beams must come through the
+    mount's two different lenses (the required 90 deg geometry), otherwise O = 0."""
     if not (a.at_sample and b.at_sample):
         return 0.0
-    w1, w2 = K.W0_800, K.W0_OPA
-    d2 = (a.spot[0] - b.spot[0]) ** 2 + (a.spot[1] - b.spot[1]) ** 2
-    s = w1 * w1 + w2 * w2
-    return (2 * w1 * w2 / s) * math.exp(-2 * d2 / s)
+    if level == 2 and a.lens_role == b.lens_role:
+        return 0.0
+    st = K.L2_STRETCH if level == 2 else 1.0
+    O = 1.0
+    for i, k in enumerate((st, 1.0)):
+        w1, w2 = K.W0_800 * k, K.W0_OPA * k
+        s = w1 * w1 + w2 * w2
+        O *= math.sqrt(2 * w1 * w2 / s) * math.exp(-2 * (a.spot[i] - b.spot[i]) ** 2 / s)
+    return O
 
 
 def delay_fs(b8: BeamResult, bo: BeamResult, opa_path: float) -> float | None:
@@ -41,16 +49,20 @@ def delay_fs(b8: BeamResult, bo: BeamResult, opa_path: float) -> float | None:
     return (b8.opl - (bo.opl + opa_path)) / K.C_MM_PER_FS
 
 
-def temporal_factor(dt_fs: float | None) -> float:
+def tau_c(level: int = 1) -> float:
+    return K.TAU_C_L2 if level == 2 else K.TAU_C
+
+
+def temporal_factor(dt_fs: float | None, level: int = 1) -> float:
     if dt_fs is None:
         return 0.0
-    return math.exp(-((dt_fs / K.TAU_C) ** 2))
+    return math.exp(-((dt_fs / tau_c(level)) ** 2))
 
 
-def truth(b8: BeamResult, bo: BeamResult, opa_path: float) -> dict:
-    O = spatial_overlap(b8, bo)
+def truth(b8: BeamResult, bo: BeamResult, opa_path: float, level: int = 1) -> dict:
+    O = spatial_overlap(b8, bo, level)
     dt = delay_fs(b8, bo, opa_path)
-    g = temporal_factor(dt)
+    g = temporal_factor(dt, level)
     return {
         "O": O,
         "dt_fs": dt,
@@ -81,7 +93,13 @@ def _bbo_pm(cut: tuple[float, float], pair: tuple[float, float]) -> float:
     return 1.0 if sorted(cut) == sorted(pair) else K.PM_MISMATCH
 
 
-def components(d: dict, lam_o: float, T8: float, To: float, cross: float) -> list[tuple[str, tuple[float, float], float]]:
+def cross_scale(level: int) -> float:
+    """L2: the cross term is smeared over tau_eff, so its peak drops by tau_c / tau_eff."""
+    return K.L2_PEAK if level == 2 else 1.0
+
+
+def components(d: dict, lam_o: float, T8: float, To: float, cross: float,
+               level: int = 1) -> list[tuple[str, tuple[float, float], float]]:
     """Mean emission components of diagnostic `d` (a catalogue part) for OPA wavelength lam_o.
     T8/To: transmission of each arm to the sample (0 if blocked); cross = T8 To O g."""
     out: list[tuple[str, tuple[float, float], float]] = []
@@ -89,7 +107,9 @@ def components(d: dict, lam_o: float, T8: float, To: float, cross: float) -> lis
     if mdl == "bbo":
         cut = d["cut"]
         lx = sum_lambda(800.0, lam_o)
-        out.append(("cross", (lx, lx), K.CROSS_A * _bbo_pm(cut, (800.0, lam_o)) * cross))
+        # crossing at 90 deg cannot be phase-matched in BBO for any cut on offer
+        pm = K.PM_MISMATCH if level == 2 else _bbo_pm(cut, (800.0, lam_o))
+        out.append(("cross", (lx, lx), K.CROSS_A * cross_scale(level) * pm * cross))
         for lam, T in ((800.0, T8), (lam_o, To)):
             if T > 0:
                 pm = _bbo_pm(cut, (lam, lam))
@@ -100,7 +120,7 @@ def components(d: dict, lam_o: float, T8: float, To: float, cross: float) -> lis
         band = d.get("band_nm", (0.0, 0.0))
         e8, eo = photon_ev(800.0), photon_ev(lam_o)
         if e8 + eo > eg:
-            out.append(("cross", band, K.CROSS_A * cross))
+            out.append(("cross", band, K.CROSS_A * cross_scale(level) * cross))
         self_amp = {"800": K.TPA_PD_SELF_800, "opa": K.TPA_PD_SELF_OPA} if mdl == "tpa_pd" else \
             {"800": K.GAN_TPA_SELF, "opa": K.GAN_TPA_SELF}
         for key, e, T in (("800", e8, T8), ("opa", eo, To)):
@@ -142,15 +162,16 @@ def cam_qe(band: tuple[float, float], rng_nm: tuple[float, float]) -> float:
 
 
 def mean_and_sigma(d: dict, f: dict | None, lam_o: float, T8: float, To: float, cross: float,
-                   t_int: float) -> tuple[float, float, float]:
+                   t_int: float, level: int = 1) -> tuple[float, float, float]:
     """(mean counts, noise sigma, cross-term counts) seen by the readout of diagnostic d."""
-    comps = components(d, lam_o, T8, To, cross)
+    comps = components(d, lam_o, T8, To, cross, level)
+    scatter = K.SCATTER * (K.L2_SCATTER if level == 2 else 1.0)
     if d["readout"] == "camera":
         gain = lambda band: cam_qe(band, K.CAM_SI_RANGE) * filter_T(f, band)  # noqa: E731
         # scattered fundamentals reach the signal camera too
         for lam, T in ((800.0, T8), (lam_o, To)):
             if T > 0:
-                comps.append(("scatter", (lam, lam), K.SCATTER * T))
+                comps.append(("scatter", (lam, lam), scatter * T))
     else:
         gain = lambda band: 1.0  # noqa: E731
     S = sum(a * gain(b) for _, b, a in comps)
@@ -161,27 +182,27 @@ def mean_and_sigma(d: dict, f: dict | None, lam_o: float, T8: float, To: float, 
 
 
 def nonlinear_signal(d: dict, f: dict | None, lam_o: float, b8: BeamResult | None, bo: BeamResult | None,
-                     opa_path: float, t_int: float, rng: random.Random) -> dict:
+                     opa_path: float, t_int: float, rng: random.Random, level: int = 1) -> dict:
     """Reading of a nonlinear diagnostic. b8 / bo are None when that arm is blocked."""
     T8 = b8.T if (b8 is not None and b8.at_sample) else 0.0
     To = bo.T if (bo is not None and bo.at_sample) else 0.0
     cross = 0.0
     if T8 > 0 and To > 0:
-        cross = T8 * To * spatial_overlap(b8, bo) * temporal_factor(delay_fs(b8, bo, opa_path))
-    S, sigma, _ = mean_and_sigma(d, f, lam_o, T8, To, cross, t_int)
+        cross = T8 * To * spatial_overlap(b8, bo, level) * temporal_factor(delay_fs(b8, bo, opa_path), level)
+    S, sigma, _ = mean_and_sigma(d, f, lam_o, T8, To, cross, t_int, level)
     v = S + rng.gauss(0.0, sigma)
     if d["readout"] == "camera" and S > K.SIG_CAM_SAT:
         return {"counts": K.SIG_CAM_SAT, "saturated": True}
     return {"counts": max(0, int(round(v)))}
 
 
-def detection_viable(d: dict, f: dict | None, lam_o: float) -> bool:
+def detection_viable(d: dict, f: dict | None, lam_o: float, level: int = 1) -> bool:
     """Can this diagnostic + filter show the cross term at all (reference alignment, both arms open,
     t_int = 1 s)? Peak must stand >= 5 sigma above the off-peak level and nothing may saturate."""
     if d["model"] not in ("bbo", "pl", "tpa_pd"):
         return False
-    S0, sig0, _ = mean_and_sigma(d, f, lam_o, 1.0, 1.0, 0.0, 1.0)
-    S1, _, C = mean_and_sigma(d, f, lam_o, 1.0, 1.0, 1.0, 1.0)
+    S0, sig0, _ = mean_and_sigma(d, f, lam_o, 1.0, 1.0, 0.0, 1.0, level)
+    S1, _, C = mean_and_sigma(d, f, lam_o, 1.0, 1.0, 1.0, 1.0, level)
     if d["readout"] == "camera" and S1 > K.SIG_CAM_SAT:
         return False
     return C >= 5.0 * sig0
@@ -212,7 +233,7 @@ def _power(T: float, rng: random.Random) -> float:
 
 
 def camera_sample(beams: dict[str, BeamResult | None], lams: dict[str, float], range_nm: tuple[float, float],
-                  rng: random.Random) -> list[dict]:
+                  rng: random.Random, stretch: float = 1.0) -> list[dict]:
     spots = []
     for arm, b in beams.items():
         if b is None or not b.at_sample or b.T < 0.01 or not sees(range_nm, lams[arm]):
@@ -226,9 +247,14 @@ def camera_sample(beams: dict[str, BeamResult | None], lams: dict[str, float], r
             q = val / K.CAM_PIXEL + rng.gauss(0.0, K.CAM_NOISE_PX)
             return round(round(q, 1) * K.CAM_PIXEL * 1000.0, 2)
 
-        spots.append({"beam": arm, "h_um": px(h), "v_um": px(v),
-                      "radius_um": round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1),
-                      "relative_power": _power(b.T, rng)})
+        r = {"beam": arm, "h_um": px(h), "v_um": px(v)}
+        if stretch == 1.0:
+            r["radius_um"] = round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1)
+        else:
+            r["radius_h_um"] = round(w0 * stretch * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1)
+            r["radius_v_um"] = round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1)
+        r["relative_power"] = _power(b.T, rng)
+        spots.append(r)
     return spots
 
 
@@ -239,6 +265,7 @@ def camera_lens(beams: dict[str, BeamResult | None], lams: dict[str, float], ran
         if b is None or not b.at_sample or b.T < 0.01 or not sees(range_nm, lams[arm]):
             continue
         h, v = b.lens_hit
-        spots.append({"beam": arm, "h_mm": round(h + rng.gauss(0.0, 0.03), 2),
+        spots.append({"beam": arm, **({"lens": b.lens_role[-1]} if b.lens_role and b.lens_role != "lens" else {}),
+                      "h_mm": round(h + rng.gauss(0.0, 0.03), 2),
                       "v_mm": round(v + rng.gauss(0.0, 0.03), 2), "relative_power": _power(b.T, rng)})
     return spots

@@ -81,6 +81,6 @@ def test_lens_spot_and_opl():
     rho_h = b.lens_hit[0]
     expect = K.LENS_F * (-th) + 0.3 * (-th) - 0.3 * rho_h / K.LENS_F
     assert b.spot[0] == pytest.approx(expect, rel=1e-3)
-    # OPL: wavefront through lens centre + f + dz
-    assert b.opl == pytest.approx(200.0 / math.cos(th) - V.dot((0.0, 0.0, b.segments[-1][1][2] - 308.0), d)
+    # OPL: wavefront through lens centre + f + dz (segments[-2] ends at the lens; [-1] is lens -> focus)
+    assert b.opl == pytest.approx(200.0 / math.cos(th) - V.dot((0.0, 0.0, b.segments[-2][1][2] - 308.0), d)
                                   + K.LENS_F + 0.3, abs=1e-6)

@@ -195,6 +195,51 @@ def manuals(lab) -> dict[str, str]:
     p, q = lab.ports["800nm"], lab.ports["opa"]
     lo = lab.opa_lambda
     w_o = K.opa_w_coll(lo)
+    l1_sample = (
+            "Sample mount with f = 100 mm lens. place(sample, x, z, height, yaw): (x, z, height) is "
+            "the lens centre, yaw the direction light travels through the lens. The sample (and the "
+            "installed diagnostic) sits at the focal plane 100 mm behind the lens. Lens clear "
+            f"aperture radius {K.LENS_R} mm (clipping from ~{K.LENS_CLIP_START} mm). A collimated "
+            "beam hitting the lens at angle theta to its axis focuses at f x theta from the axis, "
+            "whatever point of the lens it hits, so overlapping the foci means matching the beams' "
+            "ANGLES; where they hit the lens sets their crossing angle and must stay inside the "
+            "aperture. Focal spot radius ~50 um for both beams. install(part_id) swaps the diagnostic "
+            "(or the signal-camera filter); it does not change any path. Flip-in alignment camera (Si "
+            "CMOS, 400-1000 nm, blind outside; a bought VIS-SWIR camera replaces it): "
+            "view_camera('sample') images the focal "
+            f"plane ({K.CAM_PIXEL*1000:.1f} um pixels, field of view +/-{K.CAM_HALF_FOV} mm, sub-pixel "
+            "centroids); view_camera('lens') shows where each beam hits the lens (mm). Each spot also reports "
+            "relative_power: the fraction of that beam's output power reaching the sample (~2% "
+            "reading noise), so clipping on an optic shows up as a dim spot. Camera image "
+            "axes: h = horizontal, positive toward the direction (lens yaw - 90 deg) in the table "
+            "plane; v = up. The lens axis is h = v = 0."
+        )
+    l2_sample = (
+            "Sample mount, 90-degree crossing version (the experiment needs the two beams to cross at a "
+            "full angle of 90 deg at the sample, each arriving 45 deg from the sample normal). "
+            "place(sample, x, z, height, yaw): (x, z, height) is the sample point (common focus), yaw "
+            "the direction the sample's front face points (its normal, toward the incoming beams). Two "
+            "f = 100 mm lenses are built in, 100 mm before the sample point along their own axes: lens A "
+            "takes a beam travelling along (yaw + 135 deg), lens B one travelling along (yaw + 225 deg); "
+            "each beam must come through its own lens (the same lens for both is not the required "
+            f"geometry and does not count as overlap). Lens clear aperture radius {K.LENS_R} mm (clipping "
+            f"from ~{K.LENS_CLIP_START} mm). A collimated beam hitting a lens at angle theta to its axis "
+            "focuses at f x theta from that axis, so overlapping the foci means matching each beam's "
+            "angle to its own lens. Focal spot radius ~50 um, stretched by 1/cos45 (~70 um) along the "
+            "sample's horizontal axis because the sample is tilted. Across the overlap region the two "
+            "pulses arrive at different times (dt(x) = 2 x sin45 / c), so the cross-correlation is "
+            f"broadened to a 1/e half-width of ~{K.TAU_C_L2:.0f} fs and its peak is ~{K.L2_PEAK:.2f} of "
+            "the collinear value. install(part_id) swaps the diagnostic (or the signal-camera filter); "
+            "it does not change any path. Flip-in alignment camera (Si CMOS, 400-1000 nm, blind "
+            "outside; a bought VIS-SWIR camera replaces it) looks at the sample head-on along its "
+            f"normal: view_camera('sample') gives spots on the sample surface ({K.CAM_PIXEL*1000:.1f} um "
+            f"pixels, field of view +/-{K.CAM_HALF_FOV} mm, sub-pixel centroids; h = horizontal in-plane "
+            "axis, positive toward (yaw + 90 deg), v = up); view_camera('lens') shows which lens each "
+            "beam hits and where (mm, in that lens's frame: h positive toward (lens axis - 90 deg), "
+            "v up). Each spot also reports relative_power (fraction of that beam's output power "
+            "reaching the sample, ~2% noise). The signal camera also looks head-on from the front, so "
+            "only diffuse scatter (~1% of the collinear case) reaches it."
+        )
     return {
         "table": (
             f"Optical table: {K.TABLE_X:.0f} x {K.TABLE_Z:.0f} mm breadboard. Coordinates in mm: x along "
@@ -246,25 +291,7 @@ def manuals(lab) -> dict[str, str]:
             "input beam parallel to the rail by checking the return at both ends of travel. "
             "Positions are in mm from 0 to the travel limit."
         ),
-        "sample_mount": (
-            "Sample mount with f = 100 mm lens. place(sample, x, z, height, yaw): (x, z, height) is "
-            "the lens centre, yaw the direction light travels through the lens. The sample (and the "
-            "installed diagnostic) sits at the focal plane 100 mm behind the lens. Lens clear "
-            f"aperture radius {K.LENS_R} mm (clipping from ~{K.LENS_CLIP_START} mm). A collimated "
-            "beam hitting the lens at angle theta to its axis focuses at f x theta from the axis, "
-            "whatever point of the lens it hits, so overlapping the foci means matching the beams' "
-            "ANGLES; where they hit the lens sets their crossing angle and must stay inside the "
-            "aperture. Focal spot radius ~50 um for both beams. install(part_id) swaps the diagnostic "
-            "(or the signal-camera filter); it does not change any path. Flip-in alignment camera (Si "
-            "CMOS, 400-1000 nm, blind outside; a bought VIS-SWIR camera replaces it): "
-            "view_camera('sample') images the focal "
-            f"plane ({K.CAM_PIXEL*1000:.1f} um pixels, field of view +/-{K.CAM_HALF_FOV} mm, sub-pixel "
-            "centroids); view_camera('lens') shows where each beam hits the lens (mm). Each spot also reports "
-            "relative_power: the fraction of that beam's output power reaching the sample (~2% "
-            "reading noise), so clipping on an optic shows up as a dim spot. Camera image "
-            "axes: h = horizontal, positive toward the direction (lens yaw - 90 deg) in the table "
-            "plane; v = up. The lens axis is h = v = 0."
-        ),
+        "sample_mount": l1_sample if lab.level == 1 else l2_sample,
         "mirror": (
             "Kinematic mirror mount. place(mirror-N, x, z, height, yaw): yaw is the direction the "
             "reflecting face points (its normal) in the table plane. A beam travelling along "
@@ -294,6 +321,9 @@ def manuals(lab) -> dict[str, str]:
             "reaches the signal camera unless a filter blocks it: block each arm in turn to see what "
             "each one contributes. scan(start, end, step, t_int) moves the stage and reads at each "
             "point (max 5000 points)."
+            + (" With the beams crossing at 90 deg, no BBO cut can be phase-matched (sum frequency at "
+               "~1% of a collinear matched crystal); two-photon absorption needs no phase matching."
+               if lab.level == 2 else "")
         ),
         "signal_camera": (
             f"Signal camera: zoomed Si CMOS behind the sample, specified {K.CAM_SI_RANGE[0]:.0f}-"

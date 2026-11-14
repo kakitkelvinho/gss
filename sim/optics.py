@@ -63,6 +63,7 @@ class Part:
     height_in: float | None = None  # periscope input height (true)
     stage_pos: float = 0.0  # stage: true position along the rail, mm
     travel: float = 25.0
+    level: int = 1  # sample mount: 1 = one lens; 2 = two lenses at +/-45 deg from the sample normal
 
     # ------------------------------------------------------------------
     def elements(self, defocus: float) -> list["Element"]:
@@ -87,8 +88,18 @@ class Part:
             apex = V.add(self.pos, V.mul(u, K.STAGE_APEX_OFFSET + self.stage_pos))
             return [Retro(self.id, apex, u)]
         if self.kind == "sample":
-            u = V.yaw_dir(self.yaw)
-            return [Lens(self.id, self.pos, u, defocus)]
+            if self.level == 1:
+                u = V.yaw_dir(self.yaw)
+                return [Lens(self.id, self.pos, u, defocus)]
+            # L2: pos = sample point, yaw = the sample's front normal (pointing toward the incoming
+            # beams). Lens 'A' takes beams travelling at (yaw + 180 - 45), lens 'B' at (yaw + 180 + 45).
+            n = V.yaw_dir(self.yaw)
+            out = []
+            for role, sgn in (("lens-A", -1.0), ("lens-B", 1.0)):
+                u = V.yaw_dir(self.yaw + math.pi + sgn * K.L2_HALF_ANGLE)
+                c = V.sub(self.pos, V.mul(u, K.LENS_F))
+                out.append(Lens(self.id, c, u, defocus, role=role, sample_pt=self.pos, sample_n=n))
+            return out
         raise ValueError(self.kind)
 
 
@@ -158,6 +169,8 @@ class Lens:
     u: Vec  # lens axis = direction light travels through the lens
     defocus: float
     role: str = "lens"
+    sample_pt: Vec | None = None  # L2: sample point and front normal (tilted sample)
+    sample_n: Vec | None = None
 
     def intersect(self, p: Vec, d: Vec) -> Hit | None:
         den = V.dot(d, self.u)
@@ -224,6 +237,7 @@ class BeamResult:
     opl: float = 0.0  # OPL at the end point (focus if end == "sample")
     spot: tuple[float, float] | None = None  # focal-plane (h, v), mm, relative to lens axis
     lens_hit: tuple[float, float] | None = None  # (h, v) on the lens, mm
+    lens_role: str | None = None  # which lens of the mount ("lens", or L2 "lens-A"/"lens-B")
     path_geom: float = 0.0  # geometric length travelled on the table (tape measure)
 
     @property
@@ -326,10 +340,29 @@ def trace(arm: str, origin: Vec, direction: Vec, elements: list, housings: list)
             th = (V.dot(d, e1) / du, V.dot(d, e2) / du)
             rho = (V.dot(off, e1), V.dot(off, e2))
             f, dz = K.LENS_F, e.defocus
-            res.spot = tuple(f * th[i] + dz * th[i] - dz * rho[i] / f for i in range(2))
             res.lens_hit = rho
-            opl = opl - V.dot(off, d) + f + dz
-            res.path_geom += f + dz
+            res.lens_role = e.role
+            if e.sample_pt is None:
+                res.spot = tuple(f * th[i] + dz * th[i] - dz * rho[i] / f for i in range(2))
+                opl = opl - V.dot(off, d) + f + dz
+                res.path_geom += f + dz
+                end = V.add(V.add(e.center, V.mul(e.u, f + dz)), V.add(V.mul(e1, res.spot[0]), V.mul(e2, res.spot[1])))
+                res.segments.append((q, end))
+            else:
+                # focal point in the lens focal plane, then on to the tilted sample plane
+                F = V.add(V.add(e.center, V.mul(e.u, f)), V.add(V.mul(e1, f * th[0]), V.mul(e2, f * th[1])))
+                r = V.unit(V.sub(F, q))
+                n = e.sample_n
+                S0 = V.add(e.sample_pt, V.mul(n, -dz))  # sample sits dz further along the beams
+                den = V.dot(r, n)
+                sdist = V.dot(V.sub(S0, F), n) / den if abs(den) > 1e-9 else 0.0
+                X = V.add(F, V.mul(r, sdist))
+                t_ax = V.unit((-n[2], 0.0, n[0]))  # horizontal in-plane direction of the sample
+                rel = V.sub(X, e.sample_pt)
+                res.spot = (V.dot(rel, t_ax), rel[1])
+                res.segments.append((q, X))
+                opl = opl - V.dot(off, d) + f + sdist
+                res.path_geom += f + sdist
             res.end, res.end_note = "sample", "sample"
             break
     else:

@@ -15,8 +15,9 @@ VIS_BOX_PATH = 580.0
 
 
 class Lab:
-    def __init__(self, seed: int):
+    def __init__(self, seed: int, level: int = 1):
         self.seed = int(seed)
+        self.level = int(level)  # 1: one lens, any crossing angle; 2: 90 deg crossing, a lens per beam
         r = random.Random(f"gss-lab-{self.seed}")
         z_p = r.uniform(200.0, 400.0)
         h_p = r.uniform(90.0, 160.0)

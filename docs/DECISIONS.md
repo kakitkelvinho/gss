@@ -112,3 +112,15 @@ Takes precedence over the L1 catalogue, signal model and C_min above.
 - `design_viable` and C_min are brute-forced from the same detector model (`sim/reward.py`), so the two can't drift apart.
 - New tool `uninstall('filter'|'diagnostic')`; `install` also takes filters. Manuals: `nonlinear` (replaces `bbo`), `signal_camera`.
 - Reference run picks its route from photon energies (GaP when E_opa < 2.26 eV < E_800 + E_opa, else GaN + 550/40; VIS-SWIR camera at 1300 nm): η ≥ 0.995, R ≈ 0.91–0.92 on seeds 1–10.
+
+## Level 2: 90° crossing (Sat 2026-11-14)
+
+- Selected with `GSS_LEVEL=2` (server env, docker-compose passes it through); L1 is the default. `Episode(seed, level)`.
+- **Mount:** `place(sample, x, z, height, yaw)` puts the sample point (common focus) at (x, z, height), yaw = front normal. Lens A takes beams travelling at yaw + 135°, lens B at yaw + 225°, each 100 mm before the sample point on its axis. Both beams through the same lens → O = 0 (not the required geometry).
+- **Spots** are computed on the tilted sample plane (h = horizontal in-plane axis, v = up); both are stretched by 1/cos45 along h. O is the product of per-axis 1D overlaps.
+- **Broadening (user decision: reward uses the broadened width):** τ_eff² = τ_c² + (2 a sin45 / c)², a = W_t/2 = √2·52 µm/2 → τ_eff ≈ 186 fs; cross-term peak × τ_c/τ_eff ≈ 0.37.
+- **Detection:** BBO cross term at PM_MISMATCH (no phase matching at 90°). Signal camera head-on from the front (lab experience: collection through the back gave too little light; head-on the GaN brightening at zero delay was visible by eye): scatter × 0.01. GaP at 600 nm falls below the 5σ viability bar.
+- C_min L2: 1300 nm €7750 (GaP + VIS-SWIR), 600 nm €2000, 450 nm €2000.
+- **Tracer:** the lens → focus segment is now recorded, so the IR card sees the converging beam near the sample (L1 too).
+- **Camera field of view** widened from ±2.5 to ±4 mm (both levels): the ±0.5° sample-mount yaw error, magnified by the 45° tilt, put L2 spots ~3 mm off-centre.
+- **Expert L2 layout:** last mirror of each arm 300–580 mm from the sample on its lens axis (long lever arm), the mirror before it turns the beam onto that axis; pre-aligns at a nearer point when the first IR reading is > 20 mm off. Scan kernel and fine-scan window scale with the window stated in the manual.

@@ -43,6 +43,24 @@ from the catalogue, datasheets and manuals:
   - the free Si alignment camera can't see 1300 nm, so that seed needs the VIS-SWIR camera;
   - fast photodiodes give only a coarse (~10 ps) arrival time, and only for wavelengths in their range.
 
+## Level 2: 90° crossing (`GSS_LEVEL=2`)
+
+The beams must cross at a full angle of 90° at the sample (each 45° from the normal), through a mount with
+**one f = 100 mm lens per beam**; the same lens for both beams doesn't count. What changes:
+
+- The spot is stretched by $1/\cos 45°$ on the tilted sample. Across it the two pulses arrive at different
+  times, $\Delta t(x) = 2x\sin(\varphi/2)/c$, which broadens the cross-correlation to a 1/e half-width of
+  ~186 fs and lowers its peak to ~0.37. The reward uses this broadened window.
+- No BBO cut can be phase-matched at 90° (~1%); two-photon absorption needs no phase matching. The
+  signal camera looks head-on from the front (as in the lab: emission seen along the normal), so only
+  diffuse scatter (~1%) reaches it.
+- Routes: 1300 nm → GaP only (+ VIS-SWIR camera); 600 nm → GaN + 550/40 (GaP's reduced peak no longer
+  clears its two single-beam backgrounds); 450 nm → GaN + 550/40 or the 495–710 stack.
+- Short lever arms near the two lenses, and a ±0.5° sample-mount yaw error magnified by the tilt, make
+  beam steering harder.
+
+Scripted expert, seeds 1–20: L1 R = 0.91–0.92, L2 R = 0.89–0.92 (η ≥ 0.97), both within 65% of the budget.
+
 ## Why it's hard (and fair)
 
 Everything needed is in the manuals and datasheets: no trick wording and no withheld numbers. The
@@ -89,6 +107,7 @@ viability, cost, lab time, tool calls, stray-beam events and time, and footprint
 harbor run -p . -a opencode -m <provider/model>   # one agent run (needs Docker)
 harbor run -p . -a oracle                          # reference (scripted expert) run
 GSS_SEED=3 harbor run -p . -a opencode -m <provider/model>   # another seed (default 1)
+GSS_LEVEL=2 harbor run -p . -a opencode -m <provider/model>  # 90 deg crossing (default level 1)
 ```
 
 After the runs, summarise them (scores plus a failure diagnosis per run) into `jobs/summary.md`:
