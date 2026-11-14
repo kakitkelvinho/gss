@@ -95,12 +95,12 @@ def raw_jsonrpc(base, tool, args):
 
 
 def test_smoke_list_unblock_camera_submit(server):
-    names, r1, r2, r3, r4 = mcp_calls(server, [("__list__", {}), ("unblock", {"arm": "probe"}),
+    names, r1, r2, r3, r4 = mcp_calls(server, [("__list__", {}), ("unblock", {"arm": "opa"}),
                                                ("view_camera", {"plane": "sample"}), ("submit", {}),
-                                               ("unblock", {"arm": "pump"})])
+                                               ("unblock", {"arm": "800nm"})])
     assert {"place", "knob", "scan", "submit", "ir_card"} <= set(names)
     assert not any("state" in n or "debug" in n or "verif" in n for n in names)
-    assert r1["outcome"] == "probe shutter open"
+    assert r1["outcome"] == "opa shutter open"
     assert r2["spots"] == []
     assert r3["outcome"].startswith("submitted")
     assert r4 == {"error": "episode over"}  # tools after submit change nothing

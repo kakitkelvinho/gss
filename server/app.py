@@ -1,4 +1,4 @@
-"""Thin FastMCP server around one `sim.Episode` (one episode per process, seed from GSS_SEED).
+"""Thin FastMCP server around one `sim.Episode` (one episode per process, seed from GSS_SEED, level from GSS_LEVEL).
 
 Every MCP tool forwards to `Episode.call` and nothing else: no accounting, validation or state
 lives here. Parameters are declared with JSON types for the agent's benefit but are NOT validated
@@ -28,6 +28,7 @@ from sim import Episode
 from sim.episode import TOOL_SPECS
 
 SEED = int(os.environ.get("GSS_SEED", "1"))
+LEVEL = int(os.environ.get("GSS_LEVEL", "1"))  # 1 or 2 (90 deg crossing)
 TOKEN_FILE = os.environ.get("GSS_TOKEN_FILE", "/run/gss/verifier_token")
 
 
@@ -49,7 +50,7 @@ def _load_token() -> str:
 
 
 TOKEN = _load_token()
-EPISODE = Episode(SEED)
+EPISODE = Episode(SEED, LEVEL)
 LOCK = threading.Lock()
 
 mcp = FastMCP("gss")

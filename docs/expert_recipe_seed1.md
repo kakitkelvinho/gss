@@ -1,10 +1,10 @@
-# Expert lab recipe (seed 1)
+# Expert lab recipe (seed 1, level 1)
 
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
-- Parts bought: DL-C25 delay stage, BBO-T236 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope (EUR 4800; C_min = EUR 1900)
-- Lab time: 150.6 min of 240 (62.8%), 110 tool calls
-- Result: eta = 0.9948, R = 0.9118, O = 0.9966, |dt| = 2.9 fs
+- OPA wavelength 1300 nm. Parts bought: DL-C25 delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7450)
+- Lab time: 150.8 min of 240 (62.8%), 110 tool calls
+- Result: eta = 0.9964, R = 0.9082, O = 0.9966, |dt| = 0.8 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|
@@ -12,9 +12,9 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 1 | 10.0 | read_manual | `{"device": "opa"}` |
 | 2 | 15.0 | read_manual | `{"device": "delay_stage"}` |
 | 3 | 20.0 | read_manual | `{"device": "sample_mount"}` |
-| 4 | 35.0 | buy | `{"items": {"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1}}` |
+| 4 | 35.0 | buy | `{"items": {"DL-C25": 1, "MIR-1": 4, "PER-1": 1, "GAP-TPA": 1, "CAM-VSWIR": 1}}` |
 | 5 | 40.1 | place | `{"part": "sample", "x": 1300.0, "z": 600.0, "height": 120.0, "yaw_deg": 180.0}` |
-| 6 | 40.2 | unblock | `{"arm": "probe"}` |
+| 6 | 40.2 | unblock | `{"arm": "opa"}` |
 | 7 | 45.4 | place | `{"part": "periscope-1", "x": 2050.0, "z": 935.0, "height": 120.0, "yaw_deg": 180.0, "height_in": 158.0}` |
 | 8 | 45.9 | ir_card | `{"x": 1700.0, "z": 935.0, "height": 120.0}` |
 | 9 | 46.4 | ir_card | `{"x": 1700.0, "z": 935.0, "height": 120.0}` |
@@ -60,7 +60,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 49 | 76.8 | knob | `{"part": "mirror-2", "axis": "yaw", "delta_mrad": 0.3069}` |
 | 50 | 77.3 | knob | `{"part": "mirror-2", "axis": "pitch", "delta_mrad": -0.8313}` |
 | 51 | 77.8 | ir_card | `{"x": 1300.0, "z": 592.0, "height": 120.0}` |
-| 52 | 77.9 | unblock | `{"arm": "pump"}` |
+| 52 | 77.9 | unblock | `{"arm": "800nm"}` |
 | 53 | 83.0 | place | `{"part": "stage", "x": 781.5, "z": 309.0, "height": 120.0, "yaw_deg": 180.0}` |
 | 54 | 83.5 | ir_card | `{"x": 1500.0, "z": 324.0, "height": 120.0}` |
 | 55 | 88.5 | place | `{"part": "mirror-3", "x": 1500.0, "z": 325.9, "height": 119.1, "yaw_deg": 135.0}` |
@@ -86,9 +86,9 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 75 | 104.3 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -8.4178}` |
 | 76 | 104.8 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -15.183}` |
 | 77 | 105.3 | ir_card | `{"x": 1300.0, "z": 608.0, "height": 120.0}` |
-| 78 | 105.5 | block | `{"arm": "pump"}` |
+| 78 | 105.5 | block | `{"arm": "800nm"}` |
 | 79 | 105.7 | view_camera | `{"plane": "sample"}` |
-| 80 | 105.8 | unblock | `{"arm": "pump"}` |
+| 80 | 105.8 | unblock | `{"arm": "800nm"}` |
 | 81 | 105.9 | view_camera | `{"plane": "sample"}` |
 | 82 | 106.1 | view_camera | `{"plane": "sample"}` |
 | 83 | 106.7 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.3}` |
@@ -109,12 +109,12 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 98 | 112.2 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.0161}` |
 | 99 | 112.5 | view_camera | `{"plane": "sample"}` |
 | 100 | 112.7 | view_camera | `{"plane": "sample"}` |
-| 101 | 115.7 | measure_path | `{"arm": "pump"}` |
-| 102 | 118.7 | measure_path | `{"arm": "probe"}` |
+| 101 | 115.7 | measure_path | `{"arm": "800nm"}` |
+| 102 | 118.7 | measure_path | `{"arm": "opa"}` |
 | 103 | 118.7 | status | `{}` |
 | 104 | 146.9 | scan | `{"start_mm": 7.4, "end_mm": 19.4, "step_mm": 0.005, "t_int": 0.4}` |
-| 105 | 150.1 | scan | `{"start_mm": 14.055, "end_mm": 14.135, "step_mm": 0.001, "t_int": 2.0}` |
-| 106 | 150.2 | move_stage | `{"position_mm": 14.09539}` |
-| 107 | 150.4 | view_camera | `{"plane": "sample"}` |
-| 108 | 150.5 | view_camera | `{"plane": "sample"}` |
-| 109 | 150.6 | submit | `{}` |
+| 105 | 150.3 | scan | `{"start_mm": 14.053, "end_mm": 14.137, "step_mm": 0.001, "t_int": 2.0}` |
+| 106 | 150.4 | move_stage | `{"position_mm": 14.09506}` |
+| 107 | 150.5 | view_camera | `{"plane": "sample"}` |
+| 108 | 150.7 | view_camera | `{"plane": "sample"}` |
+| 109 | 150.8 | submit | `{}` |

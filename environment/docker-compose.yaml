@@ -11,6 +11,7 @@ services:
       dockerfile: environment/sim/Dockerfile
     environment:
       GSS_SEED: "${GSS_SEED:-1}"
+      GSS_LEVEL: "${GSS_LEVEL:-1}"
     expose:
       - "8000"
     healthcheck:

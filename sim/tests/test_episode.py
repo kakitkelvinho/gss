@@ -28,8 +28,8 @@ def perfect_layout(seed):
     ep = Episode(seed)
     ep.lab.defocus = 0.0
     ep.call("buy", {"items": {"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1}})
-    _, h_p, z_p = ep.lab.ports["pump"]["pos"]
-    _, h_o, z_o = ep.lab.ports["probe"]["pos"]
+    _, h_p, z_p = ep.lab.ports["800nm"]["pos"]
+    _, h_o, z_o = ep.lab.ports["opa"]["pos"]
     r = math.radians
     parts = {
         "sample": Part("sample", "sample", (1300.0, h_p, 600.0), r(180)),
@@ -43,16 +43,16 @@ def perfect_layout(seed):
     for k, p in parts.items():
         ep.inv[k]["part"] = p
     ep._invalidate()
-    ep.call("unblock", {"arm": "pump"})
-    ep.call("unblock", {"arm": "probe"})
+    ep.call("unblock", {"arm": "800nm"})
+    ep.call("unblock", {"arm": "opa"})
     return ep
 
 
 def test_hand_built_layout_reaches_sample_and_perfect_alignment_gives_eta_1():
     ep = perfect_layout(3)
     b = ep._beams()
-    assert b["pump"].at_sample and b["probe"].at_sample
-    assert b["pump"].T == 1.0 and b["probe"].T == 1.0
+    assert b["800nm"].at_sample and b["opa"].at_sample
+    assert b["800nm"].T == 1.0 and b["opa"].T == 1.0
     # place the stage apex so that dt = 0: dt is linear in stage position (2 mm of path per mm)
     dt0 = ep._truth()["dt_fs"]
     stage = ep.inv["stage"]["part"]
@@ -128,13 +128,13 @@ def test_post_submit_lock():
     ep = Episode(2)
     ep.call("submit", {})
     t = ep.t
-    assert ep.call("unblock", {"arm": "pump"}) == {"error": "episode over"}
+    assert ep.call("unblock", {"arm": "800nm"}) == {"error": "episode over"}
     assert ep.call("buy", {"items": ["MIR-1"]}) == {"error": "episode over"}
-    assert ep.t == t and ep.shutter_open["pump"] is False
+    assert ep.t == t and ep.shutter_open["800nm"] is False
     assert ep.result()["ended_by"] == "agent"
 
 
-FORBIDDEN = {"eta", "O", "dt_fs", "abs_dt_fs", "truth", "T_pump", "T_probe", "defocus", "opl", "reward"}
+FORBIDDEN = {"eta", "O", "dt_fs", "abs_dt_fs", "truth", "T_800", "T_opa", "defocus", "opl", "reward"}
 
 
 def _keys(x):
@@ -167,8 +167,8 @@ def test_no_hidden_truth_in_tool_outputs():
     assert f"{ep.lab.defocus}" not in text
     # tape measure is noisy: repeated reads differ
     ep3 = E(4)
-    ep3.call("unblock", {"arm": "pump"})
-    reads = {ep3.call("measure_path", {"arm": "pump"})["path_mm"] for _ in range(5)}
+    ep3.call("unblock", {"arm": "800nm"})
+    reads = {ep3.call("measure_path", {"arm": "800nm"})["path_mm"] for _ in range(5)}
     assert len(reads) > 1
 
 
@@ -199,7 +199,7 @@ def test_stop_early_scores_below_005(seed):
 
 def test_camera_shows_clipping_as_dim_spot():
     ep = perfect_layout(3)
-    ep.call("block", {"arm": "pump"})
+    ep.call("block", {"arm": "800nm"})
     full = ep.call("view_camera", {"plane": "sample"})["spots"]
     assert len(full) == 1 and "beam" not in full[0]
     assert full[0]["relative_power"] == pytest.approx(1.0, abs=0.08)

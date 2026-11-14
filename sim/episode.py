@@ -30,12 +30,13 @@ class BadArgs(Exception):
 
 TOOL_SPECS: dict[str, dict] = {
     "status": dict(desc="Your position, lab time, money spent, inventory (with the poses you requested), "
-                        "stage position, installed diagnostic and shutter states.", params={}),
-    "list_catalogue": dict(desc="List catalogue items, optionally for one slot (delay_stage, diagnostic, mounting).",
+                        "stage position, installed diagnostic and filter, alignment camera and shutter states.", params={}),
+    "list_catalogue": dict(desc="List catalogue items, optionally for one slot (delay_stage, diagnostic, filter, "
+                                "camera, mounting).",
                            params={"slot": ("str", False)}),
     "get_datasheet": dict(desc="Datasheet of one catalogue item.", params={"part_id": ("str", True)}),
-    "read_manual": dict(desc="Read a device manual: table, opa, delay_stage, sample_mount, mirror, periscope, "
-                             "photodiode, bbo, ir_card.", params={"device": ("str", True)}),
+    "read_manual": dict(desc="Read a device manual: table, opa, delay_stage, sample_mount, signal_camera, mirror, "
+                             "periscope, photodiode, nonlinear, ir_card.", params={"device": ("str", True)}),
     "buy": dict(desc="Place one buy order. items: list of catalogue part ids (repeat an id to buy several), "
                      "or an object {part_id: quantity}.", params={"items": ("items", True)}),
     "place": dict(desc="Place an inventory part on the table. x, z, height in mm; yaw_deg in degrees "
@@ -53,13 +54,16 @@ TOOL_SPECS: dict[str, dict] = {
                          "watch": ("bool", False)}),
     "ir_card": dict(desc="Look with the IR card: either at a placed part (part=...) or at a point (x, z, height).",
                     params={"part": ("str", False), "x": ("num", False), "z": ("num", False), "height": ("num", False)}),
-    "install": dict(desc="Install an owned diagnostic in the sample mount.", params={"part_id": ("str", True)}),
-    "measure_path": dict(desc="Tape-measure the beam path of one arm ('pump' or 'probe') from its output port (good to about +/-5 mm).",
+    "install": dict(desc="Install an owned diagnostic in the sample mount, or an owned filter in the signal "
+                         "camera's filter holder.", params={"part_id": ("str", True)}),
+    "uninstall": dict(desc="Empty the signal camera's filter holder ('filter') or the sample mount ('diagnostic').",
+                      params={"what": ("str", True)}),
+    "measure_path": dict(desc="Tape-measure the beam path of one arm ('800nm' or 'opa') from its output port (good to about +/-5 mm).",
                          params={"arm": ("str", True)}),
     "view_camera": dict(desc="Camera frame at the sample mount: plane 'sample' (focal plane) or 'lens'. Each spot gives its position and relative_power.",
                         params={"plane": ("str", True)}),
-    "block": dict(desc="Close the shutter of one arm ('pump' or 'probe').", params={"arm": ("str", True)}),
-    "unblock": dict(desc="Open the shutter of one arm ('pump' or 'probe').", params={"arm": ("str", True)}),
+    "block": dict(desc="Close the shutter of one arm ('800nm' or 'opa').", params={"arm": ("str", True)}),
+    "unblock": dict(desc="Open the shutter of one arm ('800nm' or 'opa').", params={"arm": ("str", True)}),
     "move_stage": dict(desc="Move the delay stage to position_mm.", params={"position_mm": ("num", True)}),
     "read_signal": dict(desc="Read the installed diagnostic, integrating for t_int seconds (0.01-10).",
                         params={"t_int": ("num", True)}),
@@ -108,9 +112,12 @@ class Plan:
 
 
 class Episode:
-    def __init__(self, seed: int):
+    def __init__(self, seed: int, level: int = 1):
+        if level not in (1, 2):
+            raise ValueError("level must be 1 or 2")
         self.seed = int(seed)
-        self.lab = Lab(self.seed)
+        self.level = int(level)
+        self.lab = Lab(self.seed, self.level)
         self.rng_place = random.Random(f"gss-place-{self.seed}")
         self.rng_noise = random.Random(f"gss-noise-{self.seed}")
         self.t = 0.0
@@ -128,7 +135,12 @@ class Episode:
         self.stage_last_dir = 0
         self.diag_owned: list[str] = []
         self.diag: str | None = None
-        self.shutter_open = {"pump": False, "probe": False}
+        self.filters_owned: list[str] = []
+        self.filter: str | None = None
+        self.align_cam: str | None = None  # None = the free Si camera
+        self.lams = {"800nm": 800.0, "opa": self.lab.opa_lambda}
+        self.c_min = RW.c_min(self.lab.opa_lambda, self.level)
+        self.shutter_open = {"800nm": False, "opa": False}
         self.tool_calls = 0
         self.malformed = 0
         self.stray_s = 0.0
@@ -207,15 +219,18 @@ class Episode:
         if len(xs) >= 2:
             area = (max(x[0] for x in xs) - min(x[0] for x in xs)) * (max(x[2] for x in xs) - min(x[2] for x in xs)) / 1e6
         self.final = {
-            "reward": RW.reward(tr["eta"], self.cost, self.t / K.BUDGET_S),
+            "reward": RW.reward(tr["eta"], self.cost, self.t / K.BUDGET_S, self.c_min),
             "eta": tr["eta"],
             "O": tr["O"],
             "abs_dt_fs": None if dt is None else abs(dt),
-            "T_pump": tr["T_pump"],
-            "T_probe": tr["T_probe"],
-            "design_viable": RW.design_viable(self.bought),
+            "T_800": tr["T_800"],
+            "T_opa": tr["T_opa"],
+            "opa_lambda_nm": self.lab.opa_lambda,
+            "design_viable": RW.design_viable(self.bought, self.lab.opa_lambda, self.level),
+            "level": self.level,
+            "diagnostics_bought": sorted(k for k in self.bought if cat.PARTS[k]["slot"] in ("diagnostic", "filter", "camera")),
             "cost_eur": self.cost,
-            "c_min_eur": RW.C_MIN,
+            "c_min_eur": self.c_min,
             "lab_time_min": round(self.t / 60.0, 2),
             "lab_time_frac": round(self.t / K.BUDGET_S, 4),
             "tool_calls": self.tool_calls,
@@ -278,17 +293,17 @@ class Episode:
 
     def _visible(self) -> dict:
         b = self._beams()
-        return {arm: (b[arm] if self.shutter_open[arm] else None) for arm in ("pump", "probe")}
+        return {arm: (b[arm] if self.shutter_open[arm] else None) for arm in K.ARMS}
 
     def _truth(self) -> dict:
         vis = self._visible()
-        if vis["pump"] is None or vis["probe"] is None:
+        if vis["800nm"] is None or vis["opa"] is None:
             b = self._beams()
-            return {"O": 0.0, "dt_fs": None, "T_pump": b["pump"].T if vis["pump"] else 0.0,
-                    "T_probe": b["probe"].T if vis["probe"] else 0.0, "eta": 0.0,
-                    "pump_end": "blocked" if vis["pump"] is None else b["pump"].end_note,
-                    "probe_end": "blocked" if vis["probe"] is None else b["probe"].end_note}
-        return P.truth(vis["pump"], vis["probe"], self.lab.probe_extra_path)
+            return {"O": 0.0, "dt_fs": None, "T_800": b["800nm"].T if vis["800nm"] else 0.0,
+                    "T_opa": b["opa"].T if vis["opa"] else 0.0, "eta": 0.0,
+                    "end_800": "blocked" if vis["800nm"] is None else b["800nm"].end_note,
+                    "end_opa": "blocked" if vis["opa"] is None else b["opa"].end_note}
+        return P.truth(vis["800nm"], vis["opa"], self.lab.opa_extra_path, self.level)
 
     def _update_stray(self):
         vis = self._visible()
@@ -359,8 +374,8 @@ class Episode:
         return order
 
     def _arm(self, arm: str) -> str:
-        if arm not in ("pump", "probe"):
-            raise BadArgs("arm must be 'pump' or 'probe'")
+        if arm not in K.ARMS:
+            raise BadArgs("arm must be '800nm' or 'opa'")
         return arm
 
     def _item(self, part: str, placed: bool | None = None) -> dict:
@@ -444,6 +459,8 @@ class Episode:
                     d["travel_mm"] = it["part_travel"]
                 inv[pid] = d
             return {"inventory": inv, "diagnostic_installed": self.diag, "diagnostics_owned": self.diag_owned,
+                    "filter_installed": self.filter, "filters_owned": self.filters_owned,
+                    "alignment_camera": self.align_cam or "free Si camera (400-1000 nm)",
                     "shutters_open": dict(self.shutter_open), "spent_eur": self.cost,
                     "spend_cap_eur": K.SPEND_CAP}
         return Plan(None, 5.0, run)
@@ -512,6 +529,16 @@ class Episode:
                             notes.append(f"{k} installed in the sample mount in place of {self.diag}")
                         self.diag = k
                         got.append(f"{k} (installed in the sample mount)")
+                    elif p["kind"] == "filter":
+                        if k not in self.filters_owned:
+                            self.filters_owned.append(k)
+                        if self.filter and self.filter != k:
+                            notes.append(f"{k} put in the filter holder in place of {self.filter}")
+                        self.filter = k
+                        got.append(f"{k} (in the signal camera's filter holder)")
+                    elif p["kind"] == "camera":
+                        self.align_cam = k
+                        got.append(f"{k} (fitted in the flip-in alignment mount)")
             out = {"outcome": "delivered", "order_eur": price, "spent_eur": self.cost, "received": got}
             if notes:
                 out["notes"] = notes
@@ -548,7 +575,7 @@ class Episode:
                 hin = height_in + r.uniform(-0.5, 0.5)
             p = Part(part, kind, (x + ex, height + eh, z + ez), yaw + eyaw, height_in=hin,
                      mount_err=self.lab.mount_error(part) if kind in ("mirror", "periscope") else (0.0, 0.0),
-                     travel=travel)
+                     travel=travel, level=self.level)
             if kind == "stage":
                 p.stage_pos = self.stage_true
             it["part"] = p
@@ -673,14 +700,30 @@ class Episode:
                 "dheight_mm": round(off[1] + n.gauss(0, 0.2), 1)}
 
     def _t_install(self, part_id):
-        if part_id not in self.diag_owned:
-            raise BadArgs(f"you don't own a diagnostic {part_id!r}")
+        if part_id not in self.diag_owned and part_id not in self.filters_owned:
+            raise BadArgs(f"you don't own a diagnostic or filter {part_id!r}")
         loc = self._stand_at(self.inv["sample"])
 
         def run():
+            if part_id in self.filters_owned:
+                self.filter = part_id
+                return {"outcome": f"{part_id} in the signal camera's filter holder"}
             self.diag = part_id
             return {"outcome": f"{part_id} installed in the sample mount"}
-        return Plan(loc, 120.0, run)
+        return Plan(loc, 120.0 if part_id in self.diag_owned else 30.0, run)
+
+    def _t_uninstall(self, what):
+        if what not in ("filter", "diagnostic"):
+            raise BadArgs("what must be 'filter' or 'diagnostic'")
+        loc = self._stand_at(self.inv["sample"])
+
+        def run():
+            if what == "filter":
+                self.filter = None
+                return {"outcome": "filter holder empty"}
+            self.diag = None
+            return {"outcome": "sample mount empty"}
+        return Plan(loc, 30.0 if what == "filter" else 60.0, run)
 
     def _t_measure_path(self, arm):
         arm = self._arm(arm)
@@ -699,9 +742,11 @@ class Episode:
         if self.inv["sample"]["part"] is None:
             return []
         vis = self._visible()
+        rng = cat.PARTS[self.align_cam]["range_nm"] if self.align_cam else K.CAM_SI_RANGE
         if plane == "sample":
-            return P.camera_sample(vis, self.rng_noise)
-        return P.camera_lens(vis, self.rng_noise)
+            return P.camera_sample(vis, self.lams, rng, self.rng_noise,
+                                   K.L2_STRETCH if self.level == 2 else 1.0)
+        return P.camera_lens(vis, self.lams, rng, self.rng_noise)
 
     def _t_view_camera(self, plane):
         if plane not in ("sample", "lens"):
@@ -771,12 +816,14 @@ class Episode:
         vis = self._visible()
         if self.diag is None:
             return {"note": "no detector installed in the sample mount"}
-        model = cat.PARTS[self.diag]["model"]
+        d = cat.PARTS[self.diag]
         if self.inv["sample"]["part"] is None:
-            vis = {"pump": None, "probe": None}
-        if model == "photodiode":
-            return P.photodiode(vis, self.lab.probe_extra_path, self.rng_noise)
-        return {"counts": P.bbo_signal(model, vis["pump"], vis["probe"], self.lab.probe_extra_path, t_int, self.rng_noise)}
+            vis = {"800nm": None, "opa": None}
+        if d["model"] == "photodiode":
+            return P.photodiode(vis, self.lams, d["range_nm"], self.lab.opa_extra_path, self.rng_noise)
+        f = cat.filter_spec(self.filter) if (self.filter and d["readout"] == "camera") else None
+        return P.nonlinear_signal(d, f, self.lab.opa_lambda, vis["800nm"], vis["opa"], self.lab.opa_extra_path,
+                                  t_int, self.rng_noise, self.level)
 
     def _t_read_signal(self, t_int):
         if not (0.01 <= t_int <= 10.0):
@@ -784,6 +831,8 @@ class Episode:
 
         def run():
             out = {"detector": self.diag, "t_int_s": t_int}
+            if self.diag and cat.PARTS[self.diag]["readout"] == "camera":
+                out["filter"] = self.filter
             out.update(self._read(t_int))
             return out
         return Plan("desk", t_int + 1.0, run)
@@ -813,17 +862,25 @@ class Episode:
 
         def run():
             pts = []
+            sat = False
             for x in positions:
                 self._set_stage(x)
                 r = self._read(t_int)
                 if "counts" in r:
                     pts.append([round(x, 5), r["counts"]])
+                    if r.get("saturated"):
+                        sat = True
                 elif "note" in r:
                     return {"error": r["note"], "position_mm": round(self.stage_cmd, 5)}
                 else:
                     pts.append([round(x, 5), r])
-            return {"detector": self.diag, "t_int_s": t_int, "points": pts,
-                    "position_mm": round(self.stage_cmd, 5), "columns": ["position_mm", "counts"]}
+            out = {"detector": self.diag, "t_int_s": t_int, "points": pts,
+                   "position_mm": round(self.stage_cmd, 5), "columns": ["position_mm", "counts"]}
+            if self.diag and cat.PARTS[self.diag]["readout"] == "camera":
+                out["filter"] = self.filter
+            if sat:
+                out["saturated"] = True
+            return out
         return Plan(self._stage_loc(it), cost, run)
 
     def _t_submit(self):
