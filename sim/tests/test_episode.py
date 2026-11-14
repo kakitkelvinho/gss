@@ -5,6 +5,7 @@ import pytest
 
 from sim import Episode
 from sim import constants as K
+from sim import reward as RW
 from sim.lab import Lab
 from sim.optics import Part
 from solution.expert import run_in_process
@@ -104,11 +105,34 @@ def test_bad_arguments_cost_5s_and_change_nothing():
     assert ep.malformed == len(bad)
 
 
-def test_every_action_costs_at_least_5s():
+def test_passive_information_is_free_but_malformed_calls_cost_time():
     ep = Episode(1)
-    for _ in range(20):
-        ep.call("status", {})
-    assert ep.t == pytest.approx(100.0)
+    for tool, args in (("status", {}), ("list_catalogue", {}),
+                       ("get_datasheet", {"part_id": "MIR-1"}),
+                       ("read_manual", {"device": "opa"})):
+        ep.call(tool, args)
+    assert ep.t == 0.0 and ep.pos == (K.DESK[0], K.DESK[2])
+    ep.call("read_manual", {"device": "invalid"})
+    assert ep.t == K.MIN_ACTION_S
+    assert ep.result()["reward"] == 0.0
+
+
+def test_reward_grades_physics_and_gates_efficiency():
+    base = dict(cost=0.0, time_frac=0.0, c_min_eur=950.0)
+    empty = RW.score(0.0, 0.0, 0.0, 0.0, **base)
+    assert empty["reward"] == 0.0
+    spatial = RW.score(0.0, 1.0, 1.0, 1.0, **base)
+    assert spatial["reward"] == pytest.approx(0.2)
+    assert spatial["efficiency_score"] == 0.0
+    assert RW.score(0.0, 1.0, 0.2, 1.0, **base)["reward"] == pytest.approx(0.04)
+    near = RW.score(0.89, 1.0, 1.0, 1.0, **base)
+    assert near["reward"] == pytest.approx(0.645)
+    assert not near["success"] and near["efficiency_score"] == 0.0
+    success = RW.score(1.0, 1.0, 1.0, 1.0, **base)
+    assert success["reward"] == pytest.approx(1.0)
+    assert success["success"]
+    costly = RW.score(1.0, 1.0, 1.0, 1.0, cost=K.SPEND_CAP, time_frac=1.0, c_min_eur=950.0)
+    assert costly["reward"] == pytest.approx(0.7)
 
 
 def test_timeout_auto_submits_and_locks():
@@ -190,11 +214,13 @@ def test_expert_meets_pass_criteria(seed):
 
 
 @pytest.mark.parametrize("seed", SEEDS)
-def test_stop_early_scores_below_005(seed):
+def test_stop_early_earns_spatial_credit_only(seed):
     ep, _ = run_in_process(seed, stop_early=True)
     r = ep.result()
     assert r["O"] > 0.9  # it did get spatial overlap
-    assert r["reward"] < 0.05
+    assert r["reward"] == pytest.approx(r["spatial_score"], abs=1e-6)
+    assert r["reward"] <= 0.2 and r["reward"] > 0.15
+    assert r["efficiency_score"] == 0.0
 
 
 def test_camera_shows_clipping_as_dim_spot():

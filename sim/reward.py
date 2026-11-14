@@ -1,5 +1,4 @@
-"""Reward: eta = T_800 T_opa O exp(-(dt/tau_c)^2) from true state;
-R = eta (1 - alpha (C - C_min)/(C_cap - C_min) - beta t_lab/t_budget)."""
+"""Grade final measured physics, then award efficiency only for a working setup."""
 
 from __future__ import annotations
 
@@ -48,9 +47,23 @@ def c_min(lam_o: float, level: int = 1) -> float:
     return float(stage + det + cam + N_MIN_MIRRORS[level] * cat.PARTS["MIR-1"]["price"])
 
 
-def reward(eta: float, cost: float, time_frac: float, c_min_eur: float) -> float:
-    pen = K.ALPHA * max(0.0, cost - c_min_eur) / (K.SPEND_CAP - c_min_eur) + K.BETA * min(1.0, max(0.0, time_frac))
-    return max(0.0, min(1.0, eta * (1.0 - pen)))
+def score(eta: float, overlap: float, t_800: float, t_opa: float,
+          cost: float, time_frac: float, c_min_eur: float) -> dict[str, float | bool]:
+    """Spatial credit requires two transmitted beams; timing credit requires overlap.
+
+    The 0.3 efficiency bonus is gated by physical success, not purchases or tool use.
+    """
+    spatial = max(0.0, min(1.0, t_800 * t_opa * overlap))
+    timed = max(0.0, min(1.0, eta))
+    success = timed >= 0.9
+    cost_frac = max(0.0, min(1.0, (cost - c_min_eur) / (K.SPEND_CAP - c_min_eur)))
+    time_frac = max(0.0, min(1.0, time_frac))
+    spatial_score = 0.2 * spatial
+    temporal_score = 0.5 * timed
+    efficiency_score = (K.ALPHA * (1.0 - cost_frac) + K.BETA * (1.0 - time_frac)) if success else 0.0
+    return {"reward": min(1.0, spatial_score + temporal_score + efficiency_score),
+            "spatial_score": spatial_score, "temporal_score": temporal_score,
+            "efficiency_score": efficiency_score, "success": success}
 
 
 def design_viable(bought: dict[str, int], lam_o: float, level: int = 1) -> bool:

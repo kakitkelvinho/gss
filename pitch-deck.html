@@ -339,19 +339,19 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
       <div><strong>Submit</strong><span>A separate verifier scores the simulator's true final state.</span></div>
     </div>
     <p class="muted deck-footer-line">Harbor + OpenCode · Python simulator · seeded labs · about 20 MCP actions</p>
-    <aside class="notes"><b>~18 s.</b> All lab changes go through tools that consume simulated time. The agent sees instrument readings, not simulator truth. The verifier is separate and hidden from the agent.</aside>
+    <aside class="notes"><b>~18 s.</b> Physical lab changes go through tools that consume simulated time; reading manuals and status is free. The agent sees instrument readings, not simulator truth. The verifier is separate and hidden from the agent.</aside>
   </section>
 
   <section class="slide" data-video>
-    <h2>One scored Flash run: the agent missed time zero.</h2>
-    <div class="score-chart" role="img" aria-label="Scores on seed 1 Level 1: do nothing zero, stop early zero, Gemini 3.8 Flash zero, scripted reference 0.908">
+    <h2>The agent aligned the spots but missed time zero.</h2>
+    <div class="score-chart" role="img" aria-label="Scores on seed 1 Level 1: do nothing zero, stop early 0.199, saved Gemini 3.8 Flash final state rescored 0.185, scripted reference 0.917">
       <div class="score-row"><span>Do nothing</span><div class="score-track"><i style="width:0"></i></div><b>0.000</b></div>
-      <div class="score-row"><span>Stop early</span><div class="score-track"><i style="width:0"></i></div><b>0.000</b></div>
-      <div class="score-row flash-row"><span>Gemini 3.8 Flash</span><div class="score-track"><i style="width:0"></i></div><b>0.000</b></div>
-      <div class="score-row ref-row"><span>Scripted reference</span><div class="score-track"><i style="width:90.8%"></i></div><b>0.908</b></div>
+      <div class="score-row"><span>Stop early</span><div class="score-track"><i style="width:19.9%"></i></div><b>0.199</b></div>
+      <div class="score-row flash-row"><span>Gemini 3.8 Flash*</span><div class="score-track"><i style="width:18.5%"></i></div><b>0.185</b></div>
+      <div class="score-row ref-row"><span>Scripted reference</span><div class="score-track"><i style="width:91.7%"></i></div><b>0.917</b></div>
     </div>
-    <p class="muted score-note">Same seed, Level 1, 1300 nm OPA. One completed Flash trial; more agent trials are still needed.</p>
-    <aside class="notes"><b>~20 s.</b> This is one completed Flash trial, not a reliable estimate across models. The reference is a Harbor oracle run on the same seed. The other Gemini Carbon attempts errored, so we do not count them as scored model trials.</aside>
+    <p class="muted score-note">Seed 1, Level 1. *Saved Flash final state rescored under the new rubric; no new model run.</p>
+    <aside class="notes"><b>~20 s.</b> The Flash trial used the previous rules. Its saved final physics state yields 0.185 under the new reward, but a fresh run might behave differently with free reading. The reference and stop-early values are fresh MCP baselines. The other Gemini Carbon attempts errored, so we do not count them as scored model trials.</aside>
   </section>
 
   <section class="slide failure-slide" data-video>
@@ -361,7 +361,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
       <div class="failure-metric"><strong>46,057 fs</strong><span>timing error at the end</span></div>
       <div class="failure-metric"><strong>234 min</strong><span>of 240 min used</span></div>
     </div>
-    <blockquote>“The alignment and time-zero setup … has been completed and submitted.”<small>Agent's final report; verifier score: 0</small></blockquote>
+    <blockquote>“The alignment and time-zero setup … has been completed and submitted.”<small>Agent's final report; saved state rescored: 0.185</small></blockquote>
     <p class="failure-takeaway">A camera confirms where beams land. A delay scan and signal check are needed to confirm <em>when</em> they arrive.</p>
     <aside class="notes"><b>~20 s.</b> This is the real run's final report, shortened with an ellipsis. The agent achieved spatial overlap but never verified a temporal peak. It used a short integration on one scan and did not check a single-arm background. The lab manuals describe the diagnostic and scan tools.</aside>
   </section>
@@ -369,13 +369,13 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <section class="slide" data-video>
     <h2>Reward follows the physical outcome.</h2>
     <div class="integrity-layout">
-      <div class="formula">beam throughput × spot overlap × timing overlap</div>
+      <div class="formula">0.2 spatial + 0.5 timing + 0.3 efficiency on success</div>
       <div class="integrity-text">
-        <p>Saving money cannot earn points with an empty table. Cost and time only reduce a successful physical score.</p>
-        <p>Do nothing and stop early both score 0 across seeds 1–10. The scripted expert reaches 0.91 average in Level 1.</p>
+        <p>Saving money and reading cannot earn points with an empty table. Cost and time earn points only after physical success.</p>
+        <p>Do nothing scores 0; spatial overlap without timing earns about 0.2. The scripted expert averages 0.922 in Level 1.</p>
       </div>
     </div>
-    <aside class="notes"><b>~15 s.</b> The verifier reads the true simulator state from a separate container. Baselines establish that empty or unfinished setups do not pay. We have tests for malformed actions, hidden verifier routes, post-submit calls, and end-to-end collection. Current limitation: the timing term is so sharp that partial progress can still round to zero.</aside>
+    <aside class="notes"><b>~15 s.</b> The verifier reads the true final simulator state from a separate container. Spatial credit requires both beams to reach the sample. The timing term rises as they approach time zero. Efficiency pays only if final physical efficiency is at least 0.9. We tested do-nothing, stop-early, malformed actions, hidden verifier routes, and collection.</aside>
   </section>
 
   <section class="slide" data-video>
@@ -388,17 +388,17 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <section class="slide split">
     <h2>Why the difficulty is meaningful</h2>
     <div class="cols">
-      <div><p>Observable, learnable decisions</p><ul><li>Manuals specify geometry, OPA path, and instrument ranges.</li><li>The camera reports focal spots; the detector and delay stage reveal timing.</li><li>Every action costs simulated lab time.</li></ul></div>
+      <div><p>Observable, learnable decisions</p><ul><li>Manuals specify geometry, OPA path, and instrument ranges.</li><li>The camera reports focal spots; the detector and delay stage reveal timing.</li><li>Physical actions cost simulated lab time; reading is free.</li></ul></div>
       <div><p>Physics in the loop</p><ul><li>Ray tracing, clipping on optics and mounts, lens focusing.</li><li>Polarisation, detector wavelength limits, noise, and stage backlash.</li><li>Seeded labs make reruns reproducible.</li></ul></div>
     </div>
     <aside class="notes">The task is difficult because the agent must infer a procedure and correct errors while the clock runs. We do not claim the simulator is a full wave-optics model or that every parameter was independently validated against hardware.</aside>
   </section>
 
   <section class="slide">
-    <h2>What the current score does—and misses</h2>
-    <p>The score multiplies beam throughput, spatial overlap, and a narrow temporal overlap term. Cost and time apply as penalties.</p>
-    <p class="muted" style="margin-top:42px">A run can align the spots well and still score zero when the pulses miss by many picoseconds. A more graded progress signal is a future design option, not a result in this deck.</p>
-    <aside class="notes">The critique correctly identifies a weakness for training: all non-successful runs can look alike. We have not changed the scoring code, so this slide states the limitation instead of presenting a proposed rubric as implemented.</aside>
+    <h2>What the current score measures</h2>
+    <p>Up to 0.2 for transmitted spatial overlap and 0.5 more as the pulses reach time zero.</p>
+    <p class="muted" style="margin-top:42px">The final 0.3 rewards money and lab time left only when physical efficiency is at least 0.9. Reading or buying alone earns nothing.</p>
+    <aside class="notes">Each component is computed from the simulator's true final state. Partial alignment now gives a training signal without paying for empty tables or tool-call spam. The success threshold is based on measured physical efficiency.</aside>
   </section>
 
   <section class="slide">
