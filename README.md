@@ -54,7 +54,7 @@ R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}} - 0.
 - $O$ is the normalised overlap of the two focal spots.
 - $\Delta t$ is the true delay error, and $\tau_c \approx 70$ fs.
 - $T$ is the clipping transmission of each arm.
-- $C$ is the total spend. $C_\text{min}$ = €2,200 is the cheapest workable design, and $C_\text{cap}$ = €30k.
+- $C$ is the total spend. $C_\text{min}$ = €1,900 is the cheapest workable design (stage, crystal and 2 mirrors), and $C_\text{cap}$ = €30k.
 - $t_\text{lab}$ is the lab time used: every action takes physical time, so brute-force iteration (swarm-style knob searches, blind scans) is penalised softly here and hard-capped by the 4 h budget.
 
 Diagnostics go to `reward.json` but are not part of the reward: O, |Δt|, T per arm, design
@@ -98,12 +98,16 @@ Seeds 1–10, played over MCP and scored through the verifier route (full table 
 
 | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|
-| reference (scripted expert) | 0.919 | 0.915 | 63.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| reference (scripted expert) | 0.915 | 0.906 | 63.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.7% | R < 0.05 ✅ |
+| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.6% | R < 0.05 ✅ |
 
-Frontier-agent runs (OpenCode): *TODO, these need inference credits.* Add the Harbor job logs and
-scores here.
+Blind playthroughs by fresh Claude agents with no access to the code ([docs/playthroughs.md](docs/playthroughs.md)):
+on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
+(R ≈ 0.93); after the de-hint and buildability changes, 2 runs scored R = 0.88 and 0.72 (slower, with partial
+failures such as clipping at the lens edge and timing off by backlash).
+
+Harbor/OpenCode runs: *TODO, these need inference credits.* Add the Harbor job logs and scores here.
 
 ## Layout
 

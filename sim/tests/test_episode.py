@@ -27,7 +27,7 @@ def perfect_layout(seed):
     """Hand-built expert layout with no placement errors and no defocus."""
     ep = Episode(seed)
     ep.lab.defocus = 0.0
-    ep.call("buy", {"items": {"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1}})
+    ep.call("buy", {"items": {"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1}})
     _, h_p, z_p = ep.lab.ports["pump"]["pos"]
     _, h_o, z_o = ep.lab.ports["probe"]["pos"]
     r = math.radians
@@ -35,10 +35,10 @@ def perfect_layout(seed):
         "sample": Part("sample", "sample", (1300.0, h_p, 600.0), r(180)),
         "periscope-1": Part("periscope-1", "periscope", (2050.0, h_p, z_o), r(180), height_in=h_o),
         "mirror-1": Part("mirror-1", "mirror", (1700.0, h_p, z_o), r(315)),
-        "mirror-2": Part("mirror-2", "mirror", (1700.0, h_p, 608.0), r(135)),
-        "stage": Part("stage", "stage", (900.0, h_p, z_p + 12), r(180), travel=25.0),
-        "mirror-3": Part("mirror-3", "mirror", (1500.0, h_p, z_p + 24), r(135)),
-        "mirror-4": Part("mirror-4", "mirror", (1500.0, h_p, 592.0), r(225)),
+        "mirror-2": Part("mirror-2", "mirror", (1700.0, h_p, 592.0), r(135)),
+        "stage": Part("stage", "stage", (900.0, h_p, z_p + 15), r(180), travel=25.0),
+        "mirror-3": Part("mirror-3", "mirror", (1500.0, h_p, z_p + 30), r(135)),
+        "mirror-4": Part("mirror-4", "mirror", (1500.0, h_p, 608.0), r(225)),
     }
     for k, p in parts.items():
         ep.inv[k]["part"] = p
@@ -78,7 +78,7 @@ def test_time_and_cost_ledger():
 
 def test_bad_arguments_cost_5s_and_change_nothing():
     ep = Episode(1)
-    ep.call("buy", {"items": ["MIR-1", "DL-C25", "BBO-SFG-1300"]})
+    ep.call("buy", {"items": ["MIR-1", "DL-C25", "BBO-T236"]})
     t0 = ep.t
     bad = [
         ("place", {"part": "mirror-1", "x": float("nan"), "z": 1, "height": 100, "yaw_deg": 0}),
@@ -199,11 +199,13 @@ def test_stop_early_scores_below_005(seed):
 
 def test_camera_shows_clipping_as_dim_spot():
     ep = perfect_layout(3)
-    full = {s["beam"]: s["relative_power"] for s in ep.call("view_camera", {"plane": "sample"})["spots"]}
-    assert full["probe"] == pytest.approx(1.0, abs=0.08)
+    ep.call("block", {"arm": "pump"})
+    full = ep.call("view_camera", {"plane": "sample"})["spots"]
+    assert len(full) == 1 and "beam" not in full[0]
+    assert full[0]["relative_power"] == pytest.approx(1.0, abs=0.08)
     # slide mirror-2 in its own plane: the reflected beam is unchanged but now hits 11.3 mm off-centre
     m = ep.inv["mirror-2"]["part"]
     m.pos = (m.pos[0] + 8.0, m.pos[1], m.pos[2] + 8.0)
     ep._invalidate()
-    spots = {s["beam"]: s for s in ep.call("view_camera", {"plane": "sample"})["spots"]}
-    assert spots["probe"]["relative_power"] < 0.6
+    spots = ep.call("view_camera", {"plane": "sample"})["spots"]
+    assert spots[0]["relative_power"] < 0.6

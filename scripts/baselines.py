@@ -68,7 +68,7 @@ def fmt_dt(v):
 def recipe(seed, res, traj):
     lines = [f"# Expert lab recipe (seed {seed})", "",
              "By-product of the reference run: what the scripted expert did, in order, with lab time.", "",
-             f"- Parts bought: DL-C25 delay stage, BBO-SFG-1300 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope "
+             f"- Parts bought: DL-C25 delay stage, BBO-T236 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope "
              f"(EUR {res['cost_eur']:.0f}; C_min = EUR {res['c_min_eur']:.0f})",
              f"- Lab time: {res['lab_time_min']:.1f} min of 240 ({100 * res['lab_time_frac']:.1f}%), "
              f"{res['tool_calls']} tool calls",

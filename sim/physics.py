@@ -26,12 +26,12 @@ def spatial_overlap(pump: BeamResult, probe: BeamResult) -> float:
     return (2 * w1 * w2 / s) * math.exp(-2 * d2 / s)
 
 
-def delay_fs(pump: BeamResult, probe: BeamResult, opa_path: float) -> float | None:
-    """Delta t = t_pump - t_probe at the sample, fs. Both ports are path-matched at the amplifier
-    split except for the OPA's internal path, which delays the probe."""
+def delay_fs(pump: BeamResult, probe: BeamResult, probe_extra: float) -> float | None:
+    """Delta t = t_pump - t_probe at the sample, fs. `probe_extra` is the probe's extra path before
+    its port relative to the pump's (split-to-OPA + OPA internal - split-to-pump-port)."""
     if not (pump.at_sample and probe.at_sample):
         return None
-    return (pump.opl - (probe.opl + opa_path)) / K.C_MM_PER_FS
+    return (pump.opl - (probe.opl + probe_extra)) / K.C_MM_PER_FS
 
 
 def temporal_factor(dt_fs: float | None) -> float:
@@ -40,9 +40,9 @@ def temporal_factor(dt_fs: float | None) -> float:
     return math.exp(-((dt_fs / K.TAU_C) ** 2))
 
 
-def truth(pump: BeamResult, probe: BeamResult, opa_path: float) -> dict:
+def truth(pump: BeamResult, probe: BeamResult, probe_extra: float) -> dict:
     O = spatial_overlap(pump, probe)
-    dt = delay_fs(pump, probe, opa_path)
+    dt = delay_fs(pump, probe, probe_extra)
     g = temporal_factor(dt)
     return {
         "O": O,
@@ -59,7 +59,7 @@ def truth(pump: BeamResult, probe: BeamResult, opa_path: float) -> dict:
 # Instruments
 
 
-def bbo_signal(model: str, pump: BeamResult | None, probe: BeamResult | None, opa_path: float,
+def bbo_signal(model: str, pump: BeamResult | None, probe: BeamResult | None, probe_extra: float,
                t_int: float, rng: random.Random) -> int:
     """S = A T O exp(-(dt/tau_c)^2) + b_pump T_p + b_probe T_q + N(0, sigma/sqrt(t_int)) (Q16).
     `pump` / `probe` are None when that arm is blocked."""
@@ -72,18 +72,20 @@ def bbo_signal(model: str, pump: BeamResult | None, probe: BeamResult | None, op
     if pump is not None and probe is not None:
         O = spatial_overlap(pump, probe)
         if O > 0:
-            s += p["A"] * pump.T * probe.T * O * temporal_factor(delay_fs(pump, probe, opa_path))
+            # type-I SFG uses the field components along the crystal's (horizontal) o-axis
+            s += (p["A"] * pump.T * probe.T * pump.pol * probe.pol * O
+                  * temporal_factor(delay_fs(pump, probe, probe_extra)))
     s += rng.gauss(0.0, p["sigma"] / math.sqrt(t_int))
     return max(0, int(round(s)))
 
 
-def photodiode(beams: dict[str, BeamResult | None], opa_path: float, rng: random.Random) -> dict:
+def photodiode(beams: dict[str, BeamResult | None], probe_extra: float, rng: random.Random) -> dict:
     """Arrival time of each unblocked beam reaching the sample on the 1 GHz scope."""
     out = {}
     for arm, b in beams.items():
         if b is None or not b.at_sample or b.T < 0.01:
             continue
-        opl = b.opl + (opa_path if arm == "probe" else 0.0)
+        opl = b.opl + (probe_extra if arm == "probe" else 0.0)
         t = opl / C_MM_PER_PS - SCOPE_TRIGGER_PS + rng.gauss(0.0, K.SCOPE_JITTER_PS)
         out[f"{arm}_arrival_ps"] = round(t / K.SCOPE_QUANT_PS) * K.SCOPE_QUANT_PS
     return out
@@ -108,10 +110,10 @@ def camera_sample(beams: dict[str, BeamResult | None], rng: random.Random) -> li
             q = val / K.CAM_PIXEL + rng.gauss(0.0, K.CAM_NOISE_PX)
             return round(round(q, 1) * K.CAM_PIXEL * 1000.0, 2)
 
-        spots.append({"beam": arm, "h_um": px(h), "v_um": px(v),
+        spots.append({"h_um": px(h), "v_um": px(v),
                       "radius_um": round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1),
                       "relative_power": _power(b.T, rng)})
-    return spots
+    return sorted(spots, key=lambda d: (d["h_um"], d["v_um"]))  # unlabelled: a camera can't tell the beams apart
 
 
 def camera_lens(beams: dict[str, BeamResult | None], rng: random.Random) -> list[dict]:
@@ -120,6 +122,6 @@ def camera_lens(beams: dict[str, BeamResult | None], rng: random.Random) -> list
         if b is None or not b.at_sample or b.T < 0.01:
             continue
         h, v = b.lens_hit
-        spots.append({"beam": arm, "h_mm": round(h + rng.gauss(0.0, 0.03), 2),
+        spots.append({"h_mm": round(h + rng.gauss(0.0, 0.03), 2),
                       "v_mm": round(v + rng.gauss(0.0, 0.03), 2), "relative_power": _power(b.T, rng)})
-    return spots
+    return sorted(spots, key=lambda d: (d["h_mm"], d["v_mm"]))

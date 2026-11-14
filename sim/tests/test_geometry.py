@@ -84,3 +84,42 @@ def test_lens_spot_and_opl():
     # OPL: wavefront through lens centre + f + dz
     assert b.opl == pytest.approx(200.0 / math.cos(th) - V.dot((0.0, 0.0, b.segments[-1][1][2] - 308.0), d)
                                   + K.LENS_F + 0.3, abs=1e-6)
+
+
+def test_mount_plate_behind_mirror_blocks_a_passing_beam():
+    # beam passes 10 mm beside the optic, on the side the mount plate sits (behind the mirror)
+    m = Part("mirror-1", "mirror", (1500.0, 120.0, 310.0), math.radians(135))  # faces -x,+z
+    b = trace("pump", PUMP, WEST, els(m), [])
+    assert b.end == "absorbed" and "mount of mirror-1" in b.end_note
+    # passing on the reflecting side, clear of the optic, is fine
+    m2 = Part("mirror-1", "mirror", (1500.0, 120.0, 285.0), math.radians(135))
+    b2 = trace("pump", PUMP, WEST, els(m2), [])
+    assert b2.end == "stray" and not b2.hits
+
+
+def test_post_blocks_a_low_beam():
+    m = Part("mirror-1", "mirror", (1500.0, 200.0, 300.0), math.radians(135))  # 80 mm above the beam
+    b = trace("pump", PUMP, WEST, els(m), [])
+    assert b.end == "absorbed" and "mount of mirror-1" in b.end_note
+
+
+def test_lens_mount_ring_absorbs():
+    lens = Part("sample", "sample", (1300.0, 120.0, 318.0), math.pi)  # beam 18 mm off-axis
+    b = trace("pump", PUMP, WEST, els(lens), [])
+    assert b.end == "absorbed" and b.end_note == "lens mount"
+
+
+def test_polarisation_planar_path_kept_and_out_of_plane_turn_rotates_it():
+    lens_x = Part("sample", "sample", (1300.0, 120.0, 300.0), math.pi)
+    b = trace("pump", PUMP, WEST, els(lens_x), [])
+    assert b.pol == pytest.approx(1.0)
+    # turn the beam up (-x -> +y), then sideways (+y -> -z): a 90 deg image rotation
+    up = Part("periscope-1", "periscope", (2000.0, 220.0, 300.0), math.pi, height_in=120.0)
+    # build the out-of-plane turn from two discs directly: lower mirror of the periscope + a mirror
+    from sim.optics import Disc
+    n2 = V.unit(V.sub((0.0, 0.0, -1.0), (0.0, 1.0, 0.0)))
+    discs = [up.elements(0.0)[0], Disc("m", "mirror", (2000.0, 220.0, 300.0), n2, 12.7, 10.0)]
+    lens_z = Part("sample", "sample", (2000.0, 220.0, 200.0), math.radians(270))
+    b = trace("pump", PUMP, WEST, discs + els(lens_z), [])
+    assert b.at_sample
+    assert b.pol == pytest.approx(0.0, abs=1e-9)

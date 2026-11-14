@@ -4,12 +4,13 @@ so the same code runs in-process (`sim.Episode`) and over MCP (step 3).
 Every per-seed fact comes from manuals and measurements (tool outputs), never from the sim's state.
 Layout geometry (mm; x along the table, z across, height = y; yaw from +x toward +z):
 
-  probe: port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 608)
-         -> lens at (1300, 600, h_p), hitting it at z = 608
-  pump:  port -> delay stage (yaw 180, apex line z_p + 12) -> returns +x at z_p + 24
-         -> M_q1 (1500, z_p + 24) -> M_q2 (1500, 592) -> lens, hitting it at z = 592
+  probe: port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 592)
+         -> lens at (1300, 600, h_p), hitting it at z = 592
+  pump:  port -> delay stage (yaw 180, apex line z_p + 15) -> returns +x at z_p + 30
+         -> M_q1 (1500, z_p + 30) -> M_q2 (1500, 608) -> lens, hitting it at z = 608
+  The probe passes M_q2 on its reflecting side, clear of the mount plate behind it.
   The stage is placed so time zero sits near mid-travel:
-  apex A_x = (4518 - z_p - probe_total) / 2, reference point P_x = A_x + 90 + x_mid.
+  apex A_x = (4528 - z_p - probe_total) / 2, reference point P_x = A_x + 90 + x_mid.
 """
 
 from __future__ import annotations
@@ -20,9 +21,9 @@ import statistics
 from typing import Callable
 
 LENS = (1300.0, 600.0)
-PUMP_LENS_Z, PROBE_LENS_Z = 592.0, 608.0
+PUMP_LENS_Z, PROBE_LENS_Z = 608.0, 592.0
 X_PERI, X_P, X_Q = 2050.0, 1700.0, 1500.0
-STAGE_OFF = 12.0
+STAGE_OFF = 15.0
 TAU_STAGE_MM = 0.0105  # 1/e half-width of the cross-correlation in stage travel (~70 fs)
 
 
@@ -61,7 +62,11 @@ class Expert:
         for arm, key in (("pump", "Pump output port"), ("probe", "Probe output port")):
             m = re.search(key + r"[^:]*:\s*x=([\d.]+),\s*z=([\d.]+),\s*height=([\d.]+)", t)
             ports[arm] = tuple(float(v) for v in m.groups())
-        self.L_opa = float(re.search(r"this unit[^:]*:\s*([\d.]+)\s*mm", o).group(1))
+        opa_internal = float(re.search(r"this unit:\s*([\d.]+)\s*mm", o).group(1))
+        s_pump = float(re.search(r"pump port \(([\d.]+) mm of path from the split\)", t).group(1))
+        s_opa = float(re.search(r"OPA\s+input \(([\d.]+) mm of path from the split\)", t).group(1))
+        # extra path the probe has before its port, relative to the pump
+        self.L_opa = s_opa + opa_internal - s_pump
         _, self.z_p, self.h_p = ports["pump"]
         _, self.z_o, self.h_o = ports["probe"]
         self.port_x = ports["pump"][0]
@@ -140,13 +145,28 @@ class Expert:
             self.note(f"{part}: did not converge to {tol} mm")
 
     # -- camera overlap ----------------------------------------------------------------------
+    def find_probe_spot(self):
+        """The camera doesn't label beams: block the pump to see where the probe focuses. Only the
+        pump is steered afterwards, so the probe spot stays put."""
+        self.c("block", arm="pump")
+        spots = self.c("view_camera", plane="sample")["spots"]
+        self.c("unblock", arm="pump")
+        self.probe_spot = (spots[0]["h_um"], spots[0]["v_um"]) if spots else None
+
     def cam_diff(self, frames=2):
         acc = []
         for _ in range(frames):
-            spots = {s["beam"]: s for s in self.c("view_camera", plane="sample")["spots"]}
-            if "pump" not in spots or "probe" not in spots:
+            spots = self.c("view_camera", plane="sample")["spots"]
+            if len(spots) < 2 or self.probe_spot is None:
                 return None
-            acc.append((spots["pump"]["h_um"] - spots["probe"]["h_um"], spots["pump"]["v_um"] - spots["probe"]["v_um"]))
+            pts = [(s["h_um"], s["v_um"]) for s in spots[:2]]
+            if math.dist(*pts) < 5.0:
+                # on top of each other: which is which is ambiguous and doesn't matter
+                acc.append((0.0, 0.0))
+                continue
+            pts.sort(key=lambda p: math.dist(p, self.probe_spot))
+            probe, pump = pts
+            acc.append((pump[0] - probe[0], pump[1] - probe[1]))
         return (statistics.fmean(a[0] for a in acc), statistics.fmean(a[1] for a in acc))
 
     # -- the procedure -----------------------------------------------------------------------
@@ -161,7 +181,7 @@ class Expert:
     def _run(self, stop_early):
         self.read_facts()
         zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
-        self.c("buy", items={"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1})
+        self.c("buy", items={"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1})
         travel, x_mid = 25.0, 12.5
 
         # Probe arm, in beam order
@@ -178,7 +198,11 @@ class Expert:
         # Pump arm: stage placed so time zero is near mid-travel (the stage itself stays at 0)
         probe_total = self.port_x - X_PERI + abs(hp - ho) + (X_PERI - X_P) + abs(zo - PROBE_LENS_Z) \
             + (X_P - LENS[0]) + self.L_opa
-        a_x = (4518.0 - zp - probe_total) / 2.0
+        # pump path to the lens = (port - entrance) + 80 inside the retro + (M_q1 - entrance)
+        #   + (M_q2 - M_q1 in z) + (M_q2 - lens) = 3750 - 2 A_x + (PUMP_LENS_Z - 2 * 12 - z_p) + 200
+        #   (retro entrance face 40 mm before the apex; 80 mm in and out of the retro)
+        pump_const = (self.port_x - 40.0) + 80.0 + (X_Q - 40.0) + (X_Q - LENS[0])
+        a_x = (pump_const + PUMP_LENS_Z - 2 * STAGE_OFF - zp - probe_total) / 2.0
         p_x = a_x + 90.0 + x_mid
         self.note(f"probe table+OPA path {probe_total:.0f} mm, stage apex {a_x:.0f}, reference x {p_x:.0f}")
         self.c("unblock", arm="pump")
@@ -191,6 +215,7 @@ class Expert:
         self.aim_at_point("mirror-4", "pump", (X_Q, PUMP_LENS_Z, hp), (LENS[0], PUMP_LENS_Z, hp), "x")
 
         # Spatial overlap at the focus: steer the pump (mirror-4) onto the probe
+        self.find_probe_spot()
         ok, self.J_cam = self.steer("mirror-4", self.cam_diff, 3.0, 0.3)
         if not ok:
             self.note("camera overlap did not converge")
