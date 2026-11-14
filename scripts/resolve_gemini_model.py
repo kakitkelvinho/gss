@@ -1,6 +1,6 @@
 """Resolve an AI Studio display name to a generateContent model ID for this API key.
 
-Reads GEMINI_API_KEY from the environment, never from command-line arguments. This also
+Reads GOOGLE_GENERATIVE_AI_API_KEY from the environment, never from command-line arguments. This also
 validates an explicitly supplied API ID against the project's model list.
 """
 
@@ -67,9 +67,9 @@ def resolve(choice: str, models: list[dict]) -> str:
 def main() -> None:
     if len(sys.argv) != 2:
         raise SystemExit("Usage: resolve_gemini_model.py <display name or API model ID>")
-    key = os.environ.get("GEMINI_API_KEY", "")
+    key = os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "")
     if not key:
-        raise SystemExit("GEMINI_API_KEY is not set")
+        raise SystemExit("GOOGLE_GENERATIVE_AI_API_KEY is not set")
     print(resolve(sys.argv[1], available_models(key)))
 
 

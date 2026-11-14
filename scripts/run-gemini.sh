@@ -41,14 +41,15 @@ if [[ -z "$model_choice" ]]; then
     exit 2
 fi
 
-IFS= read -r -s -p "Gemini API key: " GEMINI_API_KEY </dev/tty
+IFS= read -r -s -p "Gemini API key: " GOOGLE_GENERATIVE_AI_API_KEY </dev/tty
 printf '\n' >&2
-if [[ -z "$GEMINI_API_KEY" ]]; then
+if [[ -z "$GOOGLE_GENERATIVE_AI_API_KEY" ]]; then
     printf 'A Gemini API key is required.\n' >&2
     exit 1
 fi
-export GEMINI_API_KEY
+export GOOGLE_GENERATIVE_AI_API_KEY
 
 model_id="$(python3 scripts/resolve_gemini_model.py "$model_choice")"
 printf 'Using %s (API ID: %s)\n' "$model_choice" "$model_id"
-exec harbor run -p . -a opencode -m "google/$model_id" -o ./jobs
+# Harbor recognises the 'gemini' provider and passes its key to OpenCode's 'google' provider.
+exec harbor run -p . -a opencode -m "gemini/$model_id" -o ./jobs
