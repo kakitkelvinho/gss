@@ -195,3 +195,15 @@ def test_stop_early_scores_below_005(seed):
     r = ep.result()
     assert r["O"] > 0.9  # it did get spatial overlap
     assert r["reward"] < 0.05
+
+
+def test_camera_shows_clipping_as_dim_spot():
+    ep = perfect_layout(3)
+    full = {s["beam"]: s["relative_power"] for s in ep.call("view_camera", {"plane": "sample"})["spots"]}
+    assert full["probe"] == pytest.approx(1.0, abs=0.08)
+    # slide mirror-2 in its own plane: the reflected beam is unchanged but now hits 11.3 mm off-centre
+    m = ep.inv["mirror-2"]["part"]
+    m.pos = (m.pos[0] + 8.0, m.pos[1], m.pos[2] + 8.0)
+    ep._invalidate()
+    spots = {s["beam"]: s for s in ep.call("view_camera", {"plane": "sample"})["spots"]}
+    assert spots["probe"]["relative_power"] < 0.6
