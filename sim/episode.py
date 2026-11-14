@@ -288,7 +288,7 @@ class Episode:
                     "T_probe": b["probe"].T if vis["probe"] else 0.0, "eta": 0.0,
                     "pump_end": "blocked" if vis["pump"] is None else b["pump"].end_note,
                     "probe_end": "blocked" if vis["probe"] is None else b["probe"].end_note}
-        return P.truth(vis["pump"], vis["probe"], self.lab.opa_path)
+        return P.truth(vis["pump"], vis["probe"], self.lab.probe_extra_path)
 
     def _update_stray(self):
         vis = self._visible()
@@ -775,8 +775,8 @@ class Episode:
         if self.inv["sample"]["part"] is None:
             vis = {"pump": None, "probe": None}
         if model == "photodiode":
-            return P.photodiode(vis, self.lab.opa_path, self.rng_noise)
-        return {"counts": P.bbo_signal(model, vis["pump"], vis["probe"], self.lab.opa_path, t_int, self.rng_noise)}
+            return P.photodiode(vis, self.lab.probe_extra_path, self.rng_noise)
+        return {"counts": P.bbo_signal(model, vis["pump"], vis["probe"], self.lab.probe_extra_path, t_int, self.rng_noise)}
 
     def _t_read_signal(self, t_int):
         if not (0.01 <= t_int <= 10.0):

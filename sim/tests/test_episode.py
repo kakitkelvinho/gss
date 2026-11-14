@@ -27,7 +27,7 @@ def perfect_layout(seed):
     """Hand-built expert layout with no placement errors and no defocus."""
     ep = Episode(seed)
     ep.lab.defocus = 0.0
-    ep.call("buy", {"items": {"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1}})
+    ep.call("buy", {"items": {"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1}})
     _, h_p, z_p = ep.lab.ports["pump"]["pos"]
     _, h_o, z_o = ep.lab.ports["probe"]["pos"]
     r = math.radians
@@ -78,7 +78,7 @@ def test_time_and_cost_ledger():
 
 def test_bad_arguments_cost_5s_and_change_nothing():
     ep = Episode(1)
-    ep.call("buy", {"items": ["MIR-1", "DL-C25", "BBO-SFG-1300"]})
+    ep.call("buy", {"items": ["MIR-1", "DL-C25", "BBO-T236"]})
     t0 = ep.t
     bad = [
         ("place", {"part": "mirror-1", "x": float("nan"), "z": 1, "height": 100, "yaw_deg": 0}),

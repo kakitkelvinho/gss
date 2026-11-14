@@ -2,7 +2,7 @@
 
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
-- Parts bought: DL-C25 delay stage, BBO-SFG-1300 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope (EUR 4800; C_min = EUR 1900)
+- Parts bought: DL-C25 delay stage, BBO-T236 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope (EUR 4800; C_min = EUR 1900)
 - Lab time: 146.4 min of 240 (61.0%), 103 tool calls
 - Result: eta = 0.9984, R = 0.9169, O = 0.9984, |dt| = 0.5 fs
 
@@ -12,7 +12,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 1 | 10.0 | read_manual | `{"device": "opa"}` |
 | 2 | 15.0 | read_manual | `{"device": "delay_stage"}` |
 | 3 | 20.0 | read_manual | `{"device": "sample_mount"}` |
-| 4 | 35.0 | buy | `{"items": {"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1}}` |
+| 4 | 35.0 | buy | `{"items": {"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1}}` |
 | 5 | 40.1 | place | `{"part": "sample", "x": 1300.0, "z": 600.0, "height": 120.0, "yaw_deg": 180.0}` |
 | 6 | 40.2 | unblock | `{"arm": "probe"}` |
 | 7 | 45.4 | place | `{"part": "periscope-1", "x": 2050.0, "z": 935.0, "height": 120.0, "yaw_deg": 180.0, "height_in": 158.0}` |
@@ -61,7 +61,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 50 | 76.1 | knob | `{"part": "mirror-2", "axis": "pitch", "delta_mrad": -1.0008}` |
 | 51 | 76.6 | ir_card | `{"x": 1300.0, "z": 608.0, "height": 120.0}` |
 | 52 | 76.8 | unblock | `{"arm": "pump"}` |
-| 53 | 81.9 | place | `{"part": "stage", "x": 793.5, "z": 306.0, "height": 120.0, "yaw_deg": 180.0}` |
+| 53 | 81.9 | place | `{"part": "stage", "x": 784.5, "z": 306.0, "height": 120.0, "yaw_deg": 180.0}` |
 | 54 | 82.4 | ir_card | `{"x": 1500.0, "z": 318.0, "height": 120.0}` |
 | 55 | 87.4 | place | `{"part": "mirror-3", "x": 1500.0, "z": 319.9, "height": 119.1, "yaw_deg": 135.0}` |
 | 56 | 87.9 | ir_card | `{"x": 1500.0, "z": 592.0, "height": 120.0}` |

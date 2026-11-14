@@ -15,7 +15,7 @@ N_MIN_MIRRORS = 2
 
 def c_min() -> float:
     stage = min(p["price"] for p in cat.PARTS.values() if p["slot"] == "delay_stage")
-    bbo = cat.PARTS["BBO-SFG-1300"]["price"]
+    bbo = cat.PARTS["BBO-T236"]["price"]
     mirror = cat.PARTS["MIR-1"]["price"]
     return float(stage + bbo + N_MIN_MIRRORS * mirror)
 
@@ -31,4 +31,4 @@ def reward(eta: float, cost: float, time_frac: float = 0.0) -> float:
 def design_viable(bought: dict[str, int]) -> bool:
     has_stage = any(cat.PARTS[p]["slot"] == "delay_stage" and n > 0 for p, n in bought.items())
     optics = bought.get("MIR-1", 0) + 2 * bought.get("PER-1", 0)
-    return has_stage and bought.get("BBO-SFG-1300", 0) > 0 and optics >= N_MIN_MIRRORS
+    return has_stage and bought.get("BBO-T236", 0) > 0 and optics >= N_MIN_MIRRORS

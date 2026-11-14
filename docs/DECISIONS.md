@@ -90,3 +90,14 @@ Q-numbers refer to the grilling session.
 - The stage starts at position 0 after purchase. The reference layout puts time zero near mid-travel, so the stop-early baseline (overlap, no timing) scores 0.
 - C_min = cheapest stage + correct-cut BBO + 2 mirrors = EUR 1900 (same for every seed). Originally 4 mirrors (EUR 2200); blind playthroughs found working 2-mirror layouts.
 - Separate random streams: lab (`gss-lab-<seed>`), per-mount tilt errors (`gss-mount-<seed>-<part>`), placement errors and measurement noise.
+
+## De-hint pass (after blind playthroughs 2-3 succeeded)
+- Manuals and datasheets give specifications and conventions only, no procedures (removed e.g. "the 800 nm arm
+  must be longer by this amount", "overlapping the foci means matching angles", "enter 10-15 mm off the apex",
+  "block one arm to measure the background", "path added = 2 x displacement", expected peak counts).
+- Relative timing is no longer stated as "path-matched except the OPA": the table manual gives the per-seed paths
+  from the amplifier's split to the pump port and to the OPA input; the OPA manual gives its internal path.
+  Time zero needs pump table path + split_pump = probe table path + split_opa + opa_internal.
+- Crystal part ids/names no longer name the process: BBO-T236 (theta 23.6 deg, 450-550 nm filter) and BBO-T292
+  (theta 29.2 deg, 380-420 nm filter). The agent has to work out which one detects 800 + 1300 nm SFG (495 nm).
+- Corrected the SFG cut angle to 23.6 deg (BBO Sellmeier); it was wrongly 26.5 deg.

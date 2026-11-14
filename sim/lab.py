@@ -33,11 +33,20 @@ class Lab:
         }
         self.opa_path = float(round(r.uniform(1500.0, 1700.0)))  # stated in the OPA manual
         self.defocus = r.uniform(-0.5, 0.5)  # hidden: sample sits delta_z behind the lens focal plane
+        # Paths inside the laser housing from the amplifier's split to the pump port and to the OPA
+        # input (stated in the table manual). Drawn last so the earlier per-seed draws are unchanged.
+        self.split_pump = float(round(r.uniform(300.0, 700.0)))
+        self.split_opa = float(round(r.uniform(300.0, 700.0)))
         # Housings: absorbing boxes behind each port (x_lo, x_hi, y_lo, y_hi, z_lo, z_hi)
         self.housings = [
             (PORT_X, K.TABLE_X, 0.0, 400.0, p["pos"][2] - 150.0, p["pos"][2] + 150.0)
             for p in self.ports.values()
         ]
+
+    @property
+    def probe_extra_path(self) -> float:
+        """Extra path the probe has before its port, relative to the pump before its port (mm)."""
+        return self.split_opa + self.opa_path - self.split_pump
 
     def mount_error(self, part_id: str) -> tuple[float, float]:
         """Intrinsic (yaw, pitch) tilt error of a kinematic mount, rad. Fixed per seed and part id."""

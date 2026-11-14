@@ -61,7 +61,11 @@ class Expert:
         for arm, key in (("pump", "Pump output port"), ("probe", "Probe output port")):
             m = re.search(key + r"[^:]*:\s*x=([\d.]+),\s*z=([\d.]+),\s*height=([\d.]+)", t)
             ports[arm] = tuple(float(v) for v in m.groups())
-        self.L_opa = float(re.search(r"this unit[^:]*:\s*([\d.]+)\s*mm", o).group(1))
+        opa_internal = float(re.search(r"this unit:\s*([\d.]+)\s*mm", o).group(1))
+        s_pump = float(re.search(r"pump port \(([\d.]+) mm of path from the split\)", t).group(1))
+        s_opa = float(re.search(r"OPA\s+input \(([\d.]+) mm of path from the split\)", t).group(1))
+        # extra path the probe has before its port, relative to the pump
+        self.L_opa = s_opa + opa_internal - s_pump
         _, self.z_p, self.h_p = ports["pump"]
         _, self.z_o, self.h_o = ports["probe"]
         self.port_x = ports["pump"][0]
@@ -161,7 +165,7 @@ class Expert:
     def _run(self, stop_early):
         self.read_facts()
         zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
-        self.c("buy", items={"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1})
+        self.c("buy", items={"DL-C25": 1, "BBO-T236": 1, "MIR-1": 4, "PER-1": 1})
         travel, x_mid = 25.0, 12.5
 
         # Probe arm, in beam order
