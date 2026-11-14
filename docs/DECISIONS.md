@@ -51,7 +51,7 @@ Q-numbers refer to the grilling session.
 
 ## Agent tools (all lab-time accounting is inside the sim)
 - Layout and alignment: `place(part, x, z, height, yaw_deg)` 5 min, with ±1 mm and yaw σ≈0.5° error · `rotate(part, Δdeg)` 2 min, σ≈0.2° ·
-  `move(part, x, z)` 3 min · `remove(part)` 1 min · `knob(mirror, yaw|pitch, Δmrad, watch=false)` 1 min, ±50 mrad range, 2% error ·
+  `move(part, x, z)` 3 min · `remove(part)` 1 min · `knob(mirror, yaw|pitch, Δmrad, watch=false)` 30 s (tuned down from 1 min so the expert fits in 65% of the budget), ±50 mrad range, 2% error ·
   `ir_card(part | x,z,height)` 30 s, ±0.5 mm. (Q32′)
 - Information: `list_catalogue` 1 min · `get_datasheet` 2 min · `read_manual` 5 min (includes `"table"`) · `measure_path(arm)` 3 min, ±5 mm, can't see inside the OPA · `buy`. (Q19)
 - Measurement: `view_camera(plane)` 10 s, centroid + 1/e² radius per visible beam, 5.5 µm pixels, 0.3 px noise, 0.1 px quantisation, 5 mm field of view (Q14′) ·
@@ -84,3 +84,9 @@ Q-numbers refer to the grilling session.
   3. Reference run + baselines.
   4. Thin Harbor/compose glue modelled on `hello-mcp`.
 - Fallback: if layout isn't working by ~01:00, the Friday submission uses fixed routes. (Q28)
+
+## Implementation notes (step 1)
+- `install(part_id)` (2 min, at the sample mount) swaps between owned diagnostics; buying a diagnostic installs it.
+- The stage starts at position 0 after purchase. The reference layout puts time zero near mid-travel, so the stop-early baseline (overlap, no timing) scores 0.
+- C_min = cheapest stage + correct-cut BBO + 4 mirrors = EUR 2200 (same for every seed).
+- Separate random streams: lab (`gss-lab-<seed>`), per-mount tilt errors (`gss-mount-<seed>-<part>`), placement errors and measurement noise.

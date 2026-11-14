@@ -1,0 +1,47 @@
+schema_version = "1.1"
+
+# Grading evidence lives in the sim container, never in the agent's. After the agent's container is
+# stopped, the collect hook below reads the final state through the token-gated verifier route
+# (the token is generated inside the sim container at start-up) and writes it here:
+artifacts = [{ source = "/gss/out", service = "sim" }]
+
+[task]
+name = "gss/find-time-zero"
+description = "Design and align a pump-probe setup on a blank optical table, then find time zero."
+authors = [{ name = "God's Strongest Soldiers (GSS)" }]
+keywords = ["optics", "ultrafast", "pump-probe", "alignment", "lab", "mcp"]
+
+[metadata]
+difficulty = "hard"
+category = "scientific-lab"
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[[verifier.collect]]
+service = "sim"
+command = "cd /srv && .venv/bin/python -m server.collect"
+timeout_sec = 60.0
+
+[agent]
+timeout_sec = 5400.0
+
+[environment]
+build_timeout_sec = 900.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 10240
+gpus = 0
+
+[[environment.mcp_servers]]
+name = "gss"
+transport = "streamable-http"
+url = "http://sim:8000/mcp"
+args = []
+
+[verifier.env]
+
+[environment.env]
+
+[solution.env]

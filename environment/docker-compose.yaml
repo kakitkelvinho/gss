@@ -1,0 +1,21 @@
+# Merged on top of Harbor's base compose config; Harbor configures "main" itself.
+services:
+  main:
+    depends_on:
+      sim:
+        condition: service_healthy
+
+  sim:
+    build:
+      context: ..                     # task root; the Dockerfile copies only sim/ and server/
+      dockerfile: environment/sim/Dockerfile
+    environment:
+      GSS_SEED: "${GSS_SEED:-1}"
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('localhost',8000),timeout=2); s.close()"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s

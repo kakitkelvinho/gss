@@ -8,9 +8,14 @@ dependencies = []
 
 [dependency-groups]
 dev = ["pytest>=8"]
+server = [
+    "fastmcp==4.2.0",
+]
 
 [tool.pytest.ini_options]
-testpaths = ["sim/tests"]
+testpaths = ["sim/tests", "server/tests"]
+pythonpath = ["."]
 
 [tool.uv]
 package = false
+default-groups = ["dev", "server"]
