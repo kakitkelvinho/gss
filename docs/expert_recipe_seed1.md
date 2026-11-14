@@ -4,7 +4,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 
 - Parts bought: DL-C25 delay stage, BBO-SFG-1300 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope (EUR 4800; C_min = EUR 2200)
 - Lab time: 148.9 min of 240 (62.0%), 110 tool calls
-- Result: eta = 0.9982, R = 0.9796, O = 0.9984, |dt| = 0.9 fs
+- Result: eta = 0.9982, R = 0.9176, O = 0.9984, |dt| = 0.9 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|

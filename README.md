@@ -49,12 +49,13 @@ converging noisy alignment steps, and then scanning efficiently. Typical ways to
 The reward is computed from the **simulator's true final state**, whatever detector was bought:
 
 $$\eta = T_\text{pump}\,T_\text{probe}\;O\;\exp\!\left[-\left(\frac{\Delta t}{\tau_c}\right)^2\right],\qquad
-R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}}\right)$$
+R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}} - 0.1\,\frac{t_\text{lab}}{4\,\text{h}}\right)$$
 
 - $O$ is the normalised overlap of the two focal spots.
 - $\Delta t$ is the true delay error, and $\tau_c \approx 70$ fs.
 - $T$ is the clipping transmission of each arm.
 - $C$ is the total spend. $C_\text{min}$ = €2,200 is the cheapest workable design, and $C_\text{cap}$ = €30k.
+- $t_\text{lab}$ is the lab time used: every action takes physical time, so brute-force iteration (swarm-style knob searches, blind scans) is penalised softly here and hard-capped by the 4 h budget.
 
 Diagnostics go to `reward.json` but are not part of the reward: O, |Δt|, T per arm, design
 viability, cost, lab time, tool calls, stray-beam events and time, and footprint.
@@ -97,7 +98,7 @@ Seeds 1–10, played over MCP and scored through the verifier route (full table 
 
 | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|
-| reference (scripted expert) | 0.979 | 0.975 | 62.8% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| reference (scripted expert) | 0.918 | 0.916 | 62.8% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
 | stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.1% | R < 0.05 ✅ |
 
