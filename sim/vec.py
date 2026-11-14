@@ -1,4 +1,4 @@
-"""Tiny 3-vector helpers. Coordinates follow QUOP: mm, table plane XZ, +Y is height."""
+"""Tiny 3-vector helpers. Coordinates (y-up): mm, table plane XZ, +Y is height."""
 
 from __future__ import annotations
 

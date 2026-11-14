@@ -171,8 +171,6 @@ docs/DECISIONS.md                design decisions (they take precedence over HAN
 
 ## Disclosure
 
-All code was written at the event. **QUOP** (https://kakitkelvinho.github.io/quop/, the author's own
-earlier open-source tool) is planned only as a replay *viewer*. No QUOP code is copied, and the
-exporter has not been written yet.
+All code was written at Junction 2026.
 
 MIT licence.

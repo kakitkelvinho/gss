@@ -10,7 +10,7 @@ Q-numbers refer to the grilling session.
 - MIT `LICENSE`. All code is written at the event.
 
 ## The room (blank table)
-- 1.2 × 2.4 m breadboard. Coordinates follow QUOP's convention: mm, table plane XZ, +Y is height.
+- 1.2 × 2.4 m breadboard. Coordinates: mm, y-up convention, table plane XZ, +Y is height.
   A desk with the monitor and scope sits at one fixed end. (Q13′, Q39)
 - Fixed per seed and stated in `instruction.md`: position, direction and height (90–160 mm) of the
   pump output port (800 nm, 100 fs FWHM, 1 kHz) and of the OPA output port (1300 nm, 60 fs FWHM).
@@ -73,8 +73,6 @@ Q-numbers refer to the grilling session.
 ## Integrity
 - `/verifier/*` lives on the sim server and needs a bearer token held only in the sim container's env and in `tests/`. Without the token it returns 404, and it never changes state. (Q22)
 - The trajectory log (every action, true state, hidden Δt and O per step) is readable only through the verifier. (Q31)
-- **QUOP** (https://kakitkelvinho.github.io/quop/, the author's own earlier open-source tool, Apache-2.0) is used **only as a viewer**.
-  The sim writes QUOP-format setup JSON, using an exporter written at the event. No QUOP code is copied, and QUOP is not modified for the hackathon. This is disclosed in the README. (Q23‴)
 
 ## Pass criteria and plan
 - Reference run: η ≥ 0.9 on every seed 1–10, using ≤ 65% of the budget. Do-nothing and stop-early both get R < 0.05 on every seed. (Q11, Q41)

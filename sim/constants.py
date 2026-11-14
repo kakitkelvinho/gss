@@ -4,7 +4,7 @@ import math
 
 C_MM_PER_FS = 2.99792458e-4  # speed of light
 
-# Table (QUOP convention: XZ is the table plane, +Y is height above the breadboard)
+# Table (y-up convention: XZ is the table plane, +Y is height above the breadboard)
 TABLE_X = 2400.0
 TABLE_Z = 1200.0
 MAX_HEIGHT = 300.0

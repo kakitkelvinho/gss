@@ -49,7 +49,6 @@ Expert and model runs should be selectable in the same viewer. Side-by-side run 
 
 ## Boundaries
 
-- Build the viewer and its drawings in this repo. Do not copy QUOP code or assets or modify QUOP for this event.
 - Keep it read-only. The simulator and Harbor remain the source of truth for actions and scores.
 - Preserve the existing agent-visible MCP tool responses and the verifier token boundary.
 - Prefer a small web page using SVG or Canvas for the two projections. Avoid a 3D engine and external hosting for the first version.
