@@ -1,10 +1,10 @@
-# Expert lab recipe (seed 1)
+# Expert lab recipe (seed 1, level 1)
 
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
-- Parts bought: DL-C25 delay stage, BBO-SFG-1300 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope (EUR 4800; C_min = EUR 2200)
-- Lab time: 146.4 min of 240 (61.0%), 103 tool calls
-- Result: eta = 0.9984, R = 0.9188, O = 0.9984, |dt| = 0.5 fs
+- OPA wavelength 1300 nm. Parts bought: DL-C25 delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7750)
+- Lab time: 148.0 min of 240 (61.7%), 107 tool calls
+- Result: eta = 0.9978, R = 0.9129, O = 0.9984, |dt| = 1.8 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|
@@ -12,9 +12,9 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 1 | 10.0 | read_manual | `{"device": "opa"}` |
 | 2 | 15.0 | read_manual | `{"device": "delay_stage"}` |
 | 3 | 20.0 | read_manual | `{"device": "sample_mount"}` |
-| 4 | 35.0 | buy | `{"items": {"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1}}` |
+| 4 | 35.0 | buy | `{"items": {"DL-C25": 1, "MIR-1": 4, "PER-1": 1, "GAP-TPA": 1, "CAM-VSWIR": 1}}` |
 | 5 | 40.1 | place | `{"part": "sample", "x": 1300.0, "z": 600.0, "height": 120.0, "yaw_deg": 180.0}` |
-| 6 | 40.2 | unblock | `{"arm": "probe"}` |
+| 6 | 40.2 | unblock | `{"arm": "opa"}` |
 | 7 | 45.4 | place | `{"part": "periscope-1", "x": 2050.0, "z": 935.0, "height": 120.0, "yaw_deg": 180.0, "height_in": 158.0}` |
 | 8 | 45.9 | ir_card | `{"x": 1700.0, "z": 935.0, "height": 120.0}` |
 | 9 | 46.4 | ir_card | `{"x": 1700.0, "z": 935.0, "height": 120.0}` |
@@ -60,7 +60,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 49 | 75.6 | knob | `{"part": "mirror-2", "axis": "yaw", "delta_mrad": 0.3215}` |
 | 50 | 76.1 | knob | `{"part": "mirror-2", "axis": "pitch", "delta_mrad": -1.0008}` |
 | 51 | 76.6 | ir_card | `{"x": 1300.0, "z": 608.0, "height": 120.0}` |
-| 52 | 76.8 | unblock | `{"arm": "pump"}` |
+| 52 | 76.8 | unblock | `{"arm": "800nm"}` |
 | 53 | 81.9 | place | `{"part": "stage", "x": 793.5, "z": 306.0, "height": 120.0, "yaw_deg": 180.0}` |
 | 54 | 82.4 | ir_card | `{"x": 1500.0, "z": 318.0, "height": 120.0}` |
 | 55 | 87.4 | place | `{"part": "mirror-3", "x": 1500.0, "z": 319.9, "height": 119.1, "yaw_deg": 135.0}` |
@@ -102,12 +102,16 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 91 | 108.0 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.1065}` |
 | 92 | 108.2 | view_camera | `{"plane": "sample"}` |
 | 93 | 108.4 | view_camera | `{"plane": "sample"}` |
-| 94 | 111.4 | measure_path | `{"arm": "pump"}` |
-| 95 | 114.4 | measure_path | `{"arm": "probe"}` |
+| 94 | 111.4 | measure_path | `{"arm": "800nm"}` |
+| 95 | 114.4 | measure_path | `{"arm": "opa"}` |
 | 96 | 114.5 | status | `{}` |
 | 97 | 142.7 | scan | `{"start_mm": 6.25, "end_mm": 18.25, "step_mm": 0.005, "t_int": 0.4}` |
-| 98 | 145.9 | scan | `{"start_mm": 14.105, "end_mm": 14.185, "step_mm": 0.001, "t_int": 2.0}` |
-| 99 | 145.9 | move_stage | `{"position_mm": 14.1449}` |
-| 100 | 146.1 | view_camera | `{"plane": "sample"}` |
-| 101 | 146.3 | view_camera | `{"plane": "sample"}` |
-| 102 | 146.4 | submit | `{}` |
+| 98 | 146.0 | scan | `{"start_mm": 14.103, "end_mm": 14.187, "step_mm": 0.001, "t_int": 2.0}` |
+| 99 | 146.1 | move_stage | `{"position_mm": 14.14464}` |
+| 100 | 146.3 | view_camera | `{"plane": "sample"}` |
+| 101 | 146.4 | view_camera | `{"plane": "sample"}` |
+| 102 | 147.0 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.0119}` |
+| 103 | 147.5 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.0156}` |
+| 104 | 147.8 | view_camera | `{"plane": "sample"}` |
+| 105 | 147.9 | view_camera | `{"plane": "sample"}` |
+| 106 | 148.0 | submit | `{}` |

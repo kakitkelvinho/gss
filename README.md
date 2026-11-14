@@ -120,25 +120,30 @@ Without Docker:
 
 ```bash
 uv sync
-uv run pytest                          # 42 tests: physics, ledger, exploits, MCP server, Harbor flow
+uv run pytest                          # 72 tests: physics, routes, L2, ledger, exploits, MCP server, Harbor flow
 uv run python solution/expert.py 1 2 3 # in-process expert on seeds 1-3
 uv run python scripts/baselines.py     # reference / do-nothing / stop-early over MCP -> docs/results.md
+uv run python scripts/baselines.py --level 2   # same for L2 -> docs/results_l2.md
 ```
 
 ## Results
 
-Seeds 1–10, played over MCP and scored through the verifier route (full table in
-[docs/results.md](docs/results.md); the expert's action log is in
-[docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md)):
+Seeds 1–10, played over MCP and scored through the verifier route (full tables in
+[docs/results.md](docs/results.md) and [docs/results_l2.md](docs/results_l2.md); the expert's action logs
+are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
+[docs/expert_recipe_seed1_l2.md](docs/expert_recipe_seed1_l2.md)):
 
-| policy | mean R | min R | max lab time | pass criterion |
-|---|---|---|---|---|
-| reference (scripted expert) | 0.919 | 0.915 | 63.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
-| do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.7% | R < 0.05 ✅ |
+| level | policy | mean R | min R | max lab time | pass criterion |
+|---|---|---|---|---|---|
+| 1 | reference (scripted expert) | 0.917 | 0.912 | 62.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
+| 1 | stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 46.7% | R < 0.05 ✅ |
+| 2 | reference (scripted expert) | 0.912 | 0.896 | 63.8% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 2 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
+| 2 | stop-early | 0.000 | 0.000 | 47.5% | R < 0.05 ✅ |
 
-Frontier-agent runs (OpenCode): *TODO, these need inference credits.* Add the Harbor job logs and
-scores here.
+Frontier-agent runs (OpenCode): *TODO, these need inference credits.* After the runs,
+`python scripts/summarise_jobs.py jobs/` writes `jobs/summary.md` (scores plus a failure diagnosis per run).
 
 ## Layout
 
