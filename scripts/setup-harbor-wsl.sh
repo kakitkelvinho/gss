@@ -260,10 +260,9 @@ pause "Press Enter after checking the reference score."
 stage "Prepare a Gemini model run"
 open_url "https://aistudio.google.com/api-keys"
 step "Use your own hackathon project and copy its API key; never paste the key into chat or a repo file."
-step "Find the exact API model ID in AI Studio's model picker or Get code view."
-step "From Ubuntu, run: bash scripts/run-gemini.sh MODEL_ID"
-step "The run script prompts for the key without echoing it and writes scored jobs under jobs/."
-note "The model run is separate from this setup wizard so you can repeat it with other model IDs."
+step "From Ubuntu, run: bash scripts/run-gemini.sh"
+step "The run script shows a model menu, prompts for the key without echoing it, and writes scored jobs under jobs/."
+note "The model run is separate from this setup wizard so you can repeat it with other models."
 
 finish
 }

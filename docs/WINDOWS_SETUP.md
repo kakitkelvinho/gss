@@ -18,13 +18,13 @@ It checks WSL and Docker, guides uv installation, installs Harbor, runs the loca
 
 ## Run a Gemini agent
 
-Use an API key from your own hackathon project in AI Studio. The run script prompts for it each time and does not save it in the repo:
+Use an API key from your own hackathon project in AI Studio. The run script shows a model menu, prompts for the key, checks the exact model ID against that project's Models API, and does not save the key in the repo:
 
 ```bash
-bash scripts/run-gemini.sh GEMINI_API_MODEL_ID
+bash scripts/run-gemini.sh
 ```
 
-Replace `GEMINI_API_MODEL_ID` with the exact model ID shown in AI Studio. Do not type angle brackets around it. The result goes under `jobs/`; that directory is ignored by Git. In the newest job, inspect `verifier/reward.txt`, `verifier/diagnostics.json`, and `verifier/trajectory.json`. The score should be in `[0, 1]`. The scripted expert should score around `0.9`; a frontier model's score can be lower.
+You may also pass an exact API model ID as an argument to skip the menu. The result goes under `jobs/`; that directory is ignored by Git. In the newest job, inspect `verifier/reward.txt`, `verifier/diagnostics.json`, and `verifier/trajectory.json`. The score should be in `[0, 1]`. The scripted expert should score around `0.9`; a frontier model's score can be lower.
 
 To summarise all runs:
 
