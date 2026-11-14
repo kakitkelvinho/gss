@@ -43,7 +43,7 @@ PARTS: dict[str, dict] = {
         model="bbo_good",
         datasheet=(
             "beta-BBO, 0.1 mm thick, cut for type-I sum-frequency generation of 800 nm + 1300 nm "
-            "(theta = 26.5 deg), mounted at the sample plane with a filtered PMT for 495 nm. "
+            "(theta = 23.6 deg), mounted at the sample plane with a filtered PMT for 495 nm. "
             "The cross (sum-frequency) term is proportional to I_pump x I_probe and appears only "
             "when the pulses overlap in space and time. Each beam alone also produces a weak, "
             "delay-independent background (residual SHG/scatter leaking through the filter). "
