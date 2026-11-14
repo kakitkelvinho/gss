@@ -17,9 +17,21 @@
 
       <div class="topbar-slider">
         <button id="prevBtn" class="control btn-key" type="button" title="Previous step (Left arrow)">&#9664;</button>
+        <button id="playBtn" class="control btn-play" type="button" title="Play from this step">Play</button>
+        <button id="pauseBtn" class="control btn-play" type="button" title="Pause playback" disabled>Pause</button>
+        <button id="stopBtn" class="control btn-key" type="button" title="Stop and return to step 0">■</button>
+        <div class="speed-controls" role="group" aria-label="Playback speed">
+          <button class="control btn-speed is-active" type="button" data-speed="1" aria-pressed="true">1×</button>
+          <button class="control btn-speed" type="button" data-speed="2" aria-pressed="false">2×</button>
+          <button class="control btn-speed" type="button" data-speed="4" aria-pressed="false">4×</button>
+        </div>
         <input id="stepSlider" class="slider" type="range" min="0" max="0" value="0" step="1">
         <button id="nextBtn" class="control btn-key" type="button" title="Next step (Right arrow)">&#9654;</button>
         <div id="stepLabel" class="step-readout">Step 0 / 0</div>
+      </div>
+      <div class="run-counters" aria-live="off">
+        <div class="run-counter"><span>Lab time</span><strong id="labClock">00:00:00 / 04:00:00</strong></div>
+        <div class="run-counter"><span>Spent</span><strong id="moneyCounter">€0</strong></div>
       </div>
     </header>
 
@@ -28,7 +40,7 @@
       <section class="stage-panel panel">
         <div class="stage-bar">
           <div class="stage-legend">
-            <span class="legend-title">Top-down table (2400 &times; 1200 mm)</span>
+            <span class="legend-title">Optical table (2400 &times; 1200 mm)</span>
             <span class="legend-sep">&middot;</span>
             <span class="beam-key"><span class="swatch swatch-800"></span><span id="leg800">800 nm: closed</span></span>
             <span class="beam-key"><span class="swatch swatch-opa"></span><span id="legOpa">OPA: closed</span></span>
@@ -38,9 +50,16 @@
             <button id="fitBtn" class="control btn-sm" type="button" title="Reset zoom &amp; pan (R)">Fit view</button>
           </div>
         </div>
-        <div class="canvas-wrap">
-          <canvas id="tableCanvas"></canvas>
-          <div id="partTooltip" class="tooltip" hidden></div>
+        <div class="view-stack">
+          <div class="iso-wrap">
+            <div class="view-caption"><strong>Isometric lab</strong><span id="isoAction">Researcher at desk</span></div>
+            <canvas id="isoCanvas" aria-label="Fixed isometric view of the lab"></canvas>
+          </div>
+          <div class="canvas-wrap">
+            <div class="view-caption"><strong>Top-down plan</strong><span>Exact x / z positions</span></div>
+            <canvas id="tableCanvas" aria-label="Top-down optical table"></canvas>
+            <div id="partTooltip" class="tooltip" hidden></div>
+          </div>
         </div>
       </section>
 
@@ -48,9 +67,10 @@
         <!-- Selected tool call -->
         <section class="call-panel panel">
           <div class="section-head">
-            <h2 class="section-title">Selected tool call</h2>
+            <h2 class="section-title">Steps (tool calls)</h2>
             <span id="callTime" class="mono-meta">00:00</span>
           </div>
+          <div id="callList" class="call-list" aria-label="Tool call history"></div>
           <div id="callBody" class="call-body"></div>
         </section>
 
@@ -69,6 +89,7 @@
   </div>
 
   <script src="runs_bundle.js"></script>
+  <script src="render_iso.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

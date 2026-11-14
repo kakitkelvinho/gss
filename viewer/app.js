@@ -2,20 +2,30 @@
   "use strict";
 
   const bundle = window.GSS_RUNS_BUNDLE || { runs: [] };
-  const runs = Array.isArray(bundle.runs) ? bundle.runs : [];
+  let runs = Array.isArray(bundle.runs) ? bundle.runs : [];
+  let bundleVersion = bundle.generated_at || null;
 
   const elRunSelect = document.getElementById("runSelect");
   const elPrevBtn = document.getElementById("prevBtn");
   const elNextBtn = document.getElementById("nextBtn");
+  const elPlayBtn = document.getElementById("playBtn");
+  const elPauseBtn = document.getElementById("pauseBtn");
+  const elStopBtn = document.getElementById("stopBtn");
+  const elSpeedBtns = Array.from(document.querySelectorAll("[data-speed]"));
   const elSlider = document.getElementById("stepSlider");
   const elStepLabel = document.getElementById("stepLabel");
+  const elLabClock = document.getElementById("labClock");
+  const elMoneyCounter = document.getElementById("moneyCounter");
   const elLeg800 = document.getElementById("leg800");
   const elLegOpa = document.getElementById("legOpa");
   const elCursor = document.getElementById("cursorReadout");
   const elFitBtn = document.getElementById("fitBtn");
   const elCanvas = document.getElementById("tableCanvas");
+  const elIsoCanvas = document.getElementById("isoCanvas");
+  const isoRenderer = window.GSSIsoRenderer.create(elIsoCanvas, document.getElementById("isoAction"));
   const elTooltip = document.getElementById("partTooltip");
   const elCallTime = document.getElementById("callTime");
+  const elCallList = document.getElementById("callList");
   const elCallBody = document.getElementById("callBody");
   const elEndedBadge = document.getElementById("endedBadge");
   const elDiagMetrics = document.getElementById("diagMetrics");
@@ -30,7 +40,10 @@
     cam: { scale: 0.3, panX: 0, panY: 0, fitted: false },
     drag: null,
     hoverPart: null,
+    playing: false,
+    speed: 1,
   };
+  let playbackTimer = null;
 
   // World bounds including desk at (-300, 600) and 2400 x 1200 mm table
   const WORLD = { minX: -390, maxX: 2510, minZ: -110, maxZ: 1310 };
@@ -107,6 +120,7 @@
     }
     if (!state.cam.fitted) fitCamera();
     drawTable();
+    isoRenderer.resize();
   }
 
   // ---------------------------------------------------------------------------
@@ -559,14 +573,50 @@
     c.fillText(`${x1.toFixed(2)} mm`, w - padR, h - 4);
   }
 
+  function renderCallList() {
+    const run = currentRun();
+    if (!run) {
+      elCallList.innerHTML = "";
+      return;
+    }
+    elCallList.innerHTML = `<button type="button" class="call-list-row" data-step="0">
+      <span>#0</span><strong>Initial table</strong><time>00:00</time>
+    </button>` + run.trajectory.map((step, index) => `
+      <button type="button" class="call-list-row" data-step="${index + 1}">
+        <span>#${index + 1}</span><strong>${esc(step.tool)}</strong><time>${fmtClock(step.t_s).slice(0, 5)}</time>
+      </button>`).join("");
+  }
+
+  function highlightCallInList() {
+    const old = elCallList.querySelector(".is-active");
+    if (old) {
+      old.classList.remove("is-active");
+      old.removeAttribute("aria-current");
+    }
+    const active = elCallList.querySelector(`[data-step="${state.stepPos}"]`);
+    if (!active) return;
+    active.classList.add("is-active");
+    active.setAttribute("aria-current", "step");
+    const top = active.offsetTop;
+    const bottom = top + active.offsetHeight;
+    if (top < elCallList.scrollTop) elCallList.scrollTop = top;
+    else if (bottom > elCallList.scrollTop + elCallList.clientHeight) {
+      elCallList.scrollTop = bottom - elCallList.clientHeight;
+    }
+  }
+
   function renderSelectedCall() {
     const run = currentRun();
     if (!run) return;
     const total = run.trajectory.length;
     const step = currentStep();
 
+    elLabClock.textContent = `${fmtClock(step ? step.t_s : 0)} / ${fmtClock(run.meta.budget_s || 14400)}`;
+    elMoneyCounter.textContent = `€${Math.round(step && step.snapshot ? step.snapshot.cost_eur : 0).toLocaleString()}`;
+
     elSlider.max = String(total);
     elSlider.value = String(state.stepPos);
+    highlightCallInList();
     elPrevBtn.disabled = state.stepPos <= 0;
     elNextBtn.disabled = state.stepPos >= total;
 
@@ -661,8 +711,8 @@
       { k: "|Δt|", v: fmtDt(d.abs_dt_fs) },
       { k: "T_800 / T_opa", v: `${Number(d.T_800 || 0).toFixed(2)} / ${Number(d.T_opa || 0).toFixed(2)}` },
       {
-        k: "Spent (min)",
-        v: `€${Math.round(d.cost_eur || 0)} (€${Math.round(d.c_min_eur || run.meta.c_min_eur || 0)})`,
+        k: "Spent / cheapest",
+        v: `€${Math.round(d.cost_eur || 0)} / €${Math.round(d.c_min_eur || run.meta.c_min_eur || 0)}`,
       },
     ];
 
@@ -698,24 +748,92 @@
     }
   }
 
-  function setStep(pos) {
+  function renderPlaybackControls() {
+    const run = currentRun();
+    elPlayBtn.disabled = !run || state.playing;
+    elPauseBtn.disabled = !state.playing;
+    for (const button of elSpeedBtns) {
+      const active = Number(button.dataset.speed) === state.speed;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+  }
+
+  function pausePlayback() {
+    if (playbackTimer !== null) window.clearInterval(playbackTimer);
+    playbackTimer = null;
+    state.playing = false;
+    renderPlaybackControls();
+  }
+
+  function startPlayback() {
+    const run = currentRun();
+    if (!run || !run.trajectory.length) return;
+    pausePlayback();
+    if (state.stepPos >= run.trajectory.length) setStep(0);
+    state.playing = true;
+    renderPlaybackControls();
+    playbackTimer = window.setInterval(() => {
+      if (state.stepPos >= run.trajectory.length) {
+        pausePlayback();
+      } else {
+        setStep(state.stepPos + 1, true);
+        if (state.stepPos >= run.trajectory.length) pausePlayback();
+      }
+    }, 1000 / state.speed);
+  }
+
+  function setStep(pos, keepPlaying = false) {
+    if (!keepPlaying && state.playing) pausePlayback();
     const run = currentRun();
     const maxPos = run ? run.trajectory.length : 0;
+    const previousStep = currentStep();
     state.stepPos = Math.max(0, Math.min(maxPos, pos));
     renderSelectedCall();
     drawTable();
+    isoRenderer.show(run, currentStep(), previousStep, keepPlaying, state.speed);
   }
 
   function selectRun(idx) {
+    pausePlayback();
     state.runIdx = Math.max(0, Math.min(runs.length - 1, idx));
     const run = currentRun();
     // Default to final step so the completed table & beam paths are immediately visible
     state.stepPos = run ? run.trajectory.length : 0;
     state.hoverPart = null;
     elTooltip.hidden = true;
+    renderCallList();
     renderFinalDiagnostics();
     renderSelectedCall();
     drawTable();
+    isoRenderer.show(run, currentStep(), null);
+  }
+
+  async function refreshRuns() {
+    if (window.location.protocol === "file:") return;
+    try {
+      const response = await fetch("/api/runs", { cache: "no-store" });
+      if (!response.ok) return;
+      const fresh = await response.json();
+      if (!Array.isArray(fresh.runs) || fresh.generated_at === bundleVersion) return;
+      const selected = currentRun();
+      const selectedId = selected ? selected.id : null;
+      const previousStep = state.stepPos;
+      const wasAtEnd = selected && previousStep === selected.trajectory.length;
+      pausePlayback();
+      runs = fresh.runs;
+      bundleVersion = fresh.generated_at;
+      elRunSelect.innerHTML = runs
+        .map((run, i) => `<option value="${i}">${esc(run.label)}</option>`)
+        .join("");
+      const matchingIdx = runs.findIndex((run) => run.id === selectedId);
+      const nextIdx = matchingIdx >= 0 ? matchingIdx : 0;
+      elRunSelect.value = String(nextIdx);
+      selectRun(nextIdx);
+      if (matchingIdx >= 0 && !wasAtEnd) setStep(previousStep);
+    } catch (_) {
+      // The prebuilt bundle still works when served without the Python API.
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -727,23 +845,44 @@
       .map((r, i) => `<option value="${i}">${esc(r.label)}</option>`)
       .join("");
 
-    // Prefer the finished Flash L1 run on initial load if present
-    let initialIdx = runs.findIndex(
-      (r) => String(r.model || "").toLowerCase().includes("flash") && Number(r.meta && r.meta.level) === 1
-    );
-    if (initialIdx < 0) initialIdx = 0;
+    // The builder sorts newest finished model runs first.
+    const initialIdx = 0;
     elRunSelect.value = String(initialIdx);
 
+    refreshRuns();
+    if (window.location.protocol !== "file:") window.setInterval(refreshRuns, 15000);
+
     elRunSelect.addEventListener("change", () => selectRun(Number(elRunSelect.value)));
+    elCallList.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-step]");
+      if (row) setStep(Number(row.dataset.step));
+    });
     elSlider.addEventListener("input", () => setStep(Number(elSlider.value)));
     elPrevBtn.addEventListener("click", () => setStep(state.stepPos - 1));
     elNextBtn.addEventListener("click", () => setStep(state.stepPos + 1));
+    elPlayBtn.addEventListener("click", startPlayback);
+    elPauseBtn.addEventListener("click", pausePlayback);
+    elStopBtn.addEventListener("click", () => setStep(0));
+    for (const button of elSpeedBtns) {
+      button.addEventListener("click", () => {
+        const wasPlaying = state.playing;
+        state.speed = Number(button.dataset.speed);
+        if (wasPlaying) startPlayback();
+        else renderPlaybackControls();
+      });
+    }
     elFitBtn.addEventListener("click", () => {
       fitCamera();
       drawTable();
     });
 
     window.addEventListener("keydown", (ev) => {
+      if (ev.code === "Space" && !(ev.target && ["SELECT", "INPUT", "BUTTON"].includes(ev.target.tagName))) {
+        ev.preventDefault();
+        if (state.playing) pausePlayback();
+        else startPlayback();
+        return;
+      }
       if (ev.target && (ev.target.tagName === "SELECT" || ev.target.tagName === "INPUT")) {
         if (ev.target !== elSlider) return;
       }

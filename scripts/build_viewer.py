@@ -13,12 +13,14 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import functools
 import http.server
 import json
 import math
 import os
+import subprocess
 import sys
+import threading
+from urllib.parse import urlsplit
 from typing import Any
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -172,9 +174,15 @@ def retro_replay(
     return ep.meta_snapshot(), ep.trajectory(), replayed_res
 
 
-def _format_label(model: str, seed: int, level: int, lam_nm: float, reward: float) -> str:
+def _format_label(model: str, seed: int, level: int, lam_nm: float, reward: float,
+                  run_id: str = "") -> str:
     lvl_str = "L2 (90°)" if level == 2 else "L1"
-    return f"{model} — Seed {seed} · {lvl_str} · {lam_nm:.0f} nm · R = {reward:.3f}"
+    try:
+        run_time = dt.datetime.strptime(run_id.split("/")[0], "%Y-%m-%d__%H-%M-%S").strftime("%d %b %H:%M")
+    except ValueError:
+        run_time = ""
+    timestamp = f" · {run_time}" if run_time else ""
+    return f"{model}{timestamp} — Seed {seed} · {lvl_str} · {lam_nm:.0f} nm · R = {reward:.3f}"
 
 
 def load_run_dir(run_dir: str, root: str) -> dict | None:
@@ -223,7 +231,7 @@ def load_run_dir(run_dir: str, root: str) -> dict | None:
 
     return {
         "id": run_id,
-        "label": _format_label(model, seed, level, lam_nm, reward),
+        "label": _format_label(model, seed, level, lam_nm, reward, run_id),
         "model": model,
         "is_demo": False,
         "meta": meta,
@@ -532,7 +540,7 @@ def build_bundle(jobs_dirs: list[str], include_demos: bool = False) -> dict:
 
     return {
         "schema_version": SCHEMA_VERSION,
-        "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         "runs": runs,
     }
 
@@ -544,8 +552,73 @@ def write_bundle(bundle: dict, out_path: str) -> None:
         f.write(f"window.GSS_RUNS_BUNDLE = {payload};\n")
 
 
-def serve_viewer(viewer_dir: str, port: int) -> None:
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=viewer_dir)
+def default_jobs_dirs() -> list[str]:
+    """Include jobs in this checkout and any registered worktrees with a jobs folder."""
+    roots = [ROOT]
+    try:
+        result = subprocess.run(
+            ["git", "worktree", "list", "--porcelain"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        )
+        roots.extend(line.removeprefix("worktree ") for line in result.stdout.splitlines()
+                     if line.startswith("worktree "))
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    return list(dict.fromkeys(os.path.join(root, "jobs") for root in roots
+                              if os.path.isdir(os.path.join(root, "jobs"))))
+
+
+def _jobs_fingerprint(jobs_dirs: list[str]) -> tuple:
+    files = []
+    for root in jobs_dirs:
+        if not os.path.isdir(root):
+            continue
+        for run_dir in SJ.find_runs(root):
+            for name in ("diagnostics.json", "trajectory.json"):
+                path = os.path.join(run_dir, name)
+                try:
+                    stat = os.stat(path)
+                    files.append((path, stat.st_mtime_ns, stat.st_size))
+                except OSError:
+                    files.append((path, None, None))
+    return tuple(sorted(files))
+
+
+def serve_viewer(viewer_dir: str, port: int, jobs_dirs: list[str],
+                 include_demos: bool, out_path: str) -> None:
+    cache: dict[str, Any] = {"fingerprint": None, "bundle": None}
+    lock = threading.Lock()
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=viewer_dir, **kwargs)
+
+        def end_headers(self):
+            self.send_header("Cache-Control", "no-store")
+            super().end_headers()
+
+        def do_GET(self):
+            if urlsplit(self.path).path != "/api/runs":
+                if "If-Modified-Since" in self.headers:
+                    del self.headers["If-Modified-Since"]
+                return super().do_GET()
+            with lock:
+                fingerprint = _jobs_fingerprint(jobs_dirs)
+                if cache["bundle"] is None or fingerprint != cache["fingerprint"]:
+                    cache["bundle"] = build_bundle(jobs_dirs, include_demos=include_demos)
+                    cache["fingerprint"] = fingerprint
+                    write_bundle(cache["bundle"], out_path)
+                payload = json.dumps(cache["bundle"], separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            try:
+                self.wfile.write(payload)
+            except BrokenPipeError:
+                pass  # Browser navigated away while a large bundle was being sent.
+
+    handler = Handler
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
         print(f"Serving {viewer_dir} at http://127.0.0.1:{port} (Ctrl+C to stop)")
         try:
@@ -556,7 +629,7 @@ def serve_viewer(viewer_dir: str, port: int) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("jobs_dir", nargs="*", help="Harbor jobs folder(s) to scan (defaults to jobs/ if present)")
+    ap.add_argument("jobs_dir", nargs="*", help="Harbor jobs folder(s) to scan (defaults to jobs/ in all registered worktrees)")
     ap.add_argument("--demos", action="store_true", help="Include synthetic failure demo runs")
     ap.add_argument("--no-demos", action="store_true", help="Do not include synthetic failure demo runs (default)")
     ap.add_argument("--serve", action="store_true", help="Serve viewer/ over http.server after building")
@@ -571,16 +644,15 @@ def main(argv: list[str] | None = None) -> int:
 
     jobs_dirs = list(args.jobs_dir)
     if not jobs_dirs:
-        default_jobs = os.path.join(ROOT, "jobs")
-        if os.path.isdir(default_jobs):
-            jobs_dirs = [default_jobs]
+        jobs_dirs = default_jobs_dirs()
 
     bundle = build_bundle(jobs_dirs, include_demos=bool(args.demos and not args.no_demos))
     write_bundle(bundle, args.out)
     print(f"Wrote {len(bundle['runs'])} run(s) to {args.out}", file=sys.stderr)
 
     if args.serve:
-        serve_viewer(os.path.join(ROOT, "viewer"), args.port)
+        serve_viewer(os.path.join(ROOT, "viewer"), args.port, jobs_dirs,
+                     bool(args.demos and not args.no_demos), args.out)
     return 0
 
 

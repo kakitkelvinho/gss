@@ -131,6 +131,22 @@ uv run python scripts/baselines.py     # reference / do-nothing / stop-early ove
 uv run python scripts/baselines.py --level 2   # same for L2 -> docs/results_l2.md
 ```
 
+## Replay viewer
+
+```bash
+python3 scripts/build_viewer.py --serve
+```
+
+Open `http://127.0.0.1:8765/`. The local server discovers finished `jobs/` runs in this
+checkout and registered Git worktrees, and the page checks for new runs every 15 seconds.
+Pass one or more jobs directories to scan only those folders. The viewer is read-only;
+its simulator truth and visual snapshots never enter the agent's tool responses.
+
+Use **Play**, **Pause**, **Stop**, and **1× / 2× / 4×** to replay tool calls. Space toggles
+playback; arrow keys step through calls (Shift for ten). The top bar shows simulated lab
+time and money spent at the selected call. Opening `viewer/index.html` directly still
+works with the last built bundle, but automatic discovery requires the local server.
+
 ## Results
 
 Seeds 1–10, played over MCP and scored through the verifier route (full tables in
