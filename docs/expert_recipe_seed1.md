@@ -3,8 +3,8 @@
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
 - Parts bought: DL-C25 delay stage, BBO-T236 crystal, 4 x MIR-1 mirror, 1 x PER-1 periscope (EUR 4800; C_min = EUR 1900)
-- Lab time: 146.4 min of 240 (61.0%), 103 tool calls
-- Result: eta = 0.9984, R = 0.9169, O = 0.9984, |dt| = 0.5 fs
+- Lab time: 148.2 min of 240 (61.8%), 110 tool calls
+- Result: eta = 0.9948, R = 0.9129, O = 0.9964, |dt| = 2.8 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|
@@ -86,28 +86,35 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 75 | 101.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": -8.1547}` |
 | 76 | 102.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -15.1812}` |
 | 77 | 102.9 | ir_card | `{"x": 1300.0, "z": 592.0, "height": 120.0}` |
-| 78 | 103.2 | view_camera | `{"plane": "sample"}` |
-| 79 | 103.4 | view_camera | `{"plane": "sample"}` |
-| 80 | 103.9 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.3}` |
-| 81 | 104.2 | view_camera | `{"plane": "sample"}` |
-| 82 | 104.4 | view_camera | `{"plane": "sample"}` |
-| 83 | 105.0 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.3}` |
-| 84 | 105.2 | view_camera | `{"plane": "sample"}` |
-| 85 | 105.4 | view_camera | `{"plane": "sample"}` |
-| 86 | 106.0 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 3.5801}` |
-| 87 | 106.5 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -1.1784}` |
-| 88 | 106.7 | view_camera | `{"plane": "sample"}` |
-| 89 | 106.9 | view_camera | `{"plane": "sample"}` |
-| 90 | 107.5 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.066}` |
-| 91 | 108.0 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.1065}` |
-| 92 | 108.2 | view_camera | `{"plane": "sample"}` |
-| 93 | 108.4 | view_camera | `{"plane": "sample"}` |
-| 94 | 111.4 | measure_path | `{"arm": "pump"}` |
-| 95 | 114.4 | measure_path | `{"arm": "probe"}` |
-| 96 | 114.5 | status | `{}` |
-| 97 | 142.7 | scan | `{"start_mm": 6.25, "end_mm": 18.25, "step_mm": 0.005, "t_int": 0.4}` |
-| 98 | 145.9 | scan | `{"start_mm": 14.105, "end_mm": 14.185, "step_mm": 0.001, "t_int": 2.0}` |
-| 99 | 145.9 | move_stage | `{"position_mm": 14.1449}` |
-| 100 | 146.1 | view_camera | `{"plane": "sample"}` |
-| 101 | 146.3 | view_camera | `{"plane": "sample"}` |
-| 102 | 146.4 | submit | `{}` |
+| 78 | 103.1 | block | `{"arm": "pump"}` |
+| 79 | 103.3 | view_camera | `{"plane": "sample"}` |
+| 80 | 103.4 | unblock | `{"arm": "pump"}` |
+| 81 | 103.5 | view_camera | `{"plane": "sample"}` |
+| 82 | 103.7 | view_camera | `{"plane": "sample"}` |
+| 83 | 104.3 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.3}` |
+| 84 | 104.5 | view_camera | `{"plane": "sample"}` |
+| 85 | 104.7 | view_camera | `{"plane": "sample"}` |
+| 86 | 105.3 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.3}` |
+| 87 | 105.6 | view_camera | `{"plane": "sample"}` |
+| 88 | 105.7 | view_camera | `{"plane": "sample"}` |
+| 89 | 106.3 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 3.6142}` |
+| 90 | 106.8 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.8213}` |
+| 91 | 107.1 | view_camera | `{"plane": "sample"}` |
+| 92 | 107.2 | view_camera | `{"plane": "sample"}` |
+| 93 | 107.8 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.1521}` |
+| 94 | 108.3 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.222}` |
+| 95 | 108.6 | view_camera | `{"plane": "sample"}` |
+| 96 | 108.7 | view_camera | `{"plane": "sample"}` |
+| 97 | 109.3 | knob | `{"part": "mirror-4", "axis": "yaw", "delta_mrad": 0.0107}` |
+| 98 | 109.8 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": -0.0145}` |
+| 99 | 110.1 | view_camera | `{"plane": "sample"}` |
+| 100 | 110.3 | view_camera | `{"plane": "sample"}` |
+| 101 | 113.3 | measure_path | `{"arm": "pump"}` |
+| 102 | 116.3 | measure_path | `{"arm": "probe"}` |
+| 103 | 116.3 | status | `{}` |
+| 104 | 144.5 | scan | `{"start_mm": 7.1, "end_mm": 19.1, "step_mm": 0.005, "t_int": 0.4}` |
+| 105 | 147.7 | scan | `{"start_mm": 14.105, "end_mm": 14.185, "step_mm": 0.001, "t_int": 2.0}` |
+| 106 | 147.8 | move_stage | `{"position_mm": 14.14552}` |
+| 107 | 148.0 | view_camera | `{"plane": "sample"}` |
+| 108 | 148.1 | view_camera | `{"plane": "sample"}` |
+| 109 | 148.2 | submit | `{}` |

@@ -108,10 +108,10 @@ def camera_sample(beams: dict[str, BeamResult | None], rng: random.Random) -> li
             q = val / K.CAM_PIXEL + rng.gauss(0.0, K.CAM_NOISE_PX)
             return round(round(q, 1) * K.CAM_PIXEL * 1000.0, 2)
 
-        spots.append({"beam": arm, "h_um": px(h), "v_um": px(v),
+        spots.append({"h_um": px(h), "v_um": px(v),
                       "radius_um": round(w0 * 1000.0 * (1 + rng.gauss(0.0, 0.03)), 1),
                       "relative_power": _power(b.T, rng)})
-    return spots
+    return sorted(spots, key=lambda d: (d["h_um"], d["v_um"]))  # unlabelled: a camera can't tell the beams apart
 
 
 def camera_lens(beams: dict[str, BeamResult | None], rng: random.Random) -> list[dict]:
@@ -120,6 +120,6 @@ def camera_lens(beams: dict[str, BeamResult | None], rng: random.Random) -> list
         if b is None or not b.at_sample or b.T < 0.01:
             continue
         h, v = b.lens_hit
-        spots.append({"beam": arm, "h_mm": round(h + rng.gauss(0.0, 0.03), 2),
+        spots.append({"h_mm": round(h + rng.gauss(0.0, 0.03), 2),
                       "v_mm": round(v + rng.gauss(0.0, 0.03), 2), "relative_power": _power(b.T, rng)})
-    return spots
+    return sorted(spots, key=lambda d: (d["h_mm"], d["v_mm"]))

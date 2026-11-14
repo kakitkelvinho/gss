@@ -199,11 +199,13 @@ def test_stop_early_scores_below_005(seed):
 
 def test_camera_shows_clipping_as_dim_spot():
     ep = perfect_layout(3)
-    full = {s["beam"]: s["relative_power"] for s in ep.call("view_camera", {"plane": "sample"})["spots"]}
-    assert full["probe"] == pytest.approx(1.0, abs=0.08)
+    ep.call("block", {"arm": "pump"})
+    full = ep.call("view_camera", {"plane": "sample"})["spots"]
+    assert len(full) == 1 and "beam" not in full[0]
+    assert full[0]["relative_power"] == pytest.approx(1.0, abs=0.08)
     # slide mirror-2 in its own plane: the reflected beam is unchanged but now hits 11.3 mm off-centre
     m = ep.inv["mirror-2"]["part"]
     m.pos = (m.pos[0] + 8.0, m.pos[1], m.pos[2] + 8.0)
     ep._invalidate()
-    spots = {s["beam"]: s for s in ep.call("view_camera", {"plane": "sample"})["spots"]}
-    assert spots["probe"]["relative_power"] < 0.6
+    spots = ep.call("view_camera", {"plane": "sample"})["spots"]
+    assert spots[0]["relative_power"] < 0.6

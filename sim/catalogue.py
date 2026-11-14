@@ -143,7 +143,8 @@ def manuals(lab) -> dict[str, str]:
             f"+/-{K.CAM_HALF_FOV} mm); view_camera('lens') images the lens plane. Each spot reports its "
             "centroid, 1/e^2 radius and relative_power (fraction of that beam's output power reaching the "
             "sample, ~2% reading noise). Image axes: h horizontal, positive toward (lens yaw - 90 deg) in "
-            "the table plane; v up; the lens axis is h = v = 0."
+            "the table plane; v up; the lens axis is h = v = 0. The camera does not distinguish wavelengths: "
+            "spots are listed by position."
         ),
         "mirror": (
             "Kinematic mirror mount. place(mirror-N, x, z, height, yaw): yaw is the direction the "

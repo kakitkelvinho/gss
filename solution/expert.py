@@ -144,13 +144,28 @@ class Expert:
             self.note(f"{part}: did not converge to {tol} mm")
 
     # -- camera overlap ----------------------------------------------------------------------
+    def find_probe_spot(self):
+        """The camera doesn't label beams: block the pump to see where the probe focuses. Only the
+        pump is steered afterwards, so the probe spot stays put."""
+        self.c("block", arm="pump")
+        spots = self.c("view_camera", plane="sample")["spots"]
+        self.c("unblock", arm="pump")
+        self.probe_spot = (spots[0]["h_um"], spots[0]["v_um"]) if spots else None
+
     def cam_diff(self, frames=2):
         acc = []
         for _ in range(frames):
-            spots = {s["beam"]: s for s in self.c("view_camera", plane="sample")["spots"]}
-            if "pump" not in spots or "probe" not in spots:
+            spots = self.c("view_camera", plane="sample")["spots"]
+            if len(spots) < 2 or self.probe_spot is None:
                 return None
-            acc.append((spots["pump"]["h_um"] - spots["probe"]["h_um"], spots["pump"]["v_um"] - spots["probe"]["v_um"]))
+            pts = [(s["h_um"], s["v_um"]) for s in spots[:2]]
+            if math.dist(*pts) < 5.0:
+                # on top of each other: which is which is ambiguous and doesn't matter
+                acc.append((0.0, 0.0))
+                continue
+            pts.sort(key=lambda p: math.dist(p, self.probe_spot))
+            probe, pump = pts
+            acc.append((pump[0] - probe[0], pump[1] - probe[1]))
         return (statistics.fmean(a[0] for a in acc), statistics.fmean(a[1] for a in acc))
 
     # -- the procedure -----------------------------------------------------------------------
@@ -195,6 +210,7 @@ class Expert:
         self.aim_at_point("mirror-4", "pump", (X_Q, PUMP_LENS_Z, hp), (LENS[0], PUMP_LENS_Z, hp), "x")
 
         # Spatial overlap at the focus: steer the pump (mirror-4) onto the probe
+        self.find_probe_spot()
         ok, self.J_cam = self.steer("mirror-4", self.cam_diff, 3.0, 0.3)
         if not ok:
             self.note("camera overlap did not converge")
