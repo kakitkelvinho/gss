@@ -5,10 +5,10 @@ Question: which retrofuturist layout best lets a viewer follow an optics run?
 Start it from the repository root with one command:
 
 ```sh
-python3 -m http.server 8765 --directory viewer
+python3 -m http.server 8766 --directory viewer
 ```
 
-Open `http://localhost:8765/prototype.html?variant=A`. The floating switcher or the left and right arrow keys select three layouts:
+Open `http://localhost:8766/prototype.html?variant=A`. The floating switcher or the left and right arrow keys select three layouts:
 
 - A, **Observatory**: large isometric view, small map inset, tool history on the right.
 - B, **Lab notebook**: dedicated narrow plan column, large isometric view, right history.
