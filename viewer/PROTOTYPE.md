@@ -1,6 +1,6 @@
 # Throwaway visual study
 
-Question: which retrofuturist layout best lets a viewer follow an optics run?
+Question: can a restrained, full-window lab scene match the supplied layout sketch while keeping the robot outside the optical table?
 
 Start it from the repository root with one command:
 
@@ -8,10 +8,8 @@ Start it from the repository root with one command:
 python3 -m http.server 8766 --directory viewer
 ```
 
-Open `http://localhost:8766/prototype.html?variant=A`. The floating switcher or the left and right arrow keys select three layouts:
+Open `http://localhost:8766/prototype.html`. The player floats at the top left, tool calls at the right, and score, money, and lab time below the calls. Parts and top view open from small edge buttons.
 
-- A, **Observatory**: large isometric view, small map inset, tool history on the right.
-- B, **Lab notebook**: dedicated narrow plan column, large isometric view, right history.
-- C, **Night shift**: widescreen lab scene with a compact plan inset and a horizontal call strip below.
+Left and right arrow keys step through calls; Space plays or pauses. Escape closes a menu. Within a menu, arrows, Home, and End move focus.
 
-The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the bundled real run snapshots. The robot pose is illustrative and inferred from the tool name. This page is a design prototype, not the finished viewer. The score trace shows fractional values already present in the simulator's reward; no scoring code was changed.
+The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the bundled real run snapshots. The robot pose is illustrative and inferred from the tool name; it stands beyond the front edge of the table. The score trace shows fractional values already present in the simulator's reward. No scoring code was changed.
