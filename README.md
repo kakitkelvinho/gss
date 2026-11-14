@@ -91,6 +91,12 @@ harbor run -p . -a oracle                          # reference (scripted expert)
 GSS_SEED=3 harbor run -p . -a opencode -m <provider/model>   # another seed (default 1)
 ```
 
+After the runs, summarise them (scores plus a failure diagnosis per run) into `jobs/summary.md`:
+
+```bash
+python scripts/summarise_jobs.py jobs/
+```
+
 Without Docker:
 
 ```bash
