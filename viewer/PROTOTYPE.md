@@ -12,6 +12,6 @@ Open `http://localhost:8766/prototype.html?variant=A`. The floating switcher or 
 
 - A, **Observatory**: large isometric view, small map inset, tool history on the right.
 - B, **Lab notebook**: dedicated narrow plan column, large isometric view, right history.
-- C, **Night shift**: dark instrument surface, compact plan inset, right history.
+- C, **Night shift**: widescreen lab scene with a compact plan inset and a horizontal call strip below.
 
 The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the bundled real run snapshots. The robot pose is illustrative and inferred from the tool name. This page is a design prototype, not the finished viewer. The score trace shows fractional values already present in the simulator's reward; no scoring code was changed.
