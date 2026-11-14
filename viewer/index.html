@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSS Run Replay</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <!-- Top bar: run selector + step slider -->
+    <header class="topbar panel">
+      <div class="topbar-run">
+        <label class="field-label" for="runSelect">Run</label>
+        <select id="runSelect" class="control select-run"></select>
+      </div>
+
+      <div class="topbar-slider">
+        <button id="prevBtn" class="control btn-key" type="button" title="Previous step (Left arrow)">&#9664;</button>
+        <input id="stepSlider" class="slider" type="range" min="0" max="0" value="0" step="1">
+        <button id="nextBtn" class="control btn-key" type="button" title="Next step (Right arrow)">&#9654;</button>
+        <div id="stepLabel" class="step-readout">Step 0 / 0</div>
+      </div>
+    </header>
+
+    <!-- Main workspace: Left = Top-down optical table, Right = Selected tool call + Final diagnostics -->
+    <main class="workspace">
+      <section class="stage-panel panel">
+        <div class="stage-bar">
+          <div class="stage-legend">
+            <span class="legend-title">Top-down table (2400 &times; 1200 mm)</span>
+            <span class="legend-sep">&middot;</span>
+            <span class="beam-key"><span class="swatch swatch-800"></span><span id="leg800">800 nm: closed</span></span>
+            <span class="beam-key"><span class="swatch swatch-opa"></span><span id="legOpa">OPA: closed</span></span>
+          </div>
+          <div class="stage-tools">
+            <span id="cursorReadout" class="coord-readout">x —, z — mm</span>
+            <button id="fitBtn" class="control btn-sm" type="button" title="Reset zoom &amp; pan (R)">Fit view</button>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="tableCanvas"></canvas>
+          <div id="partTooltip" class="tooltip" hidden></div>
+        </div>
+      </section>
+
+      <aside class="side-col">
+        <!-- Selected tool call -->
+        <section class="call-panel panel">
+          <div class="section-head">
+            <h2 class="section-title">Selected tool call</h2>
+            <span id="callTime" class="mono-meta">00:00</span>
+          </div>
+          <div id="callBody" class="call-body"></div>
+        </section>
+
+        <!-- Final diagnostics -->
+        <section class="diag-panel panel">
+          <div class="section-head">
+            <h2 class="section-title">Final diagnostics</h2>
+            <span id="endedBadge" class="badge">—</span>
+          </div>
+          <div id="diagMetrics" class="metrics-grid"></div>
+          <div id="diagMeta" class="diag-meta"></div>
+          <div id="diagTags" class="tags-list"></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="runs_bundle.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

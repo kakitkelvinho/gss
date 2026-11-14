@@ -108,7 +108,13 @@ async def verifier_trajectory(request: Request):
     if not _authorised(request):
         return PlainTextResponse("Not Found", status_code=404)
     with LOCK:
-        return JSONResponse({"seed": SEED, "trajectory": EPISODE.trajectory()})
+        return JSONResponse({
+            "schema_version": "gss.viewer.v1",
+            "seed": SEED,
+            "level": LEVEL,
+            "meta": EPISODE.meta_snapshot(),
+            "trajectory": EPISODE.trajectory(),
+        })
 
 
 def main():

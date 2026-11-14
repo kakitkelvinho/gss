@@ -5,3 +5,6 @@ jobs/
 __pycache__/
 *.pyc
 .pytest_cache/
+.agents/
+skills-lock.json
+viewer/runs_bundle.js

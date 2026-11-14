@@ -17,7 +17,7 @@ from sim import physics as P
 from sim import reward as RW
 from sim import vec as V
 from sim.lab import Lab
-from sim.optics import Part, closest_approach, trace
+from sim.optics import Lens, Part, closest_approach, trace
 
 
 class BadArgs(Exception):
@@ -104,6 +104,37 @@ def _clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 
+def _vec_mm(v) -> dict[str, float]:
+    return {"x": round(float(v[0]), 4), "z": round(float(v[2]), 4), "h": round(float(v[1]), 4)}
+
+
+def _downsample_scan(pts: list, max_pts: int = 600) -> list:
+    n = len(pts)
+    if n <= max_pts:
+        return list(pts)
+    must = {0, n - 1}
+    num_idx = [
+        i for i, p in enumerate(pts)
+        if isinstance(p, (list, tuple)) and len(p) >= 2 and isinstance(p[1], (int, float)) and not isinstance(p[1], bool)
+    ]
+    if num_idx:
+        imax = max(num_idx, key=lambda i: pts[i][1])
+        imin = min(num_idx, key=lambda i: pts[i][1])
+        for k in (imax - 1, imax, imax + 1, imin):
+            if 0 <= k < n:
+                must.add(k)
+    rem = max_pts - len(must)
+    if rem > 0:
+        pool = [i for i in range(n) if i not in must]
+        if len(pool) <= rem:
+            must.update(pool)
+        else:
+            for k in range(rem):
+                idx = int(round(k * (len(pool) - 1) / max(1, rem - 1)))
+                must.add(pool[idx])
+    return [pts[i] for i in sorted(must)]
+
+
 @dataclass
 class Plan:
     loc: Any  # None (stay), "desk", or (x, z) table point to stand next to
@@ -185,6 +216,144 @@ class Episode:
     def trajectory(self) -> list[dict]:
         return list(self.log)
 
+    def meta_snapshot(self) -> dict:
+        return {
+            "schema_version": "gss.viewer.v1",
+            "seed": self.seed,
+            "level": self.level,
+            "opa_lambda_nm": float(self.lab.opa_lambda),
+            "c_min_eur": float(self.c_min),
+            "spend_cap_eur": float(K.SPEND_CAP),
+            "budget_s": float(K.BUDGET_S),
+            "table_mm": {"x": float(K.TABLE_X), "z": float(K.TABLE_Z), "max_h": float(K.MAX_HEIGHT)},
+            "desk_mm": {"x": float(DESK_XZ[0]), "z": float(DESK_XZ[1])},
+            "walk_offset_mm": float(K.WALK_OFFSET),
+            "ports": {
+                arm: {"pos": _vec_mm(p["pos"]), "dir": _vec_mm(p["dir"])}
+                for arm, p in self.lab.ports.items()
+            },
+            "housings_mm": [
+                {
+                    "x0": float(b[0]), "x1": float(b[1]),
+                    "h0": float(b[2]), "h1": float(b[3]),
+                    "z0": float(b[4]), "z1": float(b[5]),
+                }
+                for b in self.lab.housings
+            ],
+        }
+
+    def _step_snapshot(self, tool: str, args: dict, res: dict) -> dict:
+        parts = []
+        for pid, it in self.inv.items():
+            p = it["part"]
+            if p is None:
+                continue
+            lenses = []
+            if p.kind == "sample":
+                for el in p.elements(self.lab.defocus):
+                    if isinstance(el, Lens):
+                        sp = el.sample_pt if el.sample_pt is not None else V.add(el.center, V.mul(el.u, K.LENS_F))
+                        lenses.append({
+                            "role": el.role,
+                            "pos": _vec_mm(el.center),
+                            "center": _vec_mm(el.center),
+                            "dir": _vec_mm(el.u),
+                            "yaw_deg": round(math.degrees(math.atan2(el.u[2], el.u[0])), 4),
+                            "f_mm": float(K.LENS_F),
+                            "radius_mm": float(K.LENS_R),
+                            "mount_radius_mm": float(K.LENS_MOUNT_R),
+                            "sample_pos": _vec_mm(sp),
+                        })
+            parts.append({
+                "id": pid,
+                "kind": p.kind,
+                "catalogue_id": it["part_id"],
+                "pos": _vec_mm(p.pos),
+                "yaw_deg": round(math.degrees(p.yaw), 4),
+                "eff_yaw_deg": round(math.degrees(p.yaw + p.knob_yaw + p.mount_err[0]), 4),
+                "eff_pitch_deg": round(math.degrees(p.knob_pitch + p.mount_err[1]), 4),
+                "h_in": round(float(p.height_in), 4) if p.height_in is not None else None,
+                "stage_pos_mm": round(float(p.stage_pos), 6) if p.kind == "stage" else None,
+                "travel_mm": round(float(p.travel), 4) if p.kind == "stage" else None,
+                "level": int(p.level) if p.kind == "sample" else None,
+                "lenses": lenses,
+            })
+
+        traced = self._beams()
+        beams = {}
+        for arm in K.ARMS:
+            b = traced[arm]
+            beams[arm] = {
+                "open": bool(self.shutter_open[arm]),
+                "end": b.end,
+                "end_note": b.end_note,
+                "T": round(float(b.T), 6),
+                "opl_mm": round(float(b.opl), 4),
+                "spot_mm": [round(float(b.spot[0]), 4), round(float(b.spot[1]), 4)] if b.spot is not None else None,
+                "segments": [[_vec_mm(s0), _vec_mm(s1)] for s0, s1 in b.segments],
+                "hits": [{"part_id": h.part_id, "role": h.role, "T": round(float(h.T), 6)} for h in b.hits],
+            }
+
+        ir_probe = None
+        if tool == "ir_card":
+            if "point" in res and isinstance(res["point"], dict):
+                pt = res["point"]
+                ir_probe = {
+                    "x": round(float(pt["x_mm"]), 4),
+                    "z": round(float(pt["z_mm"]), 4),
+                    "h": round(float(pt["height_mm"]), 4),
+                    "beams": _jsonable(res.get("beams", [])),
+                }
+            elif "part" in res and res["part"] in self.inv and self.inv[res["part"]]["part"] is not None:
+                pp = self.inv[res["part"]]["part"].pos
+                ir_probe = {
+                    "x": round(float(pp[0]), 4),
+                    "z": round(float(pp[2]), 4),
+                    "h": round(float(pp[1]), 4),
+                    "part": res["part"],
+                    "beams": _jsonable(res.get("beams", [])),
+                }
+
+        camera_frame = None
+        if "spots" in res and isinstance(res["spots"], list):
+            camera_frame = {"plane": res.get("plane", "sample"), "spots": _jsonable(res["spots"])}
+        elif isinstance(res.get("camera_sample"), list):
+            camera_frame = {"plane": "sample", "spots": _jsonable(res["camera_sample"])}
+
+        scan_data = None
+        if tool == "scan" and "points" in res and isinstance(res["points"], list):
+            raw_pts = res["points"]
+            scan_data = {
+                "detector": res.get("detector"),
+                "filter": res.get("filter"),
+                "t_int_s": float(res.get("t_int_s", args.get("t_int", 0.0))),
+                "saturated": bool(res.get("saturated", False)),
+                "n_points": len(raw_pts),
+                "points": _jsonable(_downsample_scan(raw_pts, 600)),
+            }
+
+        return {
+            "you_mm": {
+                "x": round(float(self.pos[0]), 2),
+                "z": round(float(self.pos[1]), 2),
+                "at_desk": _ring_dist(self.pos, DESK_XZ) < 1.0,
+            },
+            "shutters_open": {arm: bool(self.shutter_open[arm]) for arm in K.ARMS},
+            "cost_eur": round(float(self.cost), 2),
+            "stage_cmd_mm": round(float(self.stage_cmd), 6),
+            "stage_true_mm": round(float(self.stage_true), 6),
+            "installed": {
+                "diagnostic": self.diag,
+                "filter": self.filter,
+                "camera": self.align_cam,
+            },
+            "parts": parts,
+            "beams": beams,
+            "ir_probe": ir_probe,
+            "camera_frame": camera_frame,
+            "scan_data": scan_data,
+        }
+
     # ------------------------------------------------------------------------------------------
     # Core machinery
 
@@ -245,13 +414,16 @@ class Episode:
 
     def _log(self, tool, args, cost_s, res):
         tr = self._truth()
+        truth_logged = {k: (round(v, 6) if isinstance(v, float) else v) for k, v in tr.items()}
+        truth_logged["reward"] = round(RW.reward(tr["eta"], self.cost, self.t / K.BUDGET_S, self.c_min), 6)
         small = {k: v for k, v in res.items() if k != "points"}
         if "points" in res:
             small["n_points"] = len(res["points"])
         self.log.append({
             "i": len(self.log), "tool": tool, "args": _jsonable(args), "cost_s": round(cost_s, 3),
             "t_s": round(self.t, 3), "result": small,
-            "truth": {k: (round(v, 6) if isinstance(v, float) else v) for k, v in tr.items()},
+            "truth": truth_logged,
+            "snapshot": self._step_snapshot(tool, args, res),
         })
 
     def _walk(self, loc):
