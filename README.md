@@ -103,6 +103,11 @@ viability, cost, lab time, tool calls, stray-beam events and time, and footprint
 
 ## Run it
 
+On Windows, follow [the WSL 2 and Docker setup guide](docs/WINDOWS_SETUP.md), then run
+`bash scripts/setup-harbor-wsl.sh` inside Ubuntu. For Gemini runs, `bash scripts/run-gemini.sh
+GEMINI_API_MODEL_ID` prompts for the API key each time. The planned replay interface is described
+in [the viewer brief](docs/VIEWER_BRIEF.md).
+
 ```bash
 harbor run -p . -a opencode -m <provider/model>   # one agent run (needs Docker)
 harbor run -p . -a oracle                          # reference (scripted expert) run
