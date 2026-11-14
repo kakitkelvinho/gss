@@ -88,5 +88,27 @@ Q-numbers refer to the grilling session.
 ## Implementation notes (step 1)
 - `install(part_id)` (2 min, at the sample mount) swaps between owned diagnostics; buying a diagnostic installs it.
 - The stage starts at position 0 after purchase. The reference layout puts time zero near mid-travel, so the stop-early baseline (overlap, no timing) scores 0.
-- C_min = cheapest stage + correct-cut BBO + 4 mirrors = EUR 2200 (same for every seed).
+- ~~C_min = cheapest stage + correct-cut BBO + 4 mirrors = EUR 2200 (same for every seed).~~ Superseded: see "Richer catalogue" below.
 - Separate random streams: lab (`gss-lab-<seed>`), per-mount tilt errors (`gss-mount-<seed>-<part>`), placement errors and measurement noise.
+
+## Richer catalogue (Sat 2026-11-14)
+
+Takes precedence over the L1 catalogue, signal model and C_min above.
+
+- **Arms renamed** `800nm` (amplifier, carries the delay stage) and `opa`. Δt = t_800 − t_opa. Reward fields `T_800`, `T_opa`.
+- **OPA wavelength per seed** ∈ {1300, 600, 450} nm, from its own random stream (`gss-lambda-<seed>`), so table layouts are unchanged. Stated in the table manual. The OPA's collimated radius is set so every wavelength focuses to ~52 µm.
+- **OPA internal path depends on the route:** signal route 1.5–1.7 m; visible outputs add the frequency-mixing box (+580 mm). From the lab experience: the box was once missing from the path budget.
+- **Detection is wavelength-aware and fails physically.** Optical diagnostics (BBO, GaN) emit into a free Si signal camera (400–1000 nm, blind outside, saturates at 60000) through one filter in a holder; scattered fundamentals (2e5 counts/beam) reach it unless filtered. Electrical: GaP two-photon photodiode; fast Si (350–1100) and InGaAs (800–1700) photodiodes for arrival times.
+  - BBO: cross term only for the pair it is cut for (else 1%); single-beam SHG (strong for the matched SHG cut).
+  - Semiconductors: cross term iff E_800 + E_opa > E_g; a single beam with h nu > E_g absorbs linearly (5e5, swamps); with 2 h nu > E_g gives one-colour TPA background. GaN (3.4 eV, yellow band 520–600 nm): peak/off-peak ≈ 4 at 450 nm (lab value), 800 nm alone gives nothing.
+  - Noise σ = √(30² + (0.03 S)²)/√t_int: background fluctuations bury small cross terms.
+- **Filters:** 400/10, 495/10, 550/40 band-passes; 495–710 colour-glass stack (GG495 + KG3); UG1 + BG40 (325–385, blocks the yellow band); 775 shortpass that leaks 5% at 770–900 nm.
+- **Alignment camera:** free Si camera is blind to 1300 nm; CAM-VSWIR (€6500, 400–1700 nm) replaces it.
+- **Routes (viable = cross term ≥ 5σ at 1 s, ideal alignment, nothing saturated):**
+  - 1300 nm: GaP (cheapest), BBO-SFG-1300 + 495 nm band-pass (or the VIS stack); needs CAM-VSWIR. C_min €7750.
+  - 600 nm: GaP (cheapest), GaN + 550/40 band-pass. C_min €1250.
+  - 450 nm: GaN + 550/40 or the VIS stack. C_min €2000.
+  - Decoys: wrong-cut BBO; BBO-SFG-600/450 (343/288 nm, camera blind); GaN at 1300 nm; GaP at 450 nm; no filter; 775 shortpass; UV stack.
+- `design_viable` and C_min are brute-forced from the same detector model (`sim/reward.py`), so the two can't drift apart.
+- New tool `uninstall('filter'|'diagnostic')`; `install` also takes filters. Manuals: `nonlinear` (replaces `bbo`), `signal_camera`.
+- Reference run picks its route from photon energies (GaP when E_opa < 2.26 eV < E_800 + E_opa, else GaN + 550/40; VIS-SWIR camera at 1300 nm): η ≥ 0.995, R ≈ 0.91–0.92 on seeds 1–10.

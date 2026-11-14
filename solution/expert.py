@@ -4,12 +4,12 @@ so the same code runs in-process (`sim.Episode`) and over MCP (step 3).
 Every per-seed fact comes from manuals and measurements (tool outputs), never from the sim's state.
 Layout geometry (mm; x along the table, z across, height = y; yaw from +x toward +z):
 
-  probe: port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 608)
+  opa:   port -> periscope (2050, z_o) raises/lowers to h_p -> M_p1 (1700, z_o) -> M_p2 (1700, 608)
          -> lens at (1300, 600, h_p), hitting it at z = 608
-  pump:  port -> delay stage (yaw 180, apex line z_p + 12) -> returns +x at z_p + 24
+  800nm: port -> delay stage (yaw 180, apex line z_p + 12) -> returns +x at z_p + 24
          -> M_q1 (1500, z_p + 24) -> M_q2 (1500, 592) -> lens, hitting it at z = 592
   The stage is placed so time zero sits near mid-travel:
-  apex A_x = (4518 - z_p - probe_total) / 2, reference point P_x = A_x + 90 + x_mid.
+  apex A_x = (4518 - z_p - opa_total) / 2, reference point P_x = A_x + 90 + x_mid.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ import statistics
 from typing import Callable
 
 LENS = (1300.0, 600.0)
-PUMP_LENS_Z, PROBE_LENS_Z = 592.0, 608.0
+P800_LENS_Z, OPA_LENS_Z = 592.0, 608.0
 X_PERI, X_P, X_Q = 2050.0, 1700.0, 1500.0
 STAGE_OFF = 12.0
 TAU_STAGE_MM = 0.0105  # 1/e half-width of the cross-correlation in stage travel (~70 fs)
@@ -58,14 +58,16 @@ class Expert:
         self.c("read_manual", device="delay_stage")
         self.c("read_manual", device="sample_mount")
         ports = {}
-        for arm, key in (("pump", "Pump output port"), ("probe", "Probe output port")):
-            m = re.search(key + r"[^:]*:\s*x=([\d.]+),\s*z=([\d.]+),\s*height=([\d.]+)", t)
+        for arm, key in (("800nm", "800 nm output port"), ("opa", "OPA output port")):
+            m = re.search(key + r".*?:\s*x=([\d.]+),\s*z=([\d.]+),\s*height=([\d.]+)", t)
             ports[arm] = tuple(float(v) for v in m.groups())
+        self.lam_o = float(re.search(r"OPA output port \(arm 'opa'; OPA, ([\d.]+) nm", t).group(1))
         self.L_opa = float(re.search(r"this unit[^:]*:\s*([\d.]+)\s*mm", o).group(1))
-        _, self.z_p, self.h_p = ports["pump"]
-        _, self.z_o, self.h_o = ports["probe"]
-        self.port_x = ports["pump"][0]
-        self.note(f"ports pump z={self.z_p} h={self.h_p}, probe z={self.z_o} h={self.h_o}; L_opa={self.L_opa}")
+        _, self.z_p, self.h_p = ports["800nm"]
+        _, self.z_o, self.h_o = ports["opa"]
+        self.port_x = ports["800nm"][0]
+        self.note(f"ports 800nm z={self.z_p} h={self.h_p}, opa z={self.z_o} h={self.h_o}; "
+                  f"OPA {self.lam_o:.0f} nm, L_opa={self.L_opa}")
 
     # -- small helpers -----------------------------------------------------------------------
     def knob(self, part, axis, mrad):
@@ -139,14 +141,29 @@ class Expert:
         if not ok:
             self.note(f"{part}: did not converge to {tol} mm")
 
+    def detection_parts(self) -> dict:
+        """Experimentalist's choice from photon energies (E = 1239.84 / lambda): the cross term needs
+        E_800 + E_opa above the gap while a single 800 nm beam stays below it (or the background is
+        tolerable); scattered laser light must be filtered away from the emission band."""
+        e8, eo = 1239.84 / 800.0, 1239.84 / self.lam_o
+        parts = {}
+        if eo < 2.26 and e8 + eo > 2.26:  # GaP two-photon photodiode: cheap, no filter, no camera
+            parts["GAP-TPA"] = 1
+        else:  # GaN two-photon yellow luminescence through a bandpass inside the yellow band
+            parts.update({"GAN-1": 1, "F-BP550": 1})
+        if self.lam_o > 1000.0:  # Si alignment camera is blind here
+            parts["CAM-VSWIR"] = 1
+        self.note(f"photon energies {e8:.2f} + {eo:.2f} eV; buying {sorted(parts)}")
+        return parts
+
     # -- camera overlap ----------------------------------------------------------------------
     def cam_diff(self, frames=2):
         acc = []
         for _ in range(frames):
             spots = {s["beam"]: s for s in self.c("view_camera", plane="sample")["spots"]}
-            if "pump" not in spots or "probe" not in spots:
+            if "800nm" not in spots or "opa" not in spots:
                 return None
-            acc.append((spots["pump"]["h_um"] - spots["probe"]["h_um"], spots["pump"]["v_um"] - spots["probe"]["v_um"]))
+            acc.append((spots["800nm"]["h_um"] - spots["opa"]["h_um"], spots["800nm"]["v_um"] - spots["opa"]["v_um"]))
         return (statistics.fmean(a[0] for a in acc), statistics.fmean(a[1] for a in acc))
 
     # -- the procedure -----------------------------------------------------------------------
@@ -161,36 +178,36 @@ class Expert:
     def _run(self, stop_early):
         self.read_facts()
         zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
-        self.c("buy", items={"DL-C25": 1, "BBO-SFG-1300": 1, "MIR-1": 4, "PER-1": 1})
+        self.c("buy", items={"DL-C25": 1, "MIR-1": 4, "PER-1": 1, **self.detection_parts()})
         travel, x_mid = 25.0, 12.5
 
         # Probe arm, in beam order
         self.c("place", part="sample", x=LENS[0], z=LENS[1], height=hp, yaw_deg=180.0)
-        self.c("unblock", arm="probe")
+        self.c("unblock", arm="opa")
         self.c("place", part="periscope-1", x=X_PERI, z=zo, height=hp, yaw_deg=180.0, height_in=ho)
-        self.aim_at_point("periscope-1", "probe", (X_PERI, zo, hp), (X_P, zo, hp), "x")
-        yaw_p1 = -45.0 if PROBE_LENS_Z < zo else 45.0
+        self.aim_at_point("periscope-1", "opa", (X_PERI, zo, hp), (X_P, zo, hp), "x")
+        yaw_p1 = -45.0 if OPA_LENS_Z < zo else 45.0
         self.c("place", part="mirror-1", x=X_P, z=zo, height=hp, yaw_deg=yaw_p1)
-        self.aim_at_point("mirror-1", "probe", (X_P, zo, hp), (X_P, PROBE_LENS_Z, hp), "z")
-        self.c("place", part="mirror-2", x=X_P, z=PROBE_LENS_Z, height=hp, yaw_deg=135.0)
-        self.aim_at_point("mirror-2", "probe", (X_P, PROBE_LENS_Z, hp), (LENS[0], PROBE_LENS_Z, hp), "x")
+        self.aim_at_point("mirror-1", "opa", (X_P, zo, hp), (X_P, OPA_LENS_Z, hp), "z")
+        self.c("place", part="mirror-2", x=X_P, z=OPA_LENS_Z, height=hp, yaw_deg=135.0)
+        self.aim_at_point("mirror-2", "opa", (X_P, OPA_LENS_Z, hp), (LENS[0], OPA_LENS_Z, hp), "x")
 
         # Pump arm: stage placed so time zero is near mid-travel (the stage itself stays at 0)
-        probe_total = self.port_x - X_PERI + abs(hp - ho) + (X_PERI - X_P) + abs(zo - PROBE_LENS_Z) \
+        opa_total = self.port_x - X_PERI + abs(hp - ho) + (X_PERI - X_P) + abs(zo - OPA_LENS_Z) \
             + (X_P - LENS[0]) + self.L_opa
-        a_x = (4518.0 - zp - probe_total) / 2.0
+        a_x = (4518.0 - zp - opa_total) / 2.0
         p_x = a_x + 90.0 + x_mid
-        self.note(f"probe table+OPA path {probe_total:.0f} mm, stage apex {a_x:.0f}, reference x {p_x:.0f}")
-        self.c("unblock", arm="pump")
+        self.note(f"OPA arm table+internal path {opa_total:.0f} mm, stage apex {a_x:.0f}, reference x {p_x:.0f}")
+        self.c("unblock", arm="800nm")
         self.c("place", part="stage", x=p_x, z=zp + STAGE_OFF, height=hp, yaw_deg=180.0)
-        ret = self.ir_point("pump", X_Q, zp + 2 * STAGE_OFF, hp, "x")
+        ret = self.ir_point("800nm", X_Q, zp + 2 * STAGE_OFF, hp, "x")
         z_ret, h_ret = (zp + 2 * STAGE_OFF, hp) if ret is None else (zp + 2 * STAGE_OFF + ret[0], hp + ret[1])
         self.c("place", part="mirror-3", x=X_Q, z=z_ret, height=h_ret, yaw_deg=135.0)
-        self.aim_at_point("mirror-3", "pump", (X_Q, z_ret, h_ret), (X_Q, PUMP_LENS_Z, hp), "z")
-        self.c("place", part="mirror-4", x=X_Q, z=PUMP_LENS_Z, height=hp, yaw_deg=225.0)
-        self.aim_at_point("mirror-4", "pump", (X_Q, PUMP_LENS_Z, hp), (LENS[0], PUMP_LENS_Z, hp), "x")
+        self.aim_at_point("mirror-3", "800nm", (X_Q, z_ret, h_ret), (X_Q, P800_LENS_Z, hp), "z")
+        self.c("place", part="mirror-4", x=X_Q, z=P800_LENS_Z, height=hp, yaw_deg=225.0)
+        self.aim_at_point("mirror-4", "800nm", (X_Q, P800_LENS_Z, hp), (LENS[0], P800_LENS_Z, hp), "x")
 
-        # Spatial overlap at the focus: steer the pump (mirror-4) onto the probe
+        # Spatial overlap at the focus: steer the 800 nm beam (mirror-4) onto the OPA beam
         ok, self.J_cam = self.steer("mirror-4", self.cam_diff, 3.0, 0.3)
         if not ok:
             self.note("camera overlap did not converge")
@@ -198,8 +215,8 @@ class Expert:
             return
 
         # Time zero: predict from tape measurements, coarse scan, fine scan
-        lp = self.c("measure_path", arm="pump")["path_mm"]
-        lq = self.c("measure_path", arm="probe")["path_mm"]
+        lp = self.c("measure_path", arm="800nm")["path_mm"]
+        lq = self.c("measure_path", arm="opa")["path_mm"]
         st = self.c("status")["inventory"]["stage"]["position_mm"]
         x0 = st + (lq + self.L_opa - lp) / 2.0
         self.note(f"predicted time zero at stage {x0:.3f} mm")

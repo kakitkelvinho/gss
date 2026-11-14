@@ -11,6 +11,7 @@ import random
 from sim import constants as K
 
 PORT_X = 2250.0
+VIS_BOX_PATH = 580.0
 
 
 class Lab:
@@ -28,10 +29,15 @@ class Lab:
         # Round to whole mm: these are stated to the agent in the table manual.
         z_p, h_p, z_o, h_o = (float(round(v)) for v in (z_p, h_p, z_o, h_o))
         self.ports = {
-            "pump": {"pos": (PORT_X, h_p, z_p), "dir": (-1.0, 0.0, 0.0)},
-            "probe": {"pos": (PORT_X, h_o, z_o), "dir": (-1.0, 0.0, 0.0)},
+            "800nm": {"pos": (PORT_X, h_p, z_p), "dir": (-1.0, 0.0, 0.0)},
+            "opa": {"pos": (PORT_X, h_o, z_o), "dir": (-1.0, 0.0, 0.0)},
         }
-        self.opa_path = float(round(r.uniform(1500.0, 1700.0)))  # stated in the OPA manual
+        signal_path = float(round(r.uniform(1500.0, 1700.0)))
+        # OPA output wavelength: its own stream, so the table layout of a seed doesn't depend on it.
+        self.opa_lambda = random.Random(f"gss-lambda-{self.seed}").choice(K.OPA_LAMBDAS_NM)
+        # Visible outputs pass through the frequency-mixing extension box: +580 mm internal path.
+        self.opa_route = "signal" if self.opa_lambda > 1000 else "visible"
+        self.opa_path = signal_path + (0.0 if self.opa_route == "signal" else VIS_BOX_PATH)  # stated in the OPA manual
         self.defocus = r.uniform(-0.5, 0.5)  # hidden: sample sits delta_z behind the lens focal plane
         # Housings: absorbing boxes behind each port (x_lo, x_hi, y_lo, y_hi, z_lo, z_hi)
         self.housings = [

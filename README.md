@@ -8,8 +8,8 @@ by **God's Strongest Soldiers (GSS)**.
 
 ## What the agent has to do
 
-There are two laser outputs on an empty 1.2 × 2.4 m breadboard: pump (800 nm, 100 fs) and probe
-(1300 nm, 60 fs, from an OPA). The goal is to get both beams onto the **same 50 µm focal spot** at
+There are two laser outputs on an empty 1.2 × 2.4 m breadboard: the `800nm` arm (amplifier, 100 fs)
+and the `opa` arm (60 fs, from an OPA whose output is 1300, 600 or 450 nm depending on the seed). The goal is to get both beams onto the **same 50 µm focal spot** at
 the sample and to make both pulses **arrive within ~100 fs of each other**, as cheaply as possible
 and within **4 h of simulated lab time**. Everything is done through ~20 MCP tools: `buy`, `place`,
 `knob`, `ir_card`, `view_camera`, `measure_path`, `move_stage`, `scan`, `read_signal`, `submit`,
@@ -18,8 +18,9 @@ and so on. Every action costs lab time, and walking around the table costs time 
 `instruction.md` gives only the goal and the constraints. The agent has to work out the method
 from the catalogue, datasheets and manuals:
 
-- **Coarse delay is a layout decision.** The probe has travelled through the OPA, whose internal
-  path (1.5–1.7 m, stated only in the OPA manual) has to be matched by laying out a longer pump arm.
+- **Coarse delay is a layout decision.** The OPA pulse has travelled through the OPA, whose internal
+  path (1.5–1.7 m on the signal route, ~0.58 m more on the visible route; stated only in the OPA
+  manual) has to be matched by laying out a longer 800 nm arm.
   The 25 mm delay stage can only fix the last few millimetres.
 - **Real alignment.** The beams are centre-line rays that reflect off each mirror's *actual*
   normal: the yaw set by eye (±0.5°), plus a mount error, plus the knob settings. Optics clip near
@@ -30,8 +31,17 @@ from the catalogue, datasheets and manuals:
 - **Finding time zero:** the cross-correlation peak is ~20 µm of path (~10 µm of stage travel)
   wide, on top of single-beam backgrounds and noise. Step size, integration time and scan range
   trade off against the time budget.
-- **Choosing the right parts:** the right-cut BBO for 800 + 1300 nm sum frequency, rather than
-  the cheaper wrong-cut crystal or the photodiode, which only gives a coarse time.
+- **Choosing the right parts depends on the OPA wavelength** (photon energies $E = 1239.84/\lambda$):
+  - a BBO only works for the pair it is cut for, *and* its sum frequency must land where the Si
+    signal camera can see (400–1000 nm): 800 + 1300 → 495 nm works, 800 + 450 → 288 nm is invisible;
+  - a two-photon semiconductor needs $E_{800} + E_\text{opa} > E_g$; GaP (2.26 eV) is a cheap
+    two-photon photodiode at 1300/600 nm but absorbs 450 nm linearly; GaN (3.4 eV) gives yellow-band
+    luminescence at 450/600 nm but nothing at 1300 nm;
+  - a filter must pass the signal and block scattered laser light (unfiltered scatter saturates the
+    signal camera; a 775 nm shortpass leaks 800 nm; a UV glass stack blocks the yellow band; at 600 nm
+    the broad 495–710 nm stack lets the OPA scatter through);
+  - the free Si alignment camera can't see 1300 nm, so that seed needs the VIS-SWIR camera;
+  - fast photodiodes give only a coarse (~10 ps) arrival time, and only for wavelengths in their range.
 
 ## Why it's hard (and fair)
 
@@ -48,13 +58,13 @@ converging noisy alignment steps, and then scanning efficiently. Typical ways to
 
 The reward is computed from the **simulator's true final state**, whatever detector was bought:
 
-$$\eta = T_\text{pump}\,T_\text{probe}\;O\;\exp\!\left[-\left(\frac{\Delta t}{\tau_c}\right)^2\right],\qquad
+$$\eta = T_{800}\,T_\text{opa}\;O\;\exp\!\left[-\left(\frac{\Delta t}{\tau_c}\right)^2\right],\qquad
 R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}} - 0.1\,\frac{t_\text{lab}}{4\,\text{h}}\right)$$
 
 - $O$ is the normalised overlap of the two focal spots.
 - $\Delta t$ is the true delay error, and $\tau_c \approx 70$ fs.
 - $T$ is the clipping transmission of each arm.
-- $C$ is the total spend. $C_\text{min}$ = €2,200 is the cheapest workable design, and $C_\text{cap}$ = €30k.
+- $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength (€7,750 at 1300 nm, €1,250 at 600 nm, €2,000 at 450 nm; brute-forced from the catalogue with the detector model), and $C_\text{cap}$ = €30k.
 - $t_\text{lab}$ is the lab time used: every action takes physical time, so brute-force iteration (swarm-style knob searches, blind scans) is penalised softly here and hard-capped by the 4 h budget.
 
 Diagnostics go to `reward.json` but are not part of the reward: O, |Δt|, T per arm, design

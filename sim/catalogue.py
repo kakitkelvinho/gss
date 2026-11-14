@@ -38,36 +38,122 @@ PARTS: dict[str, dict] = {
             "gold retroreflector. Repeatability 0.1 um, speed 2 mm/s, settle 0.3 s per scan point. "
             "Driven from the desk controller. Optical path added = 2 x stage displacement."),
     ),
-    "BBO-SFG-1300": dict(
-        slot="diagnostic", kind="diagnostic", price=1200, name="BBO crystal, type-I SFG 800 nm + 1300 nm -> 495 nm, 0.1 mm, with PMT",
-        model="bbo_good",
-        datasheet=(
-            "beta-BBO, 0.1 mm thick, cut for type-I sum-frequency generation of 800 nm + 1300 nm "
-            "(theta = 26.5 deg), mounted at the sample plane with a filtered PMT for 495 nm. "
-            "The cross (sum-frequency) term is proportional to I_pump x I_probe and appears only "
-            "when the pulses overlap in space and time. Each beam alone also produces a weak, "
-            "delay-independent background (residual SHG/scatter leaking through the filter). "
-            "Peak cross signal with good alignment: ~1000 counts/shot-averaged reading; detection "
-            "noise ~100 counts at 1 s integration, scaling as 1/sqrt(t_int)."),
-    ),
+    # --- Overlap diagnostics (sit in the sample mount at the focal plane; swapping changes no path) ---
+    # Optical ones emit light that the signal camera behind the sample reads through the filter holder.
     "BBO-SHG-800": dict(
-        slot="diagnostic", kind="diagnostic", price=900, name="BBO crystal, type-I SHG 800 nm -> 400 nm, 0.1 mm, with PMT",
-        model="bbo_wrong",
+        slot="diagnostic", kind="diagnostic", price=900, model="bbo", readout="camera", cut=(800.0, 800.0),
+        name="BBO crystal, type-I, cut for SHG of 800 nm (400 nm out), 0.1 mm",
         datasheet=(
-            "beta-BBO, 0.1 mm thick, cut for type-I second-harmonic generation of 800 nm "
-            "(theta = 29.2 deg), with filtered PMT. Phase-matched for 800 nm SHG only; "
-            "sum-frequency 800 + 1300 nm is strongly phase-mismatched at this cut (~1% efficiency "
-            "of a matched crystal). A pump beam alone gives a strong 400 nm signal."),
+            "beta-BBO, 0.1 mm thick, theta = 29.2 deg, type-I, cut for second-harmonic generation of "
+            "800 nm -> 400 nm. AR coated 650-1300 nm. Phase matching is angle specific: any other "
+            "wavelength pair (sum frequency, or SHG of another wavelength) is strongly phase-mismatched "
+            "at this cut, ~1% of the efficiency of a crystal cut for it. The 800 nm beam alone gives a "
+            "strong 400 nm signal (~20000 counts on the signal camera, unfiltered, good alignment). "
+            "The emitted light is read by the signal camera through the filter holder."),
     ),
-    "PD-FAST": dict(
-        slot="diagnostic", kind="diagnostic", price=600, name="Fast InGaAs photodiode, 25 ps rise time",
-        model="photodiode",
+    "BBO-SFG-1300": dict(
+        slot="diagnostic", kind="diagnostic", price=1200, model="bbo", readout="camera", cut=(800.0, 1300.0),
+        name="BBO crystal, type-I, cut for SFG 800 nm + 1300 nm (495 nm out), 0.1 mm",
         datasheet=(
-            "InGaAs photodiode, 800-1700 nm, 25 ps rise time, mounted at the sample plane, read on "
-            "the table's 1 GHz scope. Linear (not nonlinear) detector: it sees each pulse "
-            "separately and reports its arrival time. Timing resolution on the 1 GHz scope: "
-            "20 ps sampling, ~10 ps jitter (1 ps of delay = 0.3 mm of path)."),
+            "beta-BBO, 0.1 mm thick, theta = 26.5 deg, type-I, cut for sum-frequency generation "
+            "800 nm + 1300 nm -> 495 nm. AR coated 650-1300 nm. The sum-frequency (cross) term is "
+            "proportional to I_800 x I_1300 and appears only when the pulses overlap in space and time: "
+            "~1000 counts on the signal camera at time zero with good alignment. Other pairs (SHG of "
+            "either beam, other wavelengths) are phase-mismatched at this cut (~1%), but each beam alone "
+            "still makes some second harmonic (800 nm -> 400 nm, 1300 nm -> 650 nm)."),
     ),
+    "BBO-SFG-600": dict(
+        slot="diagnostic", kind="diagnostic", price=1200, model="bbo", readout="camera", cut=(800.0, 600.0),
+        name="BBO crystal, type-I, cut for SFG 800 nm + 600 nm (343 nm out), 0.1 mm",
+        datasheet=(
+            "beta-BBO, 0.1 mm thick, theta = 37.0 deg, type-I, cut for sum-frequency generation "
+            "800 nm + 600 nm -> 343 nm. Cross term ~1000 photon-counts-equivalent at time zero with good "
+            "alignment; other pairs ~1% (phase-mismatched). Each beam alone makes some second harmonic "
+            "(400 nm, 300 nm). Output is in the near UV: check your detector's spectral range."),
+    ),
+    "BBO-SFG-450": dict(
+        slot="diagnostic", kind="diagnostic", price=1300, model="bbo", readout="camera", cut=(800.0, 450.0),
+        name="BBO crystal, type-I, cut for SFG 800 nm + 450 nm (288 nm out), 0.1 mm",
+        datasheet=(
+            "beta-BBO, 0.1 mm thick, theta = 47.5 deg, type-I, cut for sum-frequency generation "
+            "800 nm + 450 nm -> 288 nm. Cross term ~1000 photon-counts-equivalent at time zero with good "
+            "alignment; other pairs ~1% (phase-mismatched). Each beam alone makes some second harmonic "
+            "(400 nm, 225 nm). Output is in the deep UV: check your detector's spectral range."),
+    ),
+    "GAN-1": dict(
+        slot="diagnostic", kind="diagnostic", price=800, model="pl", readout="camera", eg_ev=3.4,
+        band_nm=(520.0, 600.0),
+        name="GaN on sapphire sample, 10 x 10 mm (two-photon luminescence)",
+        datasheet=(
+            "Wide-gap semiconductor, GaN epilayer on sapphire. Band gap 3.4 eV (365 nm): transparent "
+            "to photons below the gap. Carriers created across the gap (one photon above 3.4 eV, or two "
+            "photons whose energies add up to more than 3.4 eV, absorbed together) relax through the "
+            "defect levels and emit the broad 'yellow band' luminescence, 520-600 nm (isotropic, "
+            "independent of the exciting wavelengths). Two-photon absorption of one photon from each "
+            "beam needs the pulses overlapped in space and time and gives ~1000 counts on the signal "
+            "camera at time zero with good alignment. A single beam whose two photons together exceed "
+            "the gap also excites the yellow band on its own (~330 counts). Photon energy E[eV] = "
+            "1239.84 / lambda[nm]. Read by the signal camera through the filter holder."),
+    ),
+    "GAP-TPA": dict(
+        slot="diagnostic", kind="diagnostic", price=250, model="tpa_pd", readout="electrical", eg_ev=2.26,
+        name="GaP photodiode for two-photon detection, 1 mm^2, with amplifier",
+        datasheet=(
+            "GaP photodiode (band gap 2.26 eV, i.e. 549 nm), transimpedance amplifier and gated "
+            "integrator read on the scope (read_signal returns counts). Photons above the gap are "
+            "absorbed linearly (a huge photocurrent, ~5e5 counts for a full beam). Photons below the "
+            "gap only give a photocurrent by two-photon absorption: a single beam whose two photons "
+            "add up to more than 2.26 eV gives a delay-independent background (800 nm alone: ~1500 "
+            "counts; another wavelength: ~800 counts), and one photon from each beam gives the cross "
+            "term (~1000 counts at time zero, good alignment). Photon energy E[eV] = 1239.84 / lambda[nm]. "
+            "Sits at the sample plane; not read through the filter holder."),
+    ),
+    "PD-SI": dict(
+        slot="diagnostic", kind="diagnostic", price=300, model="photodiode", readout="scope", range_nm=(350.0, 1100.0),
+        name="Fast Si photodiode, 350-1100 nm, 150 MHz",
+        datasheet=(
+            "Si photodiode, 350-1100 nm, 150 MHz, mounted at the sample plane, read on the table's 1 GHz "
+            "scope. Linear detector: it sees each pulse separately and reports its arrival time "
+            "(clock-referenced edge timing, ~20 ps sampling, ~10 ps jitter; 1 ps of delay = 0.3 mm of "
+            "path). Blind outside 350-1100 nm."),
+    ),
+    "PD-IGA": dict(
+        slot="diagnostic", kind="diagnostic", price=600, model="photodiode", readout="scope", range_nm=(800.0, 1700.0),
+        name="Fast InGaAs photodiode, 800-1700 nm, 25 ps rise time",
+        datasheet=(
+            "InGaAs photodiode, 800-1700 nm, 25 ps rise time, mounted at the sample plane, read on the "
+            "table's 1 GHz scope. Linear detector: it sees each pulse separately and reports its "
+            "arrival time (~20 ps sampling, ~10 ps jitter; 1 ps of delay = 0.3 mm of path). Blind "
+            "outside 800-1700 nm."),
+    ),
+    # --- Filters for the signal camera (one at a time in the filter holder) ---
+    "F-BP400": dict(slot="filter", kind="filter", price=180, passband=[(395.0, 405.0, 0.9)], leak=1e-4,
+                    name="Bandpass filter 400 nm, 10 nm FWHM",
+                    datasheet="Hard-coated bandpass, 400 +/- 5 nm, T > 90%; OD 4 elsewhere (300-1700 nm)."),
+    "F-BP495": dict(slot="filter", kind="filter", price=180, passband=[(490.0, 500.0, 0.9)], leak=1e-4,
+                    name="Bandpass filter 495 nm, 10 nm FWHM",
+                    datasheet="Hard-coated bandpass, 495 +/- 5 nm, T > 90%; OD 4 elsewhere (300-1700 nm)."),
+    "F-BP550": dict(slot="filter", kind="filter", price=200, passband=[(530.0, 570.0, 0.9)], leak=1e-4,
+                    name="Bandpass filter 550 nm, 40 nm FWHM",
+                    datasheet="Hard-coated bandpass, 530-570 nm, T > 90%; OD 4 elsewhere (300-1700 nm)."),
+    "F-VIS495": dict(slot="filter", kind="filter", price=220, passband=[(495.0, 710.0, 0.85)], leak=1e-4,
+                     name="Colour-glass stack: 495 nm longpass + KG3 shortpass (495-710 nm)",
+                     datasheet=("Stacked GG495-type longpass and KG3-type heat-absorbing shortpass. Passes "
+                                "~495-710 nm (T ~ 85%); OD 4 below 490 nm and above 720 nm.")),
+    "F-UV": dict(slot="filter", kind="filter", price=220, passband=[(325.0, 385.0, 0.8)], leak=1e-4,
+                 name="Colour-glass stack: UG1 + BG40 (325-385 nm)",
+                 datasheet="Stacked UG1/BG40-type glass. Passes ~325-385 nm (T ~ 80%); OD 4 at 400-1700 nm."),
+    "F-SP775": dict(slot="filter", kind="filter", price=120, passband=[(300.0, 765.0, 0.9)], leak=1e-4,
+                    extra_leak=[(770.0, 900.0, 0.05)],
+                    name="Shortpass filter, 775 nm edge",
+                    datasheet=("Dielectric shortpass, T > 90% at 300-765 nm. Edge at 775 nm; blocking is "
+                               "only OD 1.3 (5%) from 770 to 900 nm, OD 4 above.")),
+    # --- Camera ---
+    "CAM-VSWIR": dict(slot="camera", kind="camera", price=6500, range_nm=(400.0, 1700.0),
+                      name="VIS-SWIR InGaAs camera for the flip-in mount, 400-1700 nm",
+                      datasheet=("Replaces the free Si alignment camera in the sample mount's flip-in "
+                                 "holder (same plane, same 5.5 um pixel scale and calibration). Spectral "
+                                 "range 400-1700 nm: sees 800 nm and SWIR beams alike.")),
     "MIR-1": dict(
         slot="mounting", kind="mirror", price=150, name="1\" protected silver mirror in kinematic mount, on post",
         datasheet=(
@@ -89,29 +175,37 @@ PARTS: dict[str, dict] = {
 SLOTS = {
     "delay_stage": "Delay stage with retroreflector (fine delay)",
     "diagnostic": "Overlap diagnostic for the sample mount",
+    "filter": "Filters for the signal camera's filter holder",
+    "camera": "Cameras for the flip-in alignment mount",
     "mounting": "Mirrors and periscopes",
 }
 
 FREE_EQUIPMENT = (
-    "Already on the table, free: a sample mount with f = 100 mm achromatic lens and a flip-in "
-    "camera at the lens focal plane (also images the lens plane), a 1 GHz oscilloscope at the "
-    "desk, an IR viewer card, and beam-block shutters at both output ports."
+    "Already on the table, free: a sample mount with f = 100 mm achromatic lens; a flip-in Si CMOS "
+    "alignment camera at the lens focal plane (also images the lens plane), specified 400-1000 nm and "
+    "blind outside that range; a zoomed Si CMOS signal camera behind the sample (400-1000 nm) that "
+    "integrates the light from the sample in a region of interest, through an empty filter holder; "
+    "a 1 GHz oscilloscope at the desk; an IR/visible viewer card (400-1700 nm); and beam-block "
+    "shutters at both output ports."
 )
 
 
 def manuals(lab) -> dict[str, str]:
     """Device manuals. `lab` provides per-seed facts (ports, OPA internal path)."""
-    p, q = lab.ports["pump"], lab.ports["probe"]
+    p, q = lab.ports["800nm"], lab.ports["opa"]
+    lo = lab.opa_lambda
+    w_o = K.opa_w_coll(lo)
     return {
         "table": (
             f"Optical table: {K.TABLE_X:.0f} x {K.TABLE_Z:.0f} mm breadboard. Coordinates in mm: x along "
             f"the long side (0..{K.TABLE_X:.0f}), z across (0..{K.TABLE_Z:.0f}), height = height above the "
             f"breadboard (y). Yaw angles are in degrees in the table plane, measured from +x toward +z.\n"
-            f"Pump output port (amplifier, 800 nm, ~100 fs FWHM, 1 kHz): x={p['pos'][0]:.0f}, "
+            f"800 nm output port (arm '800nm'; amplifier, 800 nm, ~100 fs FWHM, 1 kHz): x={p['pos'][0]:.0f}, "
             f"z={p['pos'][2]:.0f}, height={p['pos'][1]:.0f}, beam travelling toward -x (yaw 180). "
             f"Collimated, 0.5 mm 1/e^2 radius, horizontally polarised (in the table plane).\n"
-            f"Probe output port (OPA, 1300 nm, ~60 fs FWHM): x={q['pos'][0]:.0f}, z={q['pos'][2]:.0f}, "
-            f"height={q['pos'][1]:.0f}, beam travelling toward -x (yaw 180). Collimated, 0.8 mm radius. "
+            f"OPA output port (arm 'opa'; OPA, {lo:.0f} nm, ~60 fs FWHM): x={q['pos'][0]:.0f}, z={q['pos'][2]:.0f}, "
+            f"height={q['pos'][1]:.0f}, beam travelling toward -x (yaw 180). Collimated, {w_o:.2f} mm radius "
+            f"(focuses to the same ~50 um spot as the 800 nm beam). "
             f"The OPA is pumped by the same amplifier; both ports are path-matched at the amplifier's "
             f"split EXCEPT for the OPA's internal path (see manual 'opa').\n"
             f"Laser housings occupy x > {p['pos'][0]:.0f} around each port. Both shutters start CLOSED "
@@ -127,13 +221,15 @@ def manuals(lab) -> dict[str, str]:
             f"by eye is good to ~0.5 deg. Kinematic knobs then fine-tune (+/-50 mrad).\n{FREE_EQUIPMENT}"
         ),
         "opa": (
-            "OPA user manual (excerpt). Output: signal 1300 nm, ~60 fs, horizontally polarised (in the table "
-            "plane, same as the 800 nm pump). The pump light travels an "
-            f"internal path inside the OPA before the output port. Calibrated internal optical path "
-            f"for this unit (serial on the housing): {lab.opa_path:.0f} mm, relative to the "
-            "amplifier output. To reach temporal overlap with the direct 800 nm beam, the 800 nm "
-            "arm must be longer than the 1300 nm arm's table path by this amount. It cannot be "
-            "measured from outside the housing."
+            f"OPA user manual (excerpt). Current output: {lo:.0f} nm, ~60 fs, horizontally polarised (in the "
+            "table plane, same as the 800 nm beam). The amplifier light travels an internal path inside "
+            "the OPA before the output port. Signal/idler outputs (1100-2600 nm) leave after the "
+            "parametric stages; visible outputs (e.g. 450 or 600 nm) additionally pass the "
+            "frequency-mixing extension box, which adds about 580 mm. Calibrated internal optical "
+            f"path for this unit in its current configuration ({lab.opa_route} route, serial on the "
+            f"housing): {lab.opa_path:.0f} mm, relative to the amplifier output. To reach temporal "
+            "overlap with the direct 800 nm beam, the 800 nm arm must be longer than the OPA arm's "
+            "table path by this amount. It cannot be measured from outside the housing."
         ),
         "delay_stage": (
             "Delay stage manual. place(stage, x, z, height, yaw): (x, z, height) is the stage "
@@ -158,8 +254,10 @@ def manuals(lab) -> dict[str, str]:
             "beam hitting the lens at angle theta to its axis focuses at f x theta from the axis, "
             "whatever point of the lens it hits, so overlapping the foci means matching the beams' "
             "ANGLES; where they hit the lens sets their crossing angle and must stay inside the "
-            "aperture. Focal spot radius ~50 um for both beams. install(item) swaps the diagnostic; "
-            "it does not change any path. Flip-in camera: view_camera('sample') images the focal "
+            "aperture. Focal spot radius ~50 um for both beams. install(part_id) swaps the diagnostic "
+            "(or the signal-camera filter); it does not change any path. Flip-in alignment camera (Si "
+            "CMOS, 400-1000 nm, blind outside; a bought VIS-SWIR camera replaces it): "
+            "view_camera('sample') images the focal "
             f"plane ({K.CAM_PIXEL*1000:.1f} um pixels, field of view +/-{K.CAM_HALF_FOV} mm, sub-pixel "
             "centroids); view_camera('lens') shows where each beam hits the lens (mm). Each spot also reports "
             "relative_power: the fraction of that beam's output power reaching the sample (~2% "
@@ -182,16 +280,29 @@ def manuals(lab) -> dict[str, str]:
         ),
         "photodiode": (
             "Fast photodiode on the 1 GHz scope: read_signal returns the arrival time of each pulse "
-            "that reaches the sample (relative to the scope trigger). Resolution ~20 ps (6 mm of "
-            "path). Good for catching gross path errors (metres), not for finding time zero."
+            "it is sensitive to that reaches the sample (relative to the scope trigger). Resolution "
+            "~20 ps (6 mm of path). Good for catching gross path errors (metres), not for finding time "
+            "zero. Block one arm at a time to be sure which pulse is which."
         ),
-        "bbo": (
-            "Nonlinear crystal + PMT at the sample plane. read_signal(t_int) returns counts averaged "
-            "over t_int seconds; noise falls as 1/sqrt(t_int). The cross term exists only within "
-            "~+/-100 fs of time zero (~30 um of path, ~15 um of stage travel) and only if the foci "
-            "overlap. Each beam alone gives a delay-independent background: block one arm to "
-            "measure the other's background. scan(start, end, step, t_int) moves the stage and "
-            "reads at each point (max 5000 points)."
+        "nonlinear": (
+            "Nonlinear overlap diagnostics (crystals, semiconductor samples, two-photon photodiodes) in "
+            "the sample mount. read_signal(t_int) returns counts averaged over t_int seconds; noise "
+            "(read-out floor plus ~3% source fluctuations of the total signal) falls as 1/sqrt(t_int). "
+            "The cross term exists only within ~+/-100 fs of time zero (~30 um of path, ~15 um of stage "
+            "travel) and only if the foci overlap. Single beams can give delay-independent signals of "
+            "their own (second harmonic, one-colour two-photon absorption), and scattered laser light "
+            "reaches the signal camera unless a filter blocks it: block each arm in turn to see what "
+            "each one contributes. scan(start, end, step, t_int) moves the stage and reads at each "
+            "point (max 5000 points)."
+        ),
+        "signal_camera": (
+            f"Signal camera: zoomed Si CMOS behind the sample, specified {K.CAM_SI_RANGE[0]:.0f}-"
+            f"{K.CAM_SI_RANGE[1]:.0f} nm (no specified response outside; treat it as blind). It integrates "
+            "the light leaving the sample in a fixed region of interest, through the filter holder "
+            "(empty unless you install a filter). Scattered laser light at the sample is ~2e5 counts per "
+            f"beam unfiltered; the ROI saturates at {K.SIG_CAM_SAT} counts (reported as saturated). "
+            "install(filter_id) puts a filter in the holder, uninstall('filter') empties it. The filter "
+            "does not affect the alignment camera."
         ),
         "ir_card": (
             "IR viewer card. ir_card(part=...) shows where each beam hits that optic relative to "
@@ -199,3 +310,8 @@ def manuals(lab) -> dict[str, str]:
             "point. Offsets are in table coordinates (dx, dz, dheight), good to ~0.5 mm."
         ),
     }
+
+
+def filter_spec(part_id: str) -> dict:
+    p = PARTS[part_id]
+    return {"pass": p["passband"], "leak": p["leak"], "extra_leak": p.get("extra_leak", [])}
