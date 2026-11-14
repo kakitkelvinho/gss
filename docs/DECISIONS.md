@@ -66,7 +66,7 @@ Q-numbers refer to the grilling session.
 
 ## Reward and diagnostics
 - η = T_pump·T_probe·O·exp(−(Δt/τ_c)²), computed from true state, whatever detector was bought.
-- R = η·(1 − 0.2·(C − C_min)/(C_cap − C_min)), with C_cap = €30k.
+- R = η·(1 − 0.2·(C − C_min)/(C_cap − C_min) − 0.1·t_lab/t_budget), with C_cap = €30k. The soft time term (added after the first blind playthrough, user decision) makes slow trial-and-error cost reward, not just budget.
 - C_min is computed per seed: the cheapest stage + the correct-cut BBO + the minimum mirrors/periscopes that can physically make up the path difference, found by an offline layout search. (Q6, Q27)
 - Logged in `reward.json`, not in R: O, |Δt|, T per arm, design viable, cost, lab time, tool calls, stray-beam count and time, footprint. (Q26, Q43)
 

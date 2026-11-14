@@ -53,6 +53,7 @@ BUDGET_S = 4 * 3600.0
 MIN_ACTION_S = 5.0
 SPEND_CAP = 30000.0
 ALPHA = 0.2
+BETA = 0.1  # soft lab-time penalty: using the whole budget costs 10% of the reward
 
 # Detector models
 BBO_GOOD = dict(A=1000.0, b_pump=50.0, b_probe=20.0, sigma=100.0)

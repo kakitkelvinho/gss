@@ -35,5 +35,5 @@ The score (0 to 1) is computed from the simulator's true final state:
 - how close the two pulses are in time (the overlap window is about 100 fs), times
 - how much of each beam actually reaches the sample,
 
-reduced by up to 20% for spending more than the cheapest set of parts that could do the job.
-Unused lab time is not rewarded.
+reduced by up to 20% for spending more than the cheapest set of parts that could do the job, and by up to
+10% for the lab time used (10% if you use all 4 hours).

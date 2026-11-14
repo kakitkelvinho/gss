@@ -207,7 +207,7 @@ class Episode:
         if len(xs) >= 2:
             area = (max(x[0] for x in xs) - min(x[0] for x in xs)) * (max(x[2] for x in xs) - min(x[2] for x in xs)) / 1e6
         self.final = {
-            "reward": RW.reward(tr["eta"], self.cost),
+            "reward": RW.reward(tr["eta"], self.cost, self.t / K.BUDGET_S),
             "eta": tr["eta"],
             "O": tr["O"],
             "abs_dt_fs": None if dt is None else abs(dt),

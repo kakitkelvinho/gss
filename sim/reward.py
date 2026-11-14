@@ -1,4 +1,5 @@
-"""Reward: eta = T_p T_q O exp(-(dt/tau_c)^2) from true state; R = eta (1 - alpha (C - C_min)/(C_cap - C_min))."""
+"""Reward: eta = T_p T_q O exp(-(dt/tau_c)^2) from true state;
+R = eta (1 - alpha (C - C_min)/(C_cap - C_min) - beta t_lab/t_budget)."""
 
 from __future__ import annotations
 
@@ -20,8 +21,8 @@ def c_min() -> float:
 C_MIN = c_min()
 
 
-def reward(eta: float, cost: float) -> float:
-    pen = K.ALPHA * max(0.0, cost - C_MIN) / (K.SPEND_CAP - C_MIN)
+def reward(eta: float, cost: float, time_frac: float = 0.0) -> float:
+    pen = K.ALPHA * max(0.0, cost - C_MIN) / (K.SPEND_CAP - C_MIN) + K.BETA * min(1.0, max(0.0, time_frac))
     return max(0.0, min(1.0, eta * (1.0 - pen)))
 
 
