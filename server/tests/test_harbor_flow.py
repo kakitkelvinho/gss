@@ -50,8 +50,8 @@ def test_reference_collect_grade(tmp_path):
     vdir = tmp_path / "logs" / "verifier"
     reward = float((vdir / "reward.txt").read_text())
     rj = json.loads((vdir / "reward.json").read_text())
-    assert reward >= 0.9 and rj["reward"] == reward
-    assert all(isinstance(v, (int, float)) for v in rj.values())
+    assert reward >= 0.9 and rj == {"reward": reward}
+    assert json.loads((vdir / "diagnostics.json").read_text())["reward"] == reward
     assert (vdir / "trajectory.json").exists()
 
 

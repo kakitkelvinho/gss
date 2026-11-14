@@ -85,7 +85,7 @@ R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}} - 0.
 - $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength and level (L1: €7,450 at 1300 nm, €950 at 600 nm, €1,700 at 450 nm; L2: €7,300 / €1,550 / €1,550; brute-forced from the catalogue with the detector model: stage, the minimum mirrors (2 in L1, 1 in L2), diagnostic + filter, and a camera that sees 1300 nm), and $C_\text{cap}$ = €30k.
 - $t_\text{lab}$ is the lab time used: every action takes physical time, so brute-force iteration (swarm-style knob searches, blind scans) is penalised softly here and hard-capped by the 4 h budget.
 
-Diagnostics go to `reward.json` but are not part of the reward: O, |Δt|, T per arm, design
+Diagnostics go to `diagnostics.json` but are not part of the reward: O, |Δt|, T per arm, design
 viability, cost, lab time, tool calls, stray-beam events and time, and footprint.
 
 **Reward integrity**

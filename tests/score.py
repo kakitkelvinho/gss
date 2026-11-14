@@ -21,19 +21,11 @@ def main():
     reward = float(res.get("reward", 0.0))
     if not (0.0 <= reward <= 1.0):  # also rejects NaN
         reward = 0.0
-    # Harbor prefers reward.json over reward.txt and needs it all-numeric; "reward" is the score.
-    numeric = {"reward": reward}
-    for k, v in res.items():
-        if k == "reward":
-            continue
-        if isinstance(v, bool):
-            numeric[k] = int(v)
-        elif isinstance(v, (int, float)) and v == v and abs(v) != float("inf"):
-            numeric[k] = v
     with open(os.path.join(OUT, "reward.txt"), "w") as f:
         f.write(f"{reward!r}\n")
     with open(os.path.join(OUT, "reward.json"), "w") as f:
-        json.dump(numeric, f, indent=1)
+        json.dump({"reward": reward}, f)  # Harbor reports every key here as a reward: score only
+    # Diagnostics (O, |dt|, cost, lab time, ...) are not part of the reward.
     with open(os.path.join(OUT, "diagnostics.json"), "w") as f:
         json.dump(res, f, indent=1)
     traj = os.path.join(SRC, "trajectory.json")
