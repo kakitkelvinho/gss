@@ -278,6 +278,34 @@ function scoreSvg(run, step) {
   const path = values.map((v, i) => `${i ? 'L' : 'M'}${(i / Math.max(end, 1) * 270).toFixed(1)},${(32 - v * 29).toFixed(1)}`).join(' ');
   return `<svg class="graph" viewBox="0 0 270 34" preserveAspectRatio="none" aria-label="Score history"><path d="M0 32 H270" stroke="var(--line)"/><path d="${path}" fill="none" stroke="#16120F" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg>`;
 }
+// ---- Score breakdown: the grader in sim/reward.py, recomputed from the replay's diagnostic truth at this step. ----
+// reward = 0.2 x spatial + 0.5 x timing + 0.3 efficiency (efficiency only once timing >= 0.9).
+// spatial = T_800 x T_opa x O; timing = eta = T_800 x T_opa x O x exp(-(dt / tau)^2).
+const GRADER = { spatial: 0.2, timing: 0.5, alpha: 0.2, beta: 0.1, success: 0.9, tau: { 1: 70.04, 2: 186.21 }, mmPerFs: 0.000299792458 };
+function fmtDt(fs) { const a = Math.abs(fs); return a >= 1000 ? `${(a / 1000).toFixed(1)} ps` : `${Math.round(a)} fs`; }
+function endName(end) { return end === 'sample' ? 'the sample' : String(end || 'nowhere').replace(/^mount of /, 'the mount of ').replace(/^lens mount$/, 'the lens mount'); }
+function breakdown(run, call) {
+  const t = call.truth || {}, meta = run.meta || {}, level = meta.level || 1, T8 = t.T_800 || 0, To = t.T_opa || 0, O = t.O || 0, eta = Math.max(0, Math.min(1, t.eta || 0));
+  const spatial = GRADER.spatial * Math.max(0, Math.min(1, T8 * To * O)), timing = GRADER.timing * eta, success = eta >= GRADER.success;
+  const cap = meta.spend_cap_eur || 30000, cmin = meta.c_min_eur || 0, costFrac = Math.max(0, Math.min(1, ((call.snapshot?.cost_eur || 0) - cmin) / (cap - cmin))), timeFrac = Math.max(0, Math.min(1, (call.t_s || 0) / (meta.budget_s || 14400)));
+  const efficiency = success ? GRADER.alpha * (1 - costFrac) + GRADER.beta * (1 - timeFrac) : 0, total = Math.min(1, spatial + timing + efficiency);
+  const tau = GRADER.tau[level] || GRADER.tau[1], reach = T8 * To * O, window = reach > GRADER.success ? tau * Math.sqrt(Math.log(reach / GRADER.success)) : null;
+  const isFinal = call.tool === 'submit' || state.step === run.trajectory.length - 1, recorded = Number(t.reward ?? total);
+  let reason;
+  if (!(t.end_800 === 'sample' && t.end_opa === 'sample')) reason = t.end_800 !== 'sample' ? `800 nm beam ends at ${endName(t.end_800)}` : `OPA beam ends at ${endName(t.end_opa)}`;
+  else if (O < 0.5) reason = `Spots miss each other at the sample (overlap ${(O * 100).toFixed(0)}%)`;
+  else if (!success && Number.isFinite(t.dt_fs)) reason = `Spots overlap, but the pulses arrive ${fmtDt(t.dt_fs)} apart (${(Math.abs(t.dt_fs) * GRADER.mmPerFs).toFixed(2)} mm of path). Needs ${window ? `≤ ${Math.round(window)} fs` : 'better overlap first'}.`;
+  else if (!success) reason = 'Spots overlap, but the timing has not been measured';
+  else reason = `Pulses meet in space and time (Δt ${fmtDt(t.dt_fs)})`;
+  const verdict = success ? (isFinal ? 'Passed' : 'Working') : isFinal ? 'Failed' : 'Not yet';
+  const row = (label, weight, value, points, note) => `<div class="bd-row"><span class="bd-label">${label} <em>×${weight.toFixed(1)}</em></span><span class="bd-value">${note}</span><span class="bd-bar"><i style="width:${(points / weight * 100).toFixed(1)}%"></i></span><strong>${points.toFixed(2)}</strong></div>`;
+  const legacy = isFinal && Math.abs(recorded - total) > 0.005 ? `<p class="bd-note">Recorded score ${recorded.toFixed(3)} came from an earlier grader. Today's grader gives ${total.toFixed(3)}.</p>` : '';
+  return `<div class="bd-head"><span class="bd-verdict ${success ? 'ok' : isFinal ? 'bad' : ''}">${verdict}</span><span class="bd-total">${(isFinal ? recorded : total).toFixed(3)}</span></div>
+    <p class="bd-reason">${esc(reason)}</p>
+    ${row('Spot overlap', GRADER.spatial, O, spatial, `${(O * 100).toFixed(1)}%${T8 * To < 0.99 ? ` · T ${(T8 * To * 100).toFixed(0)}%` : ''}`)}
+    ${row('Timing', GRADER.timing, eta, timing, Number.isFinite(t.dt_fs) ? `Δt ${fmtDt(t.dt_fs)}` : 'no overlap')}
+    ${row('Efficiency', 0.3, efficiency, efficiency, success ? `cost ${Math.round((1 - costFrac) * 100)}% · time ${Math.round((1 - timeFrac) * 100)}%` : 'locked until timing ≥ 0.9')}${legacy}`;
+}
 function runName(run, index) { return `Run ${index + 1} · ${run.model} · seed ${run.meta.seed} · L${run.meta.level} · R ${Number(run.diagnostics?.reward || 0).toFixed(3)}`; }
 function groupCalls(trajectory) {
   const groups = []; let setup = null;
@@ -330,7 +358,7 @@ function render() {
       <input class="scrub" type="range" min="0" max="${trajectory.length-1}" value="${state.step}" aria-label="Scrub steps"><span class="counter">${state.step+1}/${trajectory.length}</span><button data-action="speed" aria-label="Playback speed" aria-expanded="${state.menu === 'speed'}" aria-haspopup="menu">${state.speed}×</button>
     </div>
     <aside class="sidebar"><section class="call-panel"><div class="panel-heading">Steps <small>${trajectory.length} calls</small></div><div class="current-call">${state.step + 1}/${trajectory.length} · ${esc(cleanTool(call.tool))}${Object.keys(call.args || {}).length ? ` · ${esc(shortArgs(call.args))}` : ''}</div><div class="call-stack">${stepsMarkup(trajectory)}</div></section>
-      <section class="score-panel"><div class="totals"><div><span>Money</span><strong>${money(call.snapshot?.cost_eur)}</strong><small>of ${money(run.meta.spend_cap_eur)}</small></div><div><span>Lab time</span><strong>${fmtTime(call.t_s)}</strong><small>of ${fmtTime(run.meta.budget_s)}</small></div></div><div class="score-secondary"><span>Score · private replay</span><strong>${score.toFixed(3)}</strong></div>${scoreSvg(run,state.step)}</section></aside>
+      <section class="score-panel"><div class="totals"><div><span>Money</span><strong>${money(call.snapshot?.cost_eur)}</strong><small>of ${money(run.meta.spend_cap_eur)}</small></div><div><span>Lab time</span><strong>${fmtTime(call.t_s)}</strong><small>of ${fmtTime(run.meta.budget_s)}</small></div></div><div class="breakdown">${breakdown(run, call)}</div>${scoreSvg(run,state.step)}</section></aside>
     <button class="rail-toggle" data-action="rail" aria-label="${state.railOpen ? 'Hide steps' : 'Show steps'}" title="${state.railOpen ? 'Hide steps' : 'Show steps'}">${state.railOpen ? '‹' : '›'}</button>
     <button class="corner-button parts-trigger" data-action="parts" aria-label="Parts" aria-expanded="${state.menu === 'parts'}" aria-haspopup="menu">≡</button><span class="hint">Parts</span>
     <button class="corner-button view-trigger" data-action="view" aria-label="View" aria-expanded="${state.menu === 'view'}" aria-haspopup="menu">▣</button><span class="view-hint">View</span>
