@@ -1,0 +1,7 @@
+{
+ "agent": {
+  "name": "blind-cli",
+  "model_name": "anthropic/claude-opus-5-5 (blind)"
+ },
+ "note": "Blind playthrough via scripts/blind_playthrough.py: a fresh Claude Code subagent with only instruction.md and the gss CLI; seed 3, level 2. Not a Harbor run."
+}

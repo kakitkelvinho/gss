@@ -454,3 +454,49 @@ async function start() {
   } catch (error) { app.textContent = `Could not load run archive: ${error.message}`; }
 }
 start();
+
+// Live updates: re-read the run list every 10 s and add new runs to the menu without a reload,
+// keeping the run being watched. scripts/serve_viewer.py exports finished runs locally; on
+// GitHub Pages new runs arrive after a push.
+async function refreshRuns() {
+  if (document.hidden) return;
+  try {
+    const response = await fetch('runs_index.json', { cache: 'no-store' });
+    if (!response.ok) return;
+    const index = await response.json();
+    if (index.schema_version !== 'gss.archive.v1') return;
+    const known = new Map(runs.map(run => [run.id, run]));
+    const fresh = index.runs.filter(run => run.replayable);
+    const added = fresh.filter(run => !known.has(run.id));
+    if (!added.length) return;
+    const current = currentRun();
+    runs = fresh.map(run => known.get(run.id) || run);
+    if (!current) { selectRun(0, 0); }
+    else {
+      if (!runs.includes(current)) runs.push(current);
+      state.run = runs.indexOf(current);
+      render();
+    }
+    showNewRuns(added);
+  } catch { /* no server or offline: keep the current list */ }
+}
+function showNewRuns(added) {
+  let box = document.getElementById('new-runs');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'new-runs';
+    box.setAttribute('role', 'status');
+    document.body.append(box);
+  }
+  box.innerHTML = added.map(run => `<button class="new-run" data-new-run="${esc(run.id)}">New run · ${esc(run.label)}</button>`).join('')
+    + '<button class="new-run-close" aria-label="Dismiss">×</button>';
+  box.hidden = false;
+}
+document.addEventListener('click', event => {
+  const button = event.target.closest('#new-runs button');
+  if (!button) return;
+  const index = runs.findIndex(run => run.id === button.dataset.newRun);
+  if (index >= 0) selectRun(index, 0);
+  document.getElementById('new-runs').hidden = true;
+});
+setInterval(refreshRuns, 10000);

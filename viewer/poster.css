@@ -129,3 +129,10 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 .bd-note { margin: 2px 0 0; font: 500 10px/1.3 var(--label); letter-spacing: .03em; color: rgba(22,18,15,.75); }
 .score-panel .totals strong { font-size: 36px; }
 .bd-head .bd-old { margin: 0 auto 0 8px; padding: 3px 6px 1px; border: 2px solid var(--ink); font: 600 10px var(--label); letter-spacing: .12em; text-transform: uppercase; }
+
+/* New-run notice added by the live run-list refresh in prototype.js. */
+#new-runs { position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column; gap: 6px; max-width: min(520px, calc(100vw - 32px)); }
+#new-runs[hidden] { display: none; }
+#new-runs .new-run { font: 500 14px var(--label); letter-spacing: .04em; text-align: left; color: var(--ink); background: var(--paper); border: 2px solid var(--orange); padding: 8px 12px; cursor: pointer; }
+#new-runs .new-run:hover, #new-runs .new-run:focus-visible { background: var(--orange); }
+#new-runs .new-run-close { align-self: flex-end; font: 500 16px var(--label); color: var(--paper); background: var(--ink2); border: 1px solid var(--kraft); width: 28px; height: 28px; cursor: pointer; }

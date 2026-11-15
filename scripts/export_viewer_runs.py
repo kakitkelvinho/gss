@@ -156,7 +156,7 @@ def export_run(verifier_dir: Path, jobs_dir: Path):
 
     trial = verifier_dir.parent
     config = json.loads((trial / "config.json").read_text())
-    model = config["agent"]["model_name"]
+    model = config["agent"].get("model_name") or config["agent"].get("name") or "unknown"  # the oracle agent has no model
     run_id = trial.relative_to(jobs_dir).as_posix()
     when = trial.parent.name.split("__", 1)[0]
     level = f"L{ep.level}" + (" (90°)" if ep.level == 2 else "")

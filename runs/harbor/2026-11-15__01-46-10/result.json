@@ -1,0 +1,178 @@
+{
+    "schema_version": 1,
+    "id": "3187a79f-88d9-48e3-b4f4-d1ea515686f2",
+    "started_at": "2026-11-15T01:46:14.145744",
+    "updated_at": "2026-11-15T02:11:49.461314",
+    "finished_at": "2026-11-15T02:11:49.461314",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__gemini-3.8-flash__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "O": 0.9980723908950493,
+                        "T_800": 1.0,
+                        "T_opa": 1.0,
+                        "abs_dt_fs": 5.596721985331807,
+                        "c_min_eur": 7450.0,
+                        "cost_eur": 12630.0,
+                        "design_viable": 1.0,
+                        "efficiency_score": 0.15590214340585848,
+                        "eta": 0.9917192258546266,
+                        "footprint_m2": 0.9928,
+                        "lab_time_frac": 0.9816,
+                        "lab_time_min": 235.57,
+                        "level": 1.0,
+                        "malformed_calls": 1.0,
+                        "opa_lambda_nm": 1300.0,
+                        "parts_placed": 7.0,
+                        "reward": 0.8513762345121817,
+                        "seed": 1.0,
+                        "spatial_score": 0.19961447817900987,
+                        "stray_events": 2.0,
+                        "stray_time_min": 7.65,
+                        "success": 1.0,
+                        "temporal_score": 0.4958596129273133,
+                        "tool_calls": 294.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.8513762345121817": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "spatial_score": {
+                        "0.19961447817900987": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "temporal_score": {
+                        "0.4958596129273133": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "efficiency_score": {
+                        "0.15590214340585848": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "success": {
+                        "1": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "eta": {
+                        "0.9917192258546266": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "O": {
+                        "0.9980723908950493": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "abs_dt_fs": {
+                        "5.596721985331807": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "T_800": {
+                        "1.0": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "T_opa": {
+                        "1.0": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "opa_lambda_nm": {
+                        "1300.0": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "design_viable": {
+                        "1": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "level": {
+                        "1": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "cost_eur": {
+                        "12630.0": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "7450.0": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "235.57": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.9816": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "tool_calls": {
+                        "294": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "1": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "stray_events": {
+                        "2": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "7.65": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "parts_placed": {
+                        "7": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "0.9928": [
+                            "gss__KncqdLh"
+                        ]
+                    },
+                    "seed": {
+                        "1": [
+                            "gss__KncqdLh"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 31664369,
+        "n_cache_tokens": 30840368,
+        "n_output_tokens": 22656,
+        "cost_usd": 3.4846746000000004
+    }
+}

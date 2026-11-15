@@ -6,6 +6,17 @@ places and aligns mirrors by hand, overlaps two ultrafast beams at a sample, and
 until the two pulses arrive together. Built at Junction 2026 for AfterQuery's "Break the Agent" track
 by **God's Strongest Soldiers (GSS)**.
 
+> **▶ Watch the runs, don't read logs.** Every recorded run (oracle and models) can be replayed
+> step by step in a 3D lab view, with each tool call and the score explained:
+> **<https://kakitkelvinho.github.io/gss/>**. No install needed.
+>
+> **To see your own runs** after `harbor run`, start the local viewer from the repo root and leave
+> it open. It adds each run from `jobs/` by itself as soon as the run finishes:
+>
+> ```bash
+> uv run python scripts/serve_viewer.py      # opens http://localhost:8766/ ; Ctrl+C stops it
+> ```
+
 ## What the agent has to do
 
 There are two laser outputs on an empty 1.2 × 2.4 m breadboard: the `800nm` arm (amplifier, 100 fs)
@@ -121,6 +132,14 @@ harbor run -p . -a opencode -m <provider/model>   # one agent run (needs Docker)
 harbor run -p . -a oracle                          # reference (scripted expert) run
 GSS_SEED=3 harbor run -p . -a opencode -m <provider/model>   # another seed (default 1)
 GSS_LEVEL=2 harbor run -p . -a opencode -m <provider/model>  # 90 deg crossing (default level 1)
+```
+
+To watch your runs instead of reading the terminal output, start the viewer in a second terminal
+and keep it open. It picks up each run in `jobs/` when it finishes, and an open page shows it
+without a reload:
+
+```bash
+uv run python scripts/serve_viewer.py   # http://localhost:8766/
 ```
 
 After the runs, summarise them (scores plus a failure diagnosis per run) into `jobs/summary.md`:

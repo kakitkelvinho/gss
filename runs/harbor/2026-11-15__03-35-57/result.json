@@ -1,0 +1,172 @@
+{
+    "schema_version": 1,
+    "id": "f4f58f42-5fc1-4c57-a8a9-9e6524eddde7",
+    "started_at": "2026-11-15T03:36:02.066867",
+    "updated_at": "2026-11-15T03:43:17.404108",
+    "finished_at": "2026-11-15T03:43:17.404108",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__gemini-4-carbon__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "O": 0.0,
+                        "T_800": 0.0,
+                        "T_opa": 0.0,
+                        "c_min_eur": 7300.0,
+                        "cost_eur": 0.0,
+                        "design_viable": 0.0,
+                        "efficiency_score": 0.0,
+                        "eta": 0.0,
+                        "footprint_m2": 0.0,
+                        "lab_time_frac": 0.0,
+                        "lab_time_min": 0.0,
+                        "level": 2.0,
+                        "malformed_calls": 0.0,
+                        "opa_lambda_nm": 1300.0,
+                        "parts_placed": 0.0,
+                        "reward": 0.0,
+                        "seed": 1.0,
+                        "spatial_score": 0.0,
+                        "stray_events": 0.0,
+                        "stray_time_min": 0.0,
+                        "success": 0.0,
+                        "temporal_score": 0.0,
+                        "tool_calls": 32.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "spatial_score": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "temporal_score": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "efficiency_score": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "success": {
+                        "0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "eta": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "O": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "T_800": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "T_opa": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "opa_lambda_nm": {
+                        "1300.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "design_viable": {
+                        "0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "level": {
+                        "2": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "cost_eur": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "7300.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "tool_calls": {
+                        "32": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "stray_events": {
+                        "0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "parts_placed": {
+                        "0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "0.0": [
+                            "gss__qAiNFam"
+                        ]
+                    },
+                    "seed": {
+                        "1": [
+                            "gss__qAiNFam"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 44498,
+        "n_cache_tokens": 25727,
+        "n_output_tokens": 767,
+        "cost_usd": 0.3681447
+    }
+}

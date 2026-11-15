@@ -1,0 +1,31 @@
+{
+ "reward": 0.9269930222319571,
+ "spatial_score": 0.19516984550126007,
+ "temporal_score": 0.4842485647111552,
+ "efficiency_score": 0.24757461201954184,
+ "success": true,
+ "eta": 0.9684971294223104,
+ "O": 0.9758492275063003,
+ "abs_dt_fs": 16.19341440390119,
+ "T_800": 1.0,
+ "T_opa": 1.0,
+ "opa_lambda_nm": 600.0,
+ "design_viable": false,
+ "level": 2,
+ "diagnostics_bought": [
+  "GAP-TPA",
+  "PD-SI"
+ ],
+ "cost_eur": 1250.0,
+ "c_min_eur": 1550.0,
+ "lab_time_min": 125.82,
+ "lab_time_frac": 0.5243,
+ "tool_calls": 101,
+ "malformed_calls": 1,
+ "stray_events": 1,
+ "stray_time_min": 14.48,
+ "parts_placed": 4,
+ "footprint_m2": 0.5077,
+ "ended_by": "agent",
+ "seed": 3
+}

@@ -5,7 +5,21 @@ Question: can a restrained, full-window lab scene match the supplied layout sket
 Start it from the repository root with one command:
 
 ```sh
-python3 -m http.server 8766 --directory viewer
+uv run python scripts/serve_viewer.py
+```
+
+It serves `viewer/` at `http://localhost:8766/`, opens your browser, and keeps the viewer up to
+date by itself while it runs: every 10 s it exports any Harbor run that has finished in `jobs/`
+since the last check, and rebuilds `runs_index.json` when `viewer/runs/` changes (for example
+after a `git pull`). An open page adds new runs to the run menu on its own and shows a notice to
+jump to them; there's no need to reload. Ctrl+C stops it. `--jobs <folder>` watches another
+jobs folder (repeatable), `--port` changes the port, `--no-browser` skips opening the browser.
+New runs land in `viewer/runs/` as local files, so nothing reaches GitHub unless you commit it.
+
+Without auto-update, the plain static server still works after building the index once:
+
+```sh
+python3 scripts/build_run_index.py && python3 -m http.server 8766 --directory viewer
 ```
 
 Open `http://localhost:8766/prototype.html`. Playback floats at the top left. The call rail groups each optic's setup and can be collapsed to give the scene more room. Expand a group to inspect its individual calls. Money and lab time lead the telemetry; the private replay score is secondary. Run, speed, parts, and top view use the same small menu pattern.

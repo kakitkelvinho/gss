@@ -1,0 +1,172 @@
+{
+    "schema_version": 1,
+    "id": "dc9b3a87-b938-4b18-a889-a7af0196fe5e",
+    "task_name": "gss/find-time-zero",
+    "trial_name": "gss__qAiNFam",
+    "trial_uri": "file:///home/galvanj1/gss/gss/jobs/2026-11-15__03-35-57/gss__qAiNFam",
+    "task_id": {
+        "path": "."
+    },
+    "source": null,
+    "task_checksum": "d1f6895e9f954cc4ae3e492e22a1f752bb9f8c5029c0d93dbdf45bdf8648a42d",
+    "config": {
+        "schema_version": 1,
+        "task": {
+            "path": ".",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "gss__qAiNFam",
+        "trials_dir": "jobs/2026-11-15__03-35-57",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "opencode",
+            "import_path": null,
+            "model_name": "gemini/gemini-4-carbon",
+            "base_url": null,
+            "model_api_key_name": null,
+            "model_api_format": null,
+            "skip_model_parsing": false,
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "opencode_config": {
+                    "provider": {
+                        "google": {
+                            "models": {
+                                "gemini-4-carbon": {
+                                    "options": {
+                                        "thinkingConfig": {
+                                            "thinkingLevel": "low"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "override_error_policy": {},
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "f4f58f42-5fc1-4c57-a8a9-9e6524eddde7",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "opencode",
+        "version": "1.19.5",
+        "model_info": {
+            "name": "gemini-4-carbon",
+            "provider": "gemini"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 44498,
+        "n_cache_tokens": 25727,
+        "n_output_tokens": 767,
+        "cost_usd": 0.3681447,
+        "model_usage": {
+            "gemini/gemini-4-carbon": {
+                "n_input_tokens": 44498,
+                "n_cache_tokens": 25727,
+                "n_output_tokens": 767,
+                "cost_usd": 0.3681447
+            }
+        },
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0,
+            "spatial_score": 0.0,
+            "temporal_score": 0.0,
+            "efficiency_score": 0.0,
+            "success": 0,
+            "eta": 0.0,
+            "O": 0.0,
+            "T_800": 0.0,
+            "T_opa": 0.0,
+            "opa_lambda_nm": 1300.0,
+            "design_viable": 0,
+            "level": 2,
+            "cost_eur": 0.0,
+            "c_min_eur": 7300.0,
+            "lab_time_min": 0.0,
+            "lab_time_frac": 0.0,
+            "tool_calls": 32,
+            "malformed_calls": 0,
+            "stray_events": 0,
+            "stray_time_min": 0.0,
+            "parts_placed": 0,
+            "footprint_m2": 0.0,
+            "seed": 1
+        }
+    },
+    "verifier_environment_mode": "separate",
+    "exception_info": null,
+    "started_at": "2026-11-15T01:36:02.104382Z",
+    "finished_at": "2026-11-15T01:43:17.351475Z",
+    "environment_setup": {
+        "started_at": "2026-11-15T01:36:04.988862Z",
+        "finished_at": "2026-11-15T01:36:26.756761Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-11-15T01:36:26.757566Z",
+        "finished_at": "2026-11-15T01:36:27.842663Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-11-15T01:36:27.846988Z",
+        "finished_at": "2026-11-15T01:43:00.792743Z"
+    },
+    "verifier": {
+        "started_at": "2026-11-15T01:43:06.693369Z",
+        "finished_at": "2026-11-15T01:43:17.350466Z"
+    },
+    "step_results": null,
+    "reward_valid": true
+}

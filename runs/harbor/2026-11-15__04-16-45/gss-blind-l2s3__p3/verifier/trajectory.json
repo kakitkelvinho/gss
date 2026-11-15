@@ -1,0 +1,3405 @@
+{
+ "seed": 3,
+ "trajectory": [
+  {
+   "i": 0,
+   "tool": "list_catalogue",
+   "args": {},
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "slots": {
+     "delay_stage": "Delay stage with retroreflector (fine delay)",
+     "diagnostic": "Overlap diagnostic for the sample mount",
+     "filter": "Filters for the signal camera's filter holder",
+     "camera": "Cameras for the flip-in alignment mount",
+     "mounting": "Mirrors and periscopes"
+    },
+    "items": [
+     {
+      "part_id": "DL-M25",
+      "slot": "delay_stage",
+      "name": "Manual micrometer delay stage, 25 mm",
+      "price_eur": 400
+     },
+     {
+      "part_id": "DL-C25",
+      "slot": "delay_stage",
+      "name": "Closed-loop motorised delay stage, 25 mm",
+      "price_eur": 2500
+     },
+     {
+      "part_id": "DL-C100",
+      "slot": "delay_stage",
+      "name": "Closed-loop motorised delay stage, 100 mm",
+      "price_eur": 4000
+     },
+     {
+      "part_id": "BBO-T292",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 29.2 deg, type I",
+      "price_eur": 900
+     },
+     {
+      "part_id": "BBO-T236",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 23.6 deg, type I",
+      "price_eur": 1200
+     },
+     {
+      "part_id": "BBO-T341",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 34.1 deg, type I",
+      "price_eur": 1200
+     },
+     {
+      "part_id": "BBO-T408",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 40.8 deg, type I",
+      "price_eur": 1300
+     },
+     {
+      "part_id": "GAN-1",
+      "slot": "diagnostic",
+      "name": "GaN on sapphire sample, 10 x 10 mm",
+      "price_eur": 800
+     },
+     {
+      "part_id": "GAP-TPA",
+      "slot": "diagnostic",
+      "name": "GaP photodiode, 1 mm^2, with gated integrator",
+      "price_eur": 250
+     },
+     {
+      "part_id": "PD-SI",
+      "slot": "diagnostic",
+      "name": "Fast Si photodiode, 350-1100 nm, 150 MHz",
+      "price_eur": 300
+     },
+     {
+      "part_id": "PD-FAST",
+      "slot": "diagnostic",
+      "name": "Fast InGaAs photodiode, 800-1700 nm, 25 ps rise time",
+      "price_eur": 600
+     },
+     {
+      "part_id": "F-BP400",
+      "slot": "filter",
+      "name": "Bandpass filter 400 nm, 10 nm FWHM",
+      "price_eur": 180
+     },
+     {
+      "part_id": "F-BP495",
+      "slot": "filter",
+      "name": "Bandpass filter 495 nm, 10 nm FWHM",
+      "price_eur": 180
+     },
+     {
+      "part_id": "F-BP550",
+      "slot": "filter",
+      "name": "Bandpass filter 550 nm, 40 nm FWHM",
+      "price_eur": 200
+     },
+     {
+      "part_id": "F-VIS495",
+      "slot": "filter",
+      "name": "Colour-glass stack: 495 nm longpass + KG3 shortpass",
+      "price_eur": 220
+     },
+     {
+      "part_id": "F-UV",
+      "slot": "filter",
+      "name": "Colour-glass stack: UG1 + BG40",
+      "price_eur": 220
+     },
+     {
+      "part_id": "F-SP775",
+      "slot": "filter",
+      "name": "Shortpass filter, 775 nm edge",
+      "price_eur": 120
+     },
+     {
+      "part_id": "CAM-VSWIR",
+      "slot": "camera",
+      "name": "VIS-SWIR InGaAs camera for the flip-in mount, 400-1700 nm",
+      "price_eur": 6500
+     },
+     {
+      "part_id": "MIR-1",
+      "slot": "mounting",
+      "name": "1\" protected silver mirror in kinematic mount, on post",
+      "price_eur": 150
+     },
+     {
+      "part_id": "PER-1",
+      "slot": "mounting",
+      "name": "In-line periscope, two 1\" mirrors",
+      "price_eur": 500
+     }
+    ],
+    "free_equipment": "Already on the table, free: a sample mount with f = 100 mm achromatic lens(es); a flip-in Si CMOS alignment camera at the sample (also images the lens plane), specified 400-1000 nm; a zoomed Si CMOS signal camera looking at the sample (400-1000 nm) through an empty filter holder; a 1 GHz oscilloscope at the desk; an IR/visible viewer card (400-1700 nm); and beam-block shutters at both output ports.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 1,
+   "tool": "read_manual",
+   "args": {
+    "device": "table"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "table",
+    "manual": "Optical table: 2400 x 1200 mm breadboard. Coordinates in mm: x along the long side (0..2400), z across (0..1200), height = height above the breadboard (y). Yaw angles are in degrees in the table plane, measured from +x toward +z.\nLaser housing (amplifier, 800 nm, ~100 fs FWHM, 1 kHz, pulse energy stability ~3% rms, and an OPA pumped by it) at the x = 2400 end. Inside the housing the amplifier output is split: one part exits at the 800 nm port (642 mm of path from the split), the other goes to the OPA input (409 mm of path from the split).\n800 nm output port (arm '800nm'): x=2250, z=205, height=124, beam travelling toward -x (yaw 180). Collimated, 0.5 mm 1/e^2 radius, horizontally polarised.\nOPA output port (arm 'opa'; OPA, 600 nm, ~60 fs FWHM): x=2250, z=804, height=159, beam travelling toward -x (yaw 180). Collimated, 0.37 mm 1/e^2 radius, horizontally polarised.\nLaser housings occupy x > 2250 around each port. Both shutters start closed. Any beam leaving the table is a laser-safety violation (logged).\nDesk (computer, monitor, scope, stage controller) at x=-300, z=600, beside the x=0 end. You walk on a walkway 300 mm outside the table edge (tool responses give your position as you_at, or 'desk') at 0.5 m/s, and can reach 0.6 m in from the table edge. Status, catalogue, datasheets and manuals are digital and can be read anywhere without lab time. Buying (each order takes ~15 min to place and receive), camera and signal reads, motorised stage moves and scans happen at the desk; knobs, placement, the IR card and the tape measure happen at the table. knob(..., watch=true) also returns a camera frame if you are within 1.5 m of the desk. measure_path is a tape measure along the beam (good to about +/-5 mm).\nPlacing a part takes ~5 min and lands within ~1 mm of the requested position; yaw set by eye is good to ~0.5 deg.\nAlready on the table, free: a sample mount with f = 100 mm achromatic lens(es); a flip-in Si CMOS alignment camera at the sample (also images the lens plane), specified 400-1000 nm; a zoomed Si CMOS signal camera looking at the sample (400-1000 nm) through an empty filter holder; a 1 GHz oscilloscope at the desk; an IR/visible viewer card (400-1700 nm); and beam-block shutters at both output ports.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 2,
+   "tool": "read_manual",
+   "args": {
+    "device": "opa"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "opa",
+    "manual": "OPA user manual (excerpt). Current output 600 nm, ~60 fs, horizontally polarised. Signal and idler outputs (1100-2600 nm) leave after the parametric stages; visible outputs (450-700 nm) are generated in the frequency-mixing extension, which adds ~580 mm of internal path. Internal optical path from the OPA pump input to the output port in the current (visible) configuration, factory calibration for this unit: 2112 mm.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 3,
+   "tool": "read_manual",
+   "args": {
+    "device": "sample_mount"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "sample_mount",
+    "manual": "Sample mount, 90-degree crossing version. The experiment requires the two beams to cross at a full angle of 90 deg at the sample, each arriving 45 deg from the sample normal through its own lens (both beams through the same lens is not the required geometry). place(sample, x, z, height, yaw): (x, z, height) is the sample point, yaw the direction the sample's front face points (its normal). Two f = 100 mm achromatic lenses, each 100 mm before the sample point on its own axis: lens A axis along (yaw + 135 deg), lens B along (yaw + 225 deg) (directions light travels through them). Lens clear aperture radius 12.7 mm, 2\" mount rings (outer radius 25.4 mm). install(part_id) swaps the diagnostic (or the signal-camera filter) without moving the mount. The alignment and signal cameras look at the sample head-on along its normal, from the front. Flip-in alignment camera (Si CMOS, specified 400-1000 nm; CAM-VSWIR replaces it): view_camera('sample') images the sample (5.5 um pixels, field of view +/-4.0 mm); view_camera('lens') images the lens plane. Each spot reports its centroid, 1/e^2 radius and relative_power (fraction of that beam's output power reaching the sample, ~2% reading noise). The camera does not distinguish wavelengths: spots are listed by position. Sample image axes: h horizontal in the sample surface, positive toward (yaw + 90 deg); v up; the sample point is h = v = 0. Lens images report which lens (A or B) and h, v in that lens's frame (h positive toward its axis - 90 deg, v up).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 4,
+   "tool": "read_manual",
+   "args": {
+    "device": "delay_stage"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "delay_stage",
+    "manual": "Delay stage manual. place(stage, x, z, height, yaw): (x, z) is the stage reference point at the front of the rail and height the retroreflector apex height; yaw is the rail direction, pointing from the reference point toward the retroreflector. The retroreflector apex sits 90 mm + stage position along the rail from the reference point. Hollow gold retroreflector, entrance face 40 mm in front of the apex, clear aperture radius 19.1 mm. Stage positions are in mm from 0 to the travel limit.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 5,
+   "tool": "read_manual",
+   "args": {
+    "device": "mirror"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "mirror",
+    "manual": "Kinematic mirror mount. place(mirror-N, x, z, height, yaw): yaw is the direction the reflecting face points (its normal) in the table plane. knob(mirror, 'yaw'|'pitch', delta_mrad) tilts the mirror; range +/-50 mrad, actuator repeatability ~2%. Signs: +yaw turns the mirror's normal from +x toward +z (the same sense as place's yaw), +pitch tilts it up. Response of a beam in the table plane: a yaw turn of d mrad turns the reflected beam by 2d mrad in the table plane (same sign); a pitch turn of d mrad raises the reflected beam by 2d x cos(angle of incidence) mrad (~1.41d at 45 deg incidence, less at grazing incidence). rotate(part, deg) loosens the base, turns it and re-tightens (re-seat error ~0.2 deg).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 6,
+   "tool": "read_manual",
+   "args": {
+    "device": "periscope"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "periscope",
+    "manual": "In-line periscope. place(periscope-N, x, z, height, yaw, height_in): yaw is the beam travel direction (in and out), height_in the input beam height, height the output height. Knobs act on the top mirror (signs as for a mirror): a yaw turn of d mrad turns the output beam by ~d mrad in the table plane (same sign), a pitch turn of d mrad raises it by ~2d mrad.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 7,
+   "tool": "read_manual",
+   "args": {
+    "device": "photodiode"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "photodiode",
+    "manual": "Fast photodiode on the 1 GHz scope: read_signal returns the arrival time of each pulse reaching it, relative to the scope trigger (20 ps sampling, ~10 ps jitter).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 8,
+   "tool": "read_manual",
+   "args": {
+    "device": "nonlinear"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "nonlinear",
+    "manual": "Crystal / sample / integrating-photodiode diagnostics in the sample mount. read_signal(t_int) returns counts averaged over t_int seconds (signal-camera ROI counts for crystals and samples, integrator counts for the GaP photodiode). scan(start, end, step, t_int) steps the delay stage and reads at each point (max 5000 points).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 9,
+   "tool": "read_manual",
+   "args": {
+    "device": "signal_camera"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "signal_camera",
+    "manual": "Signal camera: zoomed Si CMOS, specified 400-1000 nm (no specified response outside that range). It integrates the light leaving the sample in a fixed region of interest, through the filter holder (empty unless a filter is installed). Read noise ~30 counts rms at 1 s, falling as 1/sqrt(t_int); the ROI saturates at 60000 counts (reported as saturated). install(filter_id) puts a filter in the holder, uninstall('filter') empties it. The filter holder is not in the alignment camera's path.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 10,
+   "tool": "read_manual",
+   "args": {
+    "device": "ir_card"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "device": "ir_card",
+    "manual": "IR viewer card. ir_card(part=...) shows where each beam hits that optic relative to its centre; ir_card(x=, z=, height=) shows any beam passing within 30 mm of that point. Offsets are in table coordinates (dx, dz, dheight), good to ~0.5 mm.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 11,
+   "tool": "list_catalogue",
+   "args": {},
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "slots": {
+     "delay_stage": "Delay stage with retroreflector (fine delay)",
+     "diagnostic": "Overlap diagnostic for the sample mount",
+     "filter": "Filters for the signal camera's filter holder",
+     "camera": "Cameras for the flip-in alignment mount",
+     "mounting": "Mirrors and periscopes"
+    },
+    "items": [
+     {
+      "part_id": "DL-M25",
+      "slot": "delay_stage",
+      "name": "Manual micrometer delay stage, 25 mm",
+      "price_eur": 400
+     },
+     {
+      "part_id": "DL-C25",
+      "slot": "delay_stage",
+      "name": "Closed-loop motorised delay stage, 25 mm",
+      "price_eur": 2500
+     },
+     {
+      "part_id": "DL-C100",
+      "slot": "delay_stage",
+      "name": "Closed-loop motorised delay stage, 100 mm",
+      "price_eur": 4000
+     },
+     {
+      "part_id": "BBO-T292",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 29.2 deg, type I",
+      "price_eur": 900
+     },
+     {
+      "part_id": "BBO-T236",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 23.6 deg, type I",
+      "price_eur": 1200
+     },
+     {
+      "part_id": "BBO-T341",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 34.1 deg, type I",
+      "price_eur": 1200
+     },
+     {
+      "part_id": "BBO-T408",
+      "slot": "diagnostic",
+      "name": "beta-BBO crystal 0.1 mm, theta = 40.8 deg, type I",
+      "price_eur": 1300
+     },
+     {
+      "part_id": "GAN-1",
+      "slot": "diagnostic",
+      "name": "GaN on sapphire sample, 10 x 10 mm",
+      "price_eur": 800
+     },
+     {
+      "part_id": "GAP-TPA",
+      "slot": "diagnostic",
+      "name": "GaP photodiode, 1 mm^2, with gated integrator",
+      "price_eur": 250
+     },
+     {
+      "part_id": "PD-SI",
+      "slot": "diagnostic",
+      "name": "Fast Si photodiode, 350-1100 nm, 150 MHz",
+      "price_eur": 300
+     },
+     {
+      "part_id": "PD-FAST",
+      "slot": "diagnostic",
+      "name": "Fast InGaAs photodiode, 800-1700 nm, 25 ps rise time",
+      "price_eur": 600
+     },
+     {
+      "part_id": "F-BP400",
+      "slot": "filter",
+      "name": "Bandpass filter 400 nm, 10 nm FWHM",
+      "price_eur": 180
+     },
+     {
+      "part_id": "F-BP495",
+      "slot": "filter",
+      "name": "Bandpass filter 495 nm, 10 nm FWHM",
+      "price_eur": 180
+     },
+     {
+      "part_id": "F-BP550",
+      "slot": "filter",
+      "name": "Bandpass filter 550 nm, 40 nm FWHM",
+      "price_eur": 200
+     },
+     {
+      "part_id": "F-VIS495",
+      "slot": "filter",
+      "name": "Colour-glass stack: 495 nm longpass + KG3 shortpass",
+      "price_eur": 220
+     },
+     {
+      "part_id": "F-UV",
+      "slot": "filter",
+      "name": "Colour-glass stack: UG1 + BG40",
+      "price_eur": 220
+     },
+     {
+      "part_id": "F-SP775",
+      "slot": "filter",
+      "name": "Shortpass filter, 775 nm edge",
+      "price_eur": 120
+     },
+     {
+      "part_id": "CAM-VSWIR",
+      "slot": "camera",
+      "name": "VIS-SWIR InGaAs camera for the flip-in mount, 400-1700 nm",
+      "price_eur": 6500
+     },
+     {
+      "part_id": "MIR-1",
+      "slot": "mounting",
+      "name": "1\" protected silver mirror in kinematic mount, on post",
+      "price_eur": 150
+     },
+     {
+      "part_id": "PER-1",
+      "slot": "mounting",
+      "name": "In-line periscope, two 1\" mirrors",
+      "price_eur": 500
+     }
+    ],
+    "free_equipment": "Already on the table, free: a sample mount with f = 100 mm achromatic lens(es); a flip-in Si CMOS alignment camera at the sample (also images the lens plane), specified 400-1000 nm; a zoomed Si CMOS signal camera looking at the sample (400-1000 nm) through an empty filter holder; a 1 GHz oscilloscope at the desk; an IR/visible viewer card (400-1700 nm); and beam-block shutters at both output ports.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 12,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "DL-M25"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "DL-M25",
+    "name": "Manual micrometer delay stage, 25 mm",
+    "price_eur": 400,
+    "datasheet": "Manual linear stage, 25 mm travel, carrying a 1.5\" hollow gold retroreflector. Micrometer graduation 1 um. Backlash on direction reversal: about 5 um. Turned by hand at the stage: ~3 s per scan point plus integration time. See manual 'delay_stage'.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 13,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "DL-C25"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "DL-C25",
+    "name": "Closed-loop motorised delay stage, 25 mm",
+    "price_eur": 2500,
+    "datasheet": "Motorised linear stage with optical encoder (closed loop), 25 mm travel, 1.5\" hollow gold retroreflector. Repeatability 0.1 um, speed 2 mm/s, settle 0.3 s per scan point. Driven from the desk controller. See manual 'delay_stage'.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 14,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "DL-C100"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "DL-C100",
+    "name": "Closed-loop motorised delay stage, 100 mm",
+    "price_eur": 4000,
+    "datasheet": "Motorised linear stage with optical encoder (closed loop), 100 mm travel, 1.5\" hollow gold retroreflector. Repeatability 0.1 um, speed 2 mm/s, settle 0.3 s per scan point. Driven from the desk controller. See manual 'delay_stage'.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 15,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "BBO-T292"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "BBO-T292",
+    "name": "beta-BBO crystal 0.1 mm, theta = 29.2 deg, type I",
+    "price_eur": 900,
+    "datasheet": "beta-BBO, cut theta = 29.2 deg, phi = 90 deg (type I, o + o -> e). Mounted at the sample plane (0.1 mm thick, 5 x 5 mm, AR coated 650-1300 nm); the light leaving it is read by the signal camera through the filter holder.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 16,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "BBO-T236"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "BBO-T236",
+    "name": "beta-BBO crystal 0.1 mm, theta = 23.6 deg, type I",
+    "price_eur": 1200,
+    "datasheet": "beta-BBO, cut theta = 23.6 deg, phi = 90 deg (type I, o + o -> e). Mounted at the sample plane (0.1 mm thick, 5 x 5 mm, AR coated 650-1300 nm); the light leaving it is read by the signal camera through the filter holder.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 17,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "BBO-T341"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "BBO-T341",
+    "name": "beta-BBO crystal 0.1 mm, theta = 34.1 deg, type I",
+    "price_eur": 1200,
+    "datasheet": "beta-BBO, cut theta = 34.1 deg, phi = 90 deg (type I, o + o -> e). Mounted at the sample plane (0.1 mm thick, 5 x 5 mm, AR coated 650-1300 nm); the light leaving it is read by the signal camera through the filter holder.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 18,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "BBO-T408"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "BBO-T408",
+    "name": "beta-BBO crystal 0.1 mm, theta = 40.8 deg, type I",
+    "price_eur": 1300,
+    "datasheet": "beta-BBO, cut theta = 40.8 deg, phi = 90 deg (type I, o + o -> e). Mounted at the sample plane (0.1 mm thick, 5 x 5 mm, AR coated 650-1300 nm); the light leaving it is read by the signal camera through the filter holder.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 19,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "GAN-1"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "GAN-1",
+    "name": "GaN on sapphire sample, 10 x 10 mm",
+    "price_eur": 800,
+    "datasheet": "Undoped GaN epilayer (4 um) on c-plane sapphire, 10 x 10 mm. Direct band gap 3.4 eV (365 nm). Photoluminescence: band-edge line at 365 nm and the broad defect ('yellow') band, 520-600 nm. Mounted at the sample plane; its emission is read by the signal camera through the filter holder.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 20,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "GAP-TPA"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "GAP-TPA",
+    "name": "GaP photodiode, 1 mm^2, with gated integrator",
+    "price_eur": 250,
+    "datasheet": "GaP photodiode, 1 mm^2, indirect band gap 2.26 eV (549 nm); specified photoresponse 150-550 nm. Transimpedance amplifier and gated integrator; read_signal returns integrator counts (~30 counts rms at 1 s, falling as 1/sqrt(t_int)). Mounted at the sample plane.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 21,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "PD-SI"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "PD-SI",
+    "name": "Fast Si photodiode, 350-1100 nm, 150 MHz",
+    "price_eur": 300,
+    "datasheet": "Si photodiode, 350-1100 nm, 150 MHz bandwidth. Mounted at the sample plane, read on the table's 1 GHz scope, which reports the arrival time of each pulse (20 ps sampling, ~10 ps jitter).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 22,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "PD-FAST"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "PD-FAST",
+    "name": "Fast InGaAs photodiode, 800-1700 nm, 25 ps rise time",
+    "price_eur": 600,
+    "datasheet": "InGaAs photodiode, 800-1700 nm, 25 ps rise time. Mounted at the sample plane, read on the table's 1 GHz scope, which reports the arrival time of each pulse (20 ps sampling, ~10 ps jitter).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 23,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "F-BP400"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "F-BP400",
+    "name": "Bandpass filter 400 nm, 10 nm FWHM",
+    "price_eur": 180,
+    "datasheet": "Hard-coated bandpass, 395-405 nm, T > 90%; OD 4 elsewhere (300-1700 nm).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 24,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "F-UV"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "F-UV",
+    "name": "Colour-glass stack: UG1 + BG40",
+    "price_eur": 220,
+    "datasheet": "Stacked UG1/BG40-type glass. T ~ 80% at 325-385 nm; OD 4 at 400-1700 nm.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 25,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "F-SP775"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "F-SP775",
+    "name": "Shortpass filter, 775 nm edge",
+    "price_eur": 120,
+    "datasheet": "Dielectric shortpass, T > 90% at 300-765 nm. Blocking OD 1.3 from 770 to 900 nm, OD 4 above 900 nm.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 26,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "F-VIS495"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "F-VIS495",
+    "name": "Colour-glass stack: 495 nm longpass + KG3 shortpass",
+    "price_eur": 220,
+    "datasheet": "Stacked GG495-type longpass and KG3-type shortpass. T ~ 85% at 495-710 nm; OD 4 below 490 nm and above 720 nm.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 27,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "CAM-VSWIR"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "CAM-VSWIR",
+    "name": "VIS-SWIR InGaAs camera for the flip-in mount, 400-1700 nm",
+    "price_eur": 6500,
+    "datasheet": "InGaAs focal-plane camera, spectral range 400-1700 nm. Fits the sample mount's flip-in holder in place of the Si alignment camera (same plane, 5.5 um pixel scale, same calibration).",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 28,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "MIR-1"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "MIR-1",
+    "name": "1\" protected silver mirror in kinematic mount, on post",
+    "price_eur": 150,
+    "datasheet": "1\" (25.4 mm) protected silver mirror, >95% at 450-2000 nm. Kinematic mount with two knobs (yaw, pitch), +/-50 mrad range each. Clear aperture: beams more than about 10 mm from the centre start to clip. Mount plate 38 x 38 mm, centred on the optic, from 0.5 to 12 mm behind the mirror surface; 1/2\" post (6.35 mm radius) below the plate, 6 mm behind the mirror surface. Post height 50-300 mm. Footprint ~25 mm radius.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 29,
+   "tool": "get_datasheet",
+   "args": {
+    "part_id": "PER-1"
+   },
+   "cost_s": 0.0,
+   "t_s": 0.0,
+   "result": {
+    "part_id": "PER-1",
+    "name": "In-line periscope, two 1\" mirrors",
+    "price_eur": 500,
+    "datasheet": "Rigid in-line periscope: lower 1\" mirror sends the beam vertically, top 1\" mirror sends it on in the original direction at the new height. Input and output heights 50-300 mm, at least 30 mm apart. Top mirror has a kinematic mount (yaw, pitch knobs, +/-50 mrad). Polarisation is preserved (in-line design). Footprint ~40 mm radius.",
+    "lab_time_used_min": 0.0,
+    "lab_time_remaining_min": 240.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 30,
+   "tool": "buy",
+   "args": {
+    "items": {
+     "MIR-1": 2,
+     "DL-M25": 1,
+     "GAP-TPA": 1,
+     "PD-SI": 1
+    }
+   },
+   "cost_s": 900.0,
+   "t_s": 900.0,
+   "result": {
+    "outcome": "delivered",
+    "order_eur": 1250,
+    "spent_eur": 1250.0,
+    "received": [
+     "mirror-1",
+     "mirror-2",
+     "stage",
+     "GAP-TPA (installed in the sample mount)",
+     "PD-SI (installed in the sample mount)"
+    ],
+    "notes": [
+     "PD-SI installed in the sample mount in place of GAP-TPA"
+    ],
+    "lab_time_used_min": 15.0,
+    "lab_time_remaining_min": 225.0,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 31,
+   "tool": "place",
+   "args": {
+    "part": "sample",
+    "x": 988,
+    "z": 500,
+    "height": 159,
+    "yaw_deg": 0
+   },
+   "cost_s": 304.376,
+   "t_s": 1204.376,
+   "result": {
+    "outcome": "sample placed",
+    "lab_time_used_min": 20.07,
+    "lab_time_remaining_min": 219.93,
+    "you_at": {
+     "x_mm": 988,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 32,
+   "tool": "place",
+   "args": {
+    "part": "mirror-2",
+    "x": 1292,
+    "z": 804,
+    "height": 159,
+    "yaw_deg": 292.5
+   },
+   "cost_s": 309.36,
+   "t_s": 1513.736,
+   "result": {
+    "outcome": "mirror-2 placed",
+    "lab_time_used_min": 25.23,
+    "lab_time_remaining_min": 214.77,
+    "you_at": {
+     "x_mm": 1292,
+     "z_mm": 1500
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 33,
+   "tool": "place",
+   "args": {
+    "part": "mirror-1",
+    "x": 1290,
+    "z": 198,
+    "height": 159,
+    "yaw_deg": 157.5
+   },
+   "cost_s": 309.236,
+   "t_s": 1822.972,
+   "result": {
+    "outcome": "mirror-1 placed",
+    "lab_time_used_min": 30.38,
+    "lab_time_remaining_min": 209.62,
+    "you_at": {
+     "x_mm": 1290,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 34,
+   "tool": "place",
+   "args": {
+    "part": "stage",
+    "x": 452.5,
+    "z": 201.5,
+    "height": 141.5,
+    "yaw_deg": 180
+   },
+   "cost_s": 301.675,
+   "t_s": 2124.647,
+   "result": {
+    "outcome": "stage placed",
+    "lab_time_used_min": 35.41,
+    "lab_time_remaining_min": 204.59,
+    "you_at": {
+     "x_mm": 452,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 35,
+   "tool": "status",
+   "args": {},
+   "cost_s": 0.0,
+   "t_s": 2124.647,
+   "result": {
+    "inventory": {
+     "sample": {
+      "kind": "sample",
+      "on_table": true,
+      "requested_pose": {
+       "x_mm": 988.0,
+       "z_mm": 500.0,
+       "height_mm": 159.0,
+       "yaw_deg": 0.0
+      }
+     },
+     "mirror-1": {
+      "kind": "mirror",
+      "on_table": true,
+      "catalogue_id": "MIR-1",
+      "requested_pose": {
+       "x_mm": 1290.0,
+       "z_mm": 198.0,
+       "height_mm": 159.0,
+       "yaw_deg": 157.5
+      }
+     },
+     "mirror-2": {
+      "kind": "mirror",
+      "on_table": true,
+      "catalogue_id": "MIR-1",
+      "requested_pose": {
+       "x_mm": 1292.0,
+       "z_mm": 804.0,
+       "height_mm": 159.0,
+       "yaw_deg": 292.5
+      }
+     },
+     "stage": {
+      "kind": "stage",
+      "on_table": true,
+      "catalogue_id": "DL-M25",
+      "requested_pose": {
+       "x_mm": 452.5,
+       "z_mm": 201.5,
+       "height_mm": 141.5,
+       "yaw_deg": 180.0
+      },
+      "position_mm": 0.0,
+      "travel_mm": 25.0
+     }
+    },
+    "diagnostic_installed": "PD-SI",
+    "diagnostics_owned": [
+     "GAP-TPA",
+     "PD-SI"
+    ],
+    "filter_installed": null,
+    "filters_owned": [],
+    "alignment_camera": "free Si camera (400-1000 nm)",
+    "shutters_open": {
+     "800nm": false,
+     "opa": false
+    },
+    "spent_eur": 1250.0,
+    "spend_cap_eur": 30000.0,
+    "lab_time_used_min": 35.41,
+    "lab_time_remaining_min": 204.59,
+    "you_at": {
+     "x_mm": 452,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 36,
+   "tool": "unblock",
+   "args": {
+    "arm": "800nm"
+   },
+   "cost_s": 8.305,
+   "t_s": 2132.952,
+   "result": {
+    "outcome": "800nm shutter open",
+    "lab_time_used_min": 35.55,
+    "lab_time_remaining_min": 204.45,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.491138,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 37,
+   "tool": "ir_card",
+   "args": {
+    "part": "stage"
+   },
+   "cost_s": 30.797,
+   "t_s": 2163.749,
+   "result": {
+    "part": "stage",
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.3,
+      "dz_mm": 3.6,
+      "dheight_mm": -17.4
+     }
+    ],
+    "lab_time_used_min": 36.06,
+    "lab_time_remaining_min": 203.94,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 201
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.491138,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 38,
+   "tool": "ir_card",
+   "args": {
+    "part": "mirror-1"
+   },
+   "cost_s": 34.182,
+   "t_s": 2197.931,
+   "result": {
+    "part": "mirror-1",
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.2,
+      "dz_mm": -0.2,
+      "dheight_mm": 0.1
+     }
+    ],
+    "lab_time_used_min": 36.63,
+    "lab_time_remaining_min": 203.37,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.491138,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 39,
+   "tool": "unblock",
+   "args": {
+    "arm": "opa"
+   },
+   "cost_s": 9.979,
+   "t_s": 2207.91,
+   "result": {
+    "outcome": "opa shutter open",
+    "lab_time_used_min": 36.8,
+    "lab_time_remaining_min": 203.2,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -92079.439626,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 40,
+   "tool": "ir_card",
+   "args": {
+    "part": "mirror-2"
+   },
+   "cost_s": 34.983,
+   "t_s": 2242.892,
+   "result": {
+    "part": "mirror-2",
+    "beams": [
+     {
+      "beam": "opa",
+      "dx_mm": 0.6,
+      "dz_mm": 0.1,
+      "dheight_mm": 0.2
+     }
+    ],
+    "lab_time_used_min": 37.38,
+    "lab_time_remaining_min": 202.62,
+    "you_at": {
+     "x_mm": 1291,
+     "z_mm": 1500
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -92079.439626,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 41,
+   "tool": "view_camera",
+   "args": {
+    "plane": "lens"
+   },
+   "cost_s": 14.983,
+   "t_s": 2257.875,
+   "result": {
+    "plane": "lens",
+    "spots": [
+     {
+      "lens": "A",
+      "h_mm": -7.31,
+      "v_mm": 0.76,
+      "relative_power": 0.49
+     },
+     {
+      "lens": "B",
+      "h_mm": -2.43,
+      "v_mm": 0.48,
+      "relative_power": 0.99
+     }
+    ],
+    "lab_time_used_min": 37.63,
+    "lab_time_remaining_min": 202.37,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -92079.439626,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 42,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 10.0,
+   "t_s": 2267.875,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": -1628.55,
+      "v_um": 317.9,
+      "radius_h_um": 72.4,
+      "radius_v_um": 51.6,
+      "relative_power": 0.51
+     },
+     {
+      "h_um": 294.8,
+      "v_um": 195.25,
+      "radius_h_um": 74.3,
+      "radius_v_um": 52.5,
+      "relative_power": 0.98
+     }
+    ],
+    "lab_time_used_min": 37.8,
+    "lab_time_remaining_min": 202.2,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -92079.439626,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 43,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-1",
+    "axis": "yaw",
+    "delta_mrad": -8.2
+   },
+   "cost_s": 34.979,
+   "t_s": 2302.854,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 38.38,
+    "lab_time_remaining_min": 201.62,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86184.73124,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 44,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-1",
+    "axis": "pitch",
+    "delta_mrad": -1.7
+   },
+   "cost_s": 30.0,
+   "t_s": 2332.854,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 38.88,
+    "lab_time_remaining_min": 201.12,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 45,
+   "tool": "view_camera",
+   "args": {
+    "plane": "lens"
+   },
+   "cost_s": 14.979,
+   "t_s": 2347.833,
+   "result": {
+    "plane": "lens",
+    "spots": [
+     {
+      "lens": "A",
+      "h_mm": -2.02,
+      "v_mm": -0.28,
+      "relative_power": 0.47
+     },
+     {
+      "lens": "B",
+      "h_mm": -2.39,
+      "v_mm": 0.53,
+      "relative_power": 0.99
+     }
+    ],
+    "lab_time_used_min": 39.13,
+    "lab_time_remaining_min": 200.87,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 46,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 10.0,
+   "t_s": 2357.833,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 295.35,
+      "v_um": 195.25,
+      "radius_h_um": 73.3,
+      "radius_v_um": 53.8,
+      "relative_power": 0.99
+     },
+     {
+      "h_um": 758.45,
+      "v_um": -4.95,
+      "radius_h_um": 71.8,
+      "radius_v_um": 49.1,
+      "relative_power": 0.49
+     }
+    ],
+    "lab_time_used_min": 39.3,
+    "lab_time_remaining_min": 200.7,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 47,
+   "tool": "place",
+   "args": {
+    "part": "stage",
+    "x": 452.5,
+    "z": 201.5,
+    "height": 144.5,
+    "yaw_deg": 180
+   },
+   "cost_s": 5.0,
+   "t_s": 2362.833,
+   "result": {
+    "error": "stage is already on the table (use move, rotate or remove)",
+    "lab_time_used_min": 39.38,
+    "lab_time_remaining_min": 200.62,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 48,
+   "tool": "ir_card",
+   "args": {
+    "part": "stage"
+   },
+   "cost_s": 30.797,
+   "t_s": 2393.63,
+   "result": {
+    "part": "stage",
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.4,
+      "dz_mm": 3.4,
+      "dheight_mm": -17.1
+     }
+    ],
+    "lab_time_used_min": 39.89,
+    "lab_time_remaining_min": 200.11,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 201
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 49,
+   "tool": "ir_card",
+   "args": {
+    "part": "mirror-1"
+   },
+   "cost_s": 34.182,
+   "t_s": 2427.812,
+   "result": {
+    "part": "mirror-1",
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": 0.3,
+      "dz_mm": -0.0,
+      "dheight_mm": -0.3
+     }
+    ],
+    "lab_time_used_min": 40.46,
+    "lab_time_remaining_min": 199.54,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 50,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 14.979,
+   "t_s": 2442.791,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 295.35,
+      "v_um": 194.7,
+      "radius_h_um": 70.7,
+      "radius_v_um": 50.7,
+      "relative_power": 0.94
+     },
+     {
+      "h_um": 757.35,
+      "v_um": -7.7,
+      "radius_h_um": 77.3,
+      "radius_v_um": 50.7,
+      "relative_power": 0.49
+     }
+    ],
+    "lab_time_used_min": 40.71,
+    "lab_time_remaining_min": 199.29,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -86181.344409,
+    "T_800": 0.491138,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 51,
+   "tool": "remove",
+   "args": {
+    "part": "stage"
+   },
+   "cost_s": 60.797,
+   "t_s": 2503.588,
+   "result": {
+    "outcome": "stage back in the inventory",
+    "lab_time_used_min": 41.73,
+    "lab_time_remaining_min": 198.27,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 201
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 52,
+   "tool": "place",
+   "args": {
+    "part": "stage",
+    "x": 452.5,
+    "z": 201.5,
+    "height": 144.5,
+    "yaw_deg": 180
+   },
+   "cost_s": 300.0,
+   "t_s": 2803.588,
+   "result": {
+    "outcome": "stage placed",
+    "lab_time_used_min": 46.73,
+    "lab_time_remaining_min": 193.27,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 53,
+   "tool": "ir_card",
+   "args": {
+    "part": "stage"
+   },
+   "cost_s": 30.001,
+   "t_s": 2833.59,
+   "result": {
+    "part": "stage",
+    "beams": [],
+    "lab_time_used_min": 47.23,
+    "lab_time_remaining_min": 192.77,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 54,
+   "tool": "ir_card",
+   "args": {
+    "part": "mirror-1"
+   },
+   "cost_s": 34.183,
+   "t_s": 2867.773,
+   "result": {
+    "part": "mirror-1",
+    "beams": [],
+    "lab_time_used_min": 47.8,
+    "lab_time_remaining_min": 192.2,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 55,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 14.979,
+   "t_s": 2882.752,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 296.45,
+      "v_um": 192.5,
+      "radius_h_um": 73.7,
+      "radius_v_um": 52.5,
+      "relative_power": 1.01
+     }
+    ],
+    "lab_time_used_min": 48.05,
+    "lab_time_remaining_min": 191.95,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 56,
+   "tool": "status",
+   "args": {},
+   "cost_s": 0.0,
+   "t_s": 2882.752,
+   "result": {
+    "inventory": {
+     "sample": {
+      "kind": "sample",
+      "on_table": true,
+      "requested_pose": {
+       "x_mm": 988.0,
+       "z_mm": 500.0,
+       "height_mm": 159.0,
+       "yaw_deg": 0.0
+      }
+     },
+     "mirror-1": {
+      "kind": "mirror",
+      "on_table": true,
+      "catalogue_id": "MIR-1",
+      "requested_pose": {
+       "x_mm": 1290.0,
+       "z_mm": 198.0,
+       "height_mm": 159.0,
+       "yaw_deg": 157.5
+      }
+     },
+     "mirror-2": {
+      "kind": "mirror",
+      "on_table": true,
+      "catalogue_id": "MIR-1",
+      "requested_pose": {
+       "x_mm": 1292.0,
+       "z_mm": 804.0,
+       "height_mm": 159.0,
+       "yaw_deg": 292.5
+      }
+     },
+     "stage": {
+      "kind": "stage",
+      "on_table": true,
+      "catalogue_id": "DL-M25",
+      "requested_pose": {
+       "x_mm": 452.5,
+       "z_mm": 201.5,
+       "height_mm": 144.5,
+       "yaw_deg": 180.0
+      },
+      "position_mm": 0.0,
+      "travel_mm": 25.0
+     }
+    },
+    "diagnostic_installed": "PD-SI",
+    "diagnostics_owned": [
+     "GAP-TPA",
+     "PD-SI"
+    ],
+    "filter_installed": null,
+    "filters_owned": [],
+    "alignment_camera": "free Si camera (400-1000 nm)",
+    "shutters_open": {
+     "800nm": true,
+     "opa": true
+    },
+    "spent_eur": 1250.0,
+    "spend_cap_eur": 30000.0,
+    "lab_time_used_min": 48.05,
+    "lab_time_remaining_min": 191.95,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 57,
+   "tool": "ir_card",
+   "args": {
+    "x": 2000,
+    "z": 205,
+    "height": 124
+   },
+   "cost_s": 36.4,
+   "t_s": 2919.152,
+   "result": {
+    "point": {
+     "x_mm": 2000.0,
+     "z_mm": 205.0,
+     "height_mm": 124.0
+    },
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": 0.1,
+      "dz_mm": 0.1,
+      "dheight_mm": -0.1
+     }
+    ],
+    "lab_time_used_min": 48.65,
+    "lab_time_remaining_min": 191.35,
+    "you_at": {
+     "x_mm": 2000,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 58,
+   "tool": "ir_card",
+   "args": {
+    "x": 1300,
+    "z": 205,
+    "height": 124
+   },
+   "cost_s": 31.4,
+   "t_s": 2950.552,
+   "result": {
+    "point": {
+     "x_mm": 1300.0,
+     "z_mm": 205.0,
+     "height_mm": 124.0
+    },
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": 0.1,
+      "dz_mm": -0.1,
+      "dheight_mm": 0.3
+     }
+    ],
+    "lab_time_used_min": 49.18,
+    "lab_time_remaining_min": 190.82,
+    "you_at": {
+     "x_mm": 1300,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 59,
+   "tool": "ir_card",
+   "args": {
+    "x": 800,
+    "z": 205,
+    "height": 124
+   },
+   "cost_s": 31.0,
+   "t_s": 2981.552,
+   "result": {
+    "point": {
+     "x_mm": 800.0,
+     "z_mm": 205.0,
+     "height_mm": 124.0
+    },
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.4,
+      "dz_mm": 0.3,
+      "dheight_mm": -0.3
+     }
+    ],
+    "lab_time_used_min": 49.69,
+    "lab_time_remaining_min": 190.31,
+    "you_at": {
+     "x_mm": 800,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 60,
+   "tool": "ir_card",
+   "args": {
+    "x": 500,
+    "z": 205,
+    "height": 124
+   },
+   "cost_s": 30.6,
+   "t_s": 3012.152,
+   "result": {
+    "point": {
+     "x_mm": 500.0,
+     "z_mm": 205.0,
+     "height_mm": 124.0
+    },
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.1,
+      "dz_mm": -0.1,
+      "dheight_mm": 0.1
+     }
+    ],
+    "lab_time_used_min": 50.2,
+    "lab_time_remaining_min": 189.8,
+    "you_at": {
+     "x_mm": 500,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 61,
+   "tool": "remove",
+   "args": {
+    "part": "stage"
+   },
+   "cost_s": 60.096,
+   "t_s": 3072.248,
+   "result": {
+    "outcome": "stage back in the inventory",
+    "lab_time_used_min": 51.2,
+    "lab_time_remaining_min": 188.8,
+    "you_at": {
+     "x_mm": 452,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "leaves the table",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 62,
+   "tool": "place",
+   "args": {
+    "part": "stage",
+    "x": 452.5,
+    "z": 201.5,
+    "height": 139,
+    "yaw_deg": 180
+   },
+   "cost_s": 300.001,
+   "t_s": 3372.248,
+   "result": {
+    "outcome": "stage placed",
+    "lab_time_used_min": 56.2,
+    "lab_time_remaining_min": 183.8,
+    "you_at": {
+     "x_mm": 452,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -82588.687123,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 63,
+   "tool": "ir_card",
+   "args": {
+    "part": "stage"
+   },
+   "cost_s": 30.001,
+   "t_s": 3402.249,
+   "result": {
+    "part": "stage",
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.1,
+      "dz_mm": 3.3,
+      "dheight_mm": -14.9
+     }
+    ],
+    "lab_time_used_min": 56.7,
+    "lab_time_remaining_min": 183.3,
+    "you_at": {
+     "x_mm": 453,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -82588.687123,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 64,
+   "tool": "ir_card",
+   "args": {
+    "part": "mirror-1"
+   },
+   "cost_s": 31.673,
+   "t_s": 3433.922,
+   "result": {
+    "part": "mirror-1",
+    "beams": [
+     {
+      "beam": "800nm",
+      "dx_mm": -0.3,
+      "dz_mm": -1.0,
+      "dheight_mm": -5.5
+     }
+    ],
+    "lab_time_used_min": 57.23,
+    "lab_time_remaining_min": 182.77,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -82588.687123,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 65,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 14.979,
+   "t_s": 3448.901,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 294.8,
+      "v_um": 194.7,
+      "radius_h_um": 71.2,
+      "radius_v_um": 49.4,
+      "relative_power": 1.01
+     },
+     {
+      "h_um": 770.0,
+      "v_um": 36.85,
+      "radius_h_um": 72.4,
+      "radius_v_um": 52.7,
+      "relative_power": 1.01
+     }
+    ],
+    "lab_time_used_min": 57.48,
+    "lab_time_remaining_min": 182.52,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -82588.687123,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 66,
+   "tool": "view_camera",
+   "args": {
+    "plane": "lens"
+   },
+   "cost_s": 10.0,
+   "t_s": 3458.901,
+   "result": {
+    "plane": "lens",
+    "spots": [
+     {
+      "lens": "A",
+      "h_mm": -3.05,
+      "v_mm": -5.27,
+      "relative_power": 1.0
+     },
+     {
+      "lens": "B",
+      "h_mm": -2.44,
+      "v_mm": 0.47,
+      "relative_power": 0.99
+     }
+    ],
+    "lab_time_used_min": 57.65,
+    "lab_time_remaining_min": 182.35,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -82588.687123,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 67,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-1",
+    "axis": "yaw",
+    "delta_mrad": 2.65
+   },
+   "cost_s": 34.979,
+   "t_s": 3493.88,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 58.23,
+    "lab_time_remaining_min": 181.77,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -84440.630554,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 68,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-1",
+    "axis": "pitch",
+    "delta_mrad": -0.19
+   },
+   "cost_s": 30.0,
+   "t_s": 3523.88,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 58.73,
+    "lab_time_remaining_min": 181.27,
+    "you_at": {
+     "x_mm": 1289,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -84440.834031,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 69,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-2",
+    "axis": "yaw",
+    "delta_mrad": 1.04
+   },
+   "cost_s": 39.238,
+   "t_s": 3563.119,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 59.39,
+    "lab_time_remaining_min": 180.61,
+    "you_at": {
+     "x_mm": 1291,
+     "z_mm": 1500
+    }
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": -85078.216561,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 70,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-2",
+    "axis": "pitch",
+    "delta_mrad": -1.05
+   },
+   "cost_s": 30.0,
+   "t_s": 3593.119,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 59.89,
+    "lab_time_remaining_min": 180.11,
+    "you_at": {
+     "x_mm": 1291,
+     "z_mm": 1500
+    }
+   },
+   "truth": {
+    "O": 0.000392,
+    "dt_fs": -85080.525028,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 71,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 14.983,
+   "t_s": 3608.101,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 9.9,
+      "v_um": -28.6,
+      "radius_h_um": 70.9,
+      "radius_v_um": 51.0,
+      "relative_power": 1.01
+     },
+     {
+      "h_um": 16.5,
+      "v_um": 113.3,
+      "radius_h_um": 74.3,
+      "radius_v_um": 52.6,
+      "relative_power": 1.01
+     }
+    ],
+    "lab_time_used_min": 60.14,
+    "lab_time_remaining_min": 179.86,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.000392,
+    "dt_fs": -85080.525028,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 72,
+   "tool": "block",
+   "args": {
+    "arm": "opa"
+   },
+   "cost_s": 5.0,
+   "t_s": 3613.101,
+   "result": {
+    "outcome": "opa shutter closed",
+    "lab_time_used_min": 60.22,
+    "lab_time_remaining_min": 179.78,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 1.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 73,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 10.0,
+   "t_s": 3623.101,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 8.8,
+      "v_um": -29.15,
+      "radius_h_um": 75.1,
+      "radius_v_um": 51.6,
+      "relative_power": 1.02
+     }
+    ],
+    "lab_time_used_min": 60.39,
+    "lab_time_remaining_min": 179.61,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 1.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 74,
+   "tool": "unblock",
+   "args": {
+    "arm": "opa"
+   },
+   "cost_s": 5.0,
+   "t_s": 3628.101,
+   "result": {
+    "outcome": "opa shutter open",
+    "lab_time_used_min": 60.47,
+    "lab_time_remaining_min": 179.53,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.000392,
+    "dt_fs": -85080.525028,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 75,
+   "tool": "knob",
+   "args": {
+    "part": "mirror-2",
+    "axis": "pitch",
+    "delta_mrad": -1.8
+   },
+   "cost_s": 34.983,
+   "t_s": 3663.084,
+   "result": {
+    "outcome": "turned",
+    "lab_time_used_min": 61.05,
+    "lab_time_remaining_min": 178.95,
+    "you_at": {
+     "x_mm": 1291,
+     "z_mm": 1500
+    }
+   },
+   "truth": {
+    "O": 0.971208,
+    "dt_fs": -85081.619684,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 76,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 14.983,
+   "t_s": 3678.066,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 6.05,
+      "v_um": -26.95,
+      "radius_h_um": 74.0,
+      "radius_v_um": 51.5,
+      "relative_power": 1.01
+     },
+     {
+      "h_um": 15.4,
+      "v_um": -19.8,
+      "radius_h_um": 72.2,
+      "radius_v_um": 51.7,
+      "relative_power": 1.02
+     }
+    ],
+    "lab_time_used_min": 61.3,
+    "lab_time_remaining_min": 178.7,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.971208,
+    "dt_fs": -85081.619684,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 77,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 1
+   },
+   "cost_s": 5.0,
+   "t_s": 3683.066,
+   "result": {
+    "detector": "PD-SI",
+    "t_int_s": 1.0,
+    "800nm_arrival_ps": 1820.0,
+    "opa_arrival_ps": 1880.0,
+    "lab_time_used_min": 61.38,
+    "lab_time_remaining_min": 178.62,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.971208,
+    "dt_fs": -85081.619684,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 78,
+   "tool": "measure_path",
+   "args": {
+    "arm": "800nm"
+   },
+   "cost_s": 180.0,
+   "t_s": 3863.066,
+   "result": {
+    "arm": "800nm",
+    "path_mm": 3240.3,
+    "ends_at": "sample (focal plane)",
+    "note": "table path from the output port; excludes anything inside the laser/OPA housing",
+    "lab_time_used_min": 64.38,
+    "lab_time_remaining_min": 175.62,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.971208,
+    "dt_fs": -85081.619684,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 79,
+   "tool": "measure_path",
+   "args": {
+    "arm": "opa"
+   },
+   "cost_s": 180.0,
+   "t_s": 4043.066,
+   "result": {
+    "arm": "opa",
+    "path_mm": 1383.7,
+    "ends_at": "sample (focal plane)",
+    "note": "table path from the output port; excludes anything inside the laser/OPA housing",
+    "lab_time_used_min": 67.38,
+    "lab_time_remaining_min": 172.62,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.971208,
+    "dt_fs": -85081.619684,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 80,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 10
+   },
+   "cost_s": 11.0,
+   "t_s": 4054.066,
+   "result": {
+    "detector": "PD-SI",
+    "t_int_s": 10.0,
+    "800nm_arrival_ps": 1840.0,
+    "opa_arrival_ps": 1900.0,
+    "lab_time_used_min": 67.57,
+    "lab_time_remaining_min": 172.43,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.971208,
+    "dt_fs": -85081.619684,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 81,
+   "tool": "move_stage",
+   "args": {
+    "position_mm": 11
+   },
+   "cost_s": 14.795,
+   "t_s": 4068.862,
+   "result": {
+    "outcome": "moved",
+    "position_mm": 11.0,
+    "lab_time_used_min": 67.81,
+    "lab_time_remaining_min": 172.19,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    }
+   },
+   "truth": {
+    "O": 0.975257,
+    "dt_fs": -11717.987853,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 82,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 10
+   },
+   "cost_s": 11.795,
+   "t_s": 4080.657,
+   "result": {
+    "detector": "PD-SI",
+    "t_int_s": 10.0,
+    "800nm_arrival_ps": 1880.0,
+    "opa_arrival_ps": 1880.0,
+    "lab_time_used_min": 68.01,
+    "lab_time_remaining_min": 171.99,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975257,
+    "dt_fs": -11717.987853,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 83,
+   "tool": "install",
+   "args": {
+    "part_id": "GAP-TPA"
+   },
+   "cost_s": 124.374,
+   "t_s": 4205.031,
+   "result": {
+    "outcome": "GAP-TPA installed in the sample mount",
+    "lab_time_used_min": 70.08,
+    "lab_time_remaining_min": 169.92,
+    "you_at": {
+     "x_mm": 987,
+     "z_mm": -300
+    }
+   },
+   "truth": {
+    "O": 0.975257,
+    "dt_fs": -11717.987853,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 84,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 1
+   },
+   "cost_s": 6.374,
+   "t_s": 4211.405,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 1.0,
+    "counts": 2289,
+    "lab_time_used_min": 70.19,
+    "lab_time_remaining_min": 169.81,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975257,
+    "dt_fs": -11717.987853,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 85,
+   "tool": "block",
+   "args": {
+    "arm": "opa"
+   },
+   "cost_s": 5.0,
+   "t_s": 4216.405,
+   "result": {
+    "outcome": "opa shutter closed",
+    "lab_time_used_min": 70.27,
+    "lab_time_remaining_min": 169.73,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 1.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 86,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 1
+   },
+   "cost_s": 5.0,
+   "t_s": 4221.405,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 1.0,
+    "counts": 1473,
+    "lab_time_used_min": 70.36,
+    "lab_time_remaining_min": 169.64,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 1.0,
+    "T_opa": 0.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "blocked"
+   }
+  },
+  {
+   "i": 87,
+   "tool": "unblock",
+   "args": {
+    "arm": "opa"
+   },
+   "cost_s": 5.0,
+   "t_s": 4226.405,
+   "result": {
+    "outcome": "opa shutter open",
+    "lab_time_used_min": 70.44,
+    "lab_time_remaining_min": 169.56,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975257,
+    "dt_fs": -11717.987853,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 88,
+   "tool": "block",
+   "args": {
+    "arm": "800nm"
+   },
+   "cost_s": 5.0,
+   "t_s": 4231.405,
+   "result": {
+    "outcome": "800nm shutter closed",
+    "lab_time_used_min": 70.52,
+    "lab_time_remaining_min": 169.48,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 89,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 1
+   },
+   "cost_s": 5.0,
+   "t_s": 4236.405,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 1.0,
+    "counts": 822,
+    "lab_time_used_min": 70.61,
+    "lab_time_remaining_min": 169.39,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.0,
+    "dt_fs": null,
+    "T_800": 0.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "blocked",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 90,
+   "tool": "unblock",
+   "args": {
+    "arm": "800nm"
+   },
+   "cost_s": 5.0,
+   "t_s": 4241.405,
+   "result": {
+    "outcome": "800nm shutter open",
+    "lab_time_used_min": 70.69,
+    "lab_time_remaining_min": 169.31,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975257,
+    "dt_fs": -11717.987853,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 91,
+   "tool": "scan",
+   "args": {
+    "start_mm": 8,
+    "end_mm": 14,
+    "step_mm": 0.012,
+    "t_int": 0.05
+   },
+   "cost_s": 1534.845,
+   "t_s": 5776.251,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 0.05,
+    "position_mm": 14.0,
+    "columns": [
+     "position_mm",
+     "counts"
+    ],
+    "lab_time_used_min": 96.27,
+    "lab_time_remaining_min": 143.73,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    },
+    "n_points": 501
+   },
+   "truth": {
+    "O": 0.976258,
+    "dt_fs": 8294.828863,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 92,
+   "tool": "scan",
+   "args": {
+    "start_mm": 12.86,
+    "end_mm": 13.1,
+    "step_mm": 0.01,
+    "t_int": 1
+   },
+   "cost_s": 104.14,
+   "t_s": 5880.391,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 1.0,
+    "position_mm": 13.1,
+    "columns": [
+     "position_mm",
+     "counts"
+    ],
+    "lab_time_used_min": 98.01,
+    "lab_time_remaining_min": 141.99,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    },
+    "n_points": 25
+   },
+   "truth": {
+    "O": 0.975962,
+    "dt_fs": 2290.983617,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 93,
+   "tool": "scan",
+   "args": {
+    "start_mm": 13.6,
+    "end_mm": 13.8,
+    "step_mm": 0.01,
+    "t_int": 1
+   },
+   "cost_s": 87.5,
+   "t_s": 5967.891,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 1.0,
+    "position_mm": 13.8,
+    "columns": [
+     "position_mm",
+     "counts"
+    ],
+    "lab_time_used_min": 99.46,
+    "lab_time_remaining_min": 140.54,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    },
+    "n_points": 21
+   },
+   "truth": {
+    "O": 0.976193,
+    "dt_fs": 6960.641013,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 94,
+   "tool": "scan",
+   "args": {
+    "start_mm": 8,
+    "end_mm": 14,
+    "step_mm": 0.015,
+    "t_int": 0.3
+   },
+   "cost_s": 1332.1,
+   "t_s": 7299.991,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 0.3,
+    "position_mm": 14.0,
+    "columns": [
+     "position_mm",
+     "counts"
+    ],
+    "lab_time_used_min": 121.67,
+    "lab_time_remaining_min": 118.33,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    },
+    "n_points": 401
+   },
+   "truth": {
+    "O": 0.976258,
+    "dt_fs": 8294.828863,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.0,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 95,
+   "tool": "scan",
+   "args": {
+    "start_mm": 12.68,
+    "end_mm": 12.84,
+    "step_mm": 0.005,
+    "t_int": 1
+   },
+   "cost_s": 136.32,
+   "t_s": 7436.311,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 1.0,
+    "position_mm": 12.84,
+    "columns": [
+     "position_mm",
+     "counts"
+    ],
+    "lab_time_used_min": 123.94,
+    "lab_time_remaining_min": 116.06,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    },
+    "n_points": 33
+   },
+   "truth": {
+    "O": 0.975876,
+    "dt_fs": 556.539472,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.000129,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 96,
+   "tool": "scan",
+   "args": {
+    "start_mm": 12.69,
+    "end_mm": 12.82,
+    "step_mm": 0.01,
+    "t_int": 3
+   },
+   "cost_s": 87.15,
+   "t_s": 7523.461,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 3.0,
+    "position_mm": 12.82,
+    "columns": [
+     "position_mm",
+     "counts"
+    ],
+    "lab_time_used_min": 125.39,
+    "lab_time_remaining_min": 114.61,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    },
+    "n_points": 14
+   },
+   "truth": {
+    "O": 0.97587,
+    "dt_fs": 423.120692,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.005585,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 97,
+   "tool": "move_stage",
+   "args": {
+    "position_mm": 12.754
+   },
+   "cost_s": 5.0,
+   "t_s": 7528.461,
+   "result": {
+    "outcome": "moved",
+    "position_mm": 12.754,
+    "lab_time_used_min": 125.47,
+    "lab_time_remaining_min": 114.53,
+    "you_at": {
+     "x_mm": -300,
+     "z_mm": 202
+    }
+   },
+   "truth": {
+    "O": 0.975849,
+    "dt_fs": 16.193414,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.968497,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 98,
+   "tool": "view_camera",
+   "args": {
+    "plane": "sample"
+   },
+   "cost_s": 10.795,
+   "t_s": 7539.256,
+   "result": {
+    "plane": "sample",
+    "spots": [
+     {
+      "h_um": 7.7,
+      "v_um": -29.15,
+      "radius_h_um": 72.7,
+      "radius_v_um": 53.2,
+      "relative_power": 1.01
+     },
+     {
+      "h_um": 13.2,
+      "v_um": -25.3,
+      "radius_h_um": 82.8,
+      "radius_v_um": 50.7,
+      "relative_power": 1.01
+     }
+    ],
+    "lab_time_used_min": 125.65,
+    "lab_time_remaining_min": 114.35,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975849,
+    "dt_fs": 16.193414,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.968497,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 99,
+   "tool": "read_signal",
+   "args": {
+    "t_int": 2
+   },
+   "cost_s": 5.0,
+   "t_s": 7544.256,
+   "result": {
+    "detector": "GAP-TPA",
+    "t_int_s": 2.0,
+    "counts": 2644,
+    "lab_time_used_min": 125.74,
+    "lab_time_remaining_min": 114.26,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975849,
+    "dt_fs": 16.193414,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.968497,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  },
+  {
+   "i": 100,
+   "tool": "submit",
+   "args": {},
+   "cost_s": 5.0,
+   "t_s": 7549.256,
+   "result": {
+    "outcome": "submitted; the episode is over",
+    "lab_time_used_min": 125.82,
+    "lab_time_remaining_min": 114.18,
+    "you_at": "desk"
+   },
+   "truth": {
+    "O": 0.975849,
+    "dt_fs": 16.193414,
+    "T_800": 1.0,
+    "T_opa": 1.0,
+    "eta": 0.968497,
+    "end_800": "sample",
+    "end_opa": "sample"
+   }
+  }
+ ]
+}
