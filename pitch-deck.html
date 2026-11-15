@@ -412,6 +412,11 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   .bl-p.ph, .bv-p.ph { fill:#E8742A; } .rn-p { font:500 26px Oswald, Impact, sans-serif; fill:#EDE3CC; letter-spacing:.04em; } .rn-p.ink { fill:#16120F; }
   .tk-n { font:400 96px "Bebas Neue", Impact, sans-serif; fill:#16120F; } .tk-b { font:400 54px "Bebas Neue", Impact, sans-serif; fill:#16120F; }
   .bv-p { font:400 60px "Bebas Neue", Impact, sans-serif; fill:#EDE3CC; }
+  .fm-p { font:500 44px Oswald, Impact, sans-serif; fill:#EDE3CC; letter-spacing:.02em; }
+  .fm-s { font:500 24px Oswald, Impact, sans-serif; fill:#EDE3CC; opacity:.8; letter-spacing:.03em; text-transform:uppercase; }
+  .lk-p { font:400 120px "Bebas Neue", Impact, sans-serif; fill:#EDE3CC; letter-spacing:.02em; }
+  .slide .sn { position:absolute; right:36px; bottom:26px; z-index:5; min-width:56px; padding:6px 12px; text-align:center;
+    background:#16120F; color:#EDE3CC; font:400 38px/1 "Bebas Neue", Impact, sans-serif; letter-spacing:.04em; }
   .cmd { font:700 64px "Courier New", Courier, monospace; fill:#16120F; }
   @keyframes ppO { 0%,8% { transform:translate(0,0) scale(1.4); opacity:0; } 14% { opacity:1; } 52% { transform:translate(940px,-400px) scale(.3); opacity:1; } 56%,100% { transform:translate(940px,-400px) scale(.3); opacity:0; } }
   @keyframes ppB { 0%,8% { transform:translate(0,0) scale(1.4); opacity:0; } 14% { opacity:1; } 52% { transform:translate(-860px,-340px) scale(.3); opacity:1; } 56%,100% { transform:translate(-860px,-340px) scale(.3); opacity:0; } }
@@ -509,6 +514,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
 </svg>
     <h1 class="sr">Can AI take our jobs?</h1>
     <aside class="notes"><b>~6 s.</b> We're experimental physicists. Instead of asking whether AI can take our job, we gave an agent a lab and measured what happened.</aside>
+    <span class="sn">1</span>
   </section>
 
   <section class="slide poster" data-video>
@@ -572,30 +578,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
 </svg>
     <h1 class="sr">A known design is not a working setup.</h1>
     <aside class="notes"><b>~10 s.</b> The task tests execution in a physical loop. Manuals and datasheets contain the needed information; success requires decisions under a time budget.</aside>
-  </section>
-
-  <section class="slide poster p-pulses" data-video>
-    <svg class="poster-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <rect width="1920" height="1080" fill="#16120F"/>
-  <g filter="url(#pcut)">
-    <polygon points="1000,400 -60,690 -60,930" fill="#E8742A" opacity=".9"/>
-    <polygon points="1000,400 1980,610 1980,860" fill="#4A8FC4" opacity=".9"/>
-    <path d="M1180 150 L1220 122 L1220 612 L1180 640 Z" fill="#9C927E"/>
-    <path d="M820 150 L860 122 L1220 122 L1180 150 Z" fill="#F7F0DF"/>
-    <rect x="820" y="150" width="360" height="490" fill="#EDE3CC"/>
-    <rect x="982" y="640" width="36" height="84" fill="#EDE3CC"/><rect x="900" y="716" width="200" height="22" fill="#EDE3CC"/>
-    <path class="hit" d="M1000 300 L1020 380 L1100 400 L1020 420 L1000 500 L980 420 L900 400 L980 380 Z" fill="#E8742A"/>
-    <circle cx="1000" cy="400" r="16" fill="#16120F"/>
-  </g>
-  <circle class="pp-o" cx="60" cy="800" r="60" fill="#E8742A" stroke="#EDE3CC" stroke-width="6"/>
-  <circle class="pp-b" cx="1860" cy="740" r="60" fill="#4A8FC4" stroke="#EDE3CC" stroke-width="6"/>
-  <g filter="url(#pcut)">
-    <text x="110" y="110" class="pt-sm" style="font-size:40px;fill:#EDE3CC">≤ 4 hours simulated lab time</text><text x="110" y="156" class="pt-sm" style="font-size:40px;fill:#EDE3CC">≤ €30,000 parts budget</text>
-    <text x="110" y="905" class="pt-big" style="font-size:140px;fill:#EDE3CC" textLength="1456" lengthAdjust="spacingAndGlyphs">MAKE TWO LASER PULSES ARRIVE</text><text x="110" y="1040" class="pt-big" style="font-size:140px;fill:#E8742A" textLength="1283.8" lengthAdjust="spacingAndGlyphs">AT THE SAME SPOT AND TIME.</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
-    </svg>
-    <h2 class="sr">Make two laser pulses arrive at the same spot and time.</h2>
-    <aside class="notes"><b>~12 s.</b> An 800 nm pulse and an OPA pulse start on opposite sides of an empty optical table. The agent has to build both beam paths so they focus on the same spot of the sample and arrive within about 100 femtoseconds of each other.</aside>
+    <span class="sn">2</span>
   </section>
 
   <section class="slide poster " data-video>
@@ -619,6 +602,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     </svg>
     <h2 class="sr">Finding time zero means scanning for one narrow spike.</h2>
     <aside class="notes"><b>~14 s.</b> The hard part is time zero: the delay where both pulses arrive together. You only see it as a narrow spike in a detector signal while you move the delay stage. This is our scripted expert's real scan with the agent's own tools: a coarse scan outward from a tape-measure estimate, then a zoom on the spike. It works on every seed at both levels, so the task is hard but fair.</aside>
+    <span class="sn">3</span>
   </section>
 
   <section class="slide poster " data-video>
@@ -640,7 +624,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <circle cx="110" cy="196" r="14" fill="#EDE3CC"/>
   <path d="M110 14 V-6" stroke="#16120F" stroke-width="6"/><rect x="103" y="-16" width="14" height="14" fill="#E8742A"/></g>
     </g>
-    <g class="mm-node" style="--d:0.2s"><text x="346" y="126" text-anchor="end" class="mm-t">READ</text><text x="346" y="162" text-anchor="end" class="mm-s">read_manual</text><text x="346" y="195" text-anchor="end" class="mm-s">get_datasheet</text><text x="346" y="228" text-anchor="end" class="mm-s">list_catalogue · status</text></g><g class="mm-node" style="--d:0.30000000000000004s"><text x="904" y="78" text-anchor="start" class="mm-t">BUY</text><text x="904" y="114" text-anchor="start" class="mm-s">buy</text></g><g class="mm-node" style="--d:0.4s"><text x="1254" y="126" text-anchor="start" class="mm-t">BUILD</text><text x="1254" y="162" text-anchor="start" class="mm-s">place · rotate · move</text><text x="1254" y="195" text-anchor="start" class="mm-s">remove · knob · install</text></g><g class="mm-node" style="--d:0.5s"><text x="1254" y="456" text-anchor="start" class="mm-t">LOOK</text><text x="1254" y="492" text-anchor="start" class="mm-s">ir_card · view_camera</text><text x="1254" y="525" text-anchor="start" class="mm-s">measure_path · block</text></g><g class="mm-node" style="--d:0.6000000000000001s"><text x="904" y="576" text-anchor="start" class="mm-t">FIND TIME ZERO</text><text x="904" y="612" text-anchor="start" class="mm-s">move_stage · scan</text><text x="904" y="645" text-anchor="start" class="mm-s">read_signal</text></g><g class="mm-node" style="--d:0.7s"><text x="346" y="456" text-anchor="end" class="mm-t">SUBMIT</text><text x="346" y="492" text-anchor="end" class="mm-s">submit</text></g>
+    <g class="mm-node" style="--d:0.2s"><text x="346" y="126" text-anchor="end" class="mm-t">READ</text><text x="346" y="162" text-anchor="end" class="mm-s">read_manual</text><text x="346" y="195" text-anchor="end" class="mm-s">get_datasheet</text><text x="346" y="228" text-anchor="end" class="mm-s">list_catalogue · status</text></g><g class="mm-node" style="--d:0.30000000000000004s"><text x="904" y="78" text-anchor="start" class="mm-t">BUY</text><text x="904" y="114" text-anchor="start" class="mm-s">buy</text></g><g class="mm-node" style="--d:0.4s"><text x="1254" y="126" text-anchor="start" class="mm-t">BUILD</text><text x="1254" y="162" text-anchor="start" class="mm-s">place · rotate · move</text><text x="1254" y="195" text-anchor="start" class="mm-s">remove · knob · install</text></g><g class="mm-node" style="--d:0.5s"><text x="1254" y="456" text-anchor="start" class="mm-t">LOOK</text><text x="1254" y="492" text-anchor="start" class="mm-s">ir_card · view_camera</text><text x="1254" y="525" text-anchor="start" class="mm-s">measure_path · block</text></g><g class="mm-node" style="--d:0.6000000000000001s"><text x="904" y="576" text-anchor="start" class="mm-t">SCAN</text><text x="904" y="612" text-anchor="start" class="mm-s">move_stage · scan</text><text x="904" y="645" text-anchor="start" class="mm-s">read_signal</text></g><g class="mm-node" style="--d:0.7s"><text x="346" y="456" text-anchor="end" class="mm-t">SUBMIT</text><text x="346" y="492" text-anchor="end" class="mm-s">submit</text></g>
   </g>
   <g filter="url(#pcut)">
     <text x="110" y="110" class="pt-sm" style="font-size:32px;fill:#16120F">About 20 tools · reading is free · physical actions cost lab time</text>
@@ -649,19 +633,17 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     </svg>
     <h2 class="sr">The agent controls a physics lab through MCP.</h2>
     <aside class="notes"><b>~13 s.</b> About twenty tools in six groups. Reading manuals is free; anything physical costs simulated lab time. The agent only sees instrument readings, never the simulator's true state.</aside>
+    <span class="sn">4</span>
   </section>
 
   <section class="slide poster " data-video>
     <svg class="poster-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="1920" height="1080" fill="#16120F"/>
   <g filter="url(#pcutS)">
-    <rect x="470" y="200" width="34" height="34" fill="#4A8FC4"/><text x="518" y="230" class="lg-p">SPATIAL ≤ 0.2</text>
-    <rect x="770" y="200" width="34" height="34" fill="#E8742A"/><text x="818" y="230" class="lg-p">TIMING ≤ 0.5</text>
-    <rect x="1050" y="200" width="34" height="34" fill="#EDE3CC"/><text x="1098" y="230" class="lg-p">EFFICIENCY ≤ 0.3, ONLY IF η ≥ 0.9</text>
     <g class="br-row" style="--d:0.2s"><text x="440" y="344" text-anchor="end" class="bl-p">Do nothing</text>
         <rect x="470" y="300" width="1090" height="62" fill="#EDE3CC" opacity=".12"/>
         
-        <text x="1590" y="348" class="bv-p">0.000</text></g><g class="br-row" style="--d:0.32s"><text x="440" y="454" text-anchor="end" class="bl-p">Exploit attempts†</text>
+        <text x="1590" y="348" class="bv-p">0.000</text></g><g class="br-row" style="--d:0.32s"><text x="440" y="454" text-anchor="end" class="bl-p">Exploit attempts</text>
         <rect x="470" y="410" width="1090" height="62" fill="#EDE3CC" opacity=".12"/>
         
         <text x="1590" y="458" class="bv-p">0.000</text></g><g class="br-row" style="--d:0.44s"><text x="440" y="564" text-anchor="end" class="bl-p">Stop early</text>
@@ -673,39 +655,40 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
         <text x="1590" y="678" class="bv-p">0.928</text></g>
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="100" class="pt-sm" style="font-size:28px;fill:#EDE3CC">†Absurd arguments, 100,000 mirrors, status-call spam, verifier calls without its token — all in the test suite</text><text x="110" y="134" class="pt-sm" style="font-size:28px;fill:#EDE3CC">Grader and simulator run outside the agent's container</text>
-    <text x="110" y="925" class="pt-big" style="font-size:120px;fill:#EDE3CC" textLength="956.4" lengthAdjust="spacingAndGlyphs">SCORED ON THE PHYSICS.</text><text x="110" y="1043" class="pt-big" style="font-size:120px;fill:#E8742A" textLength="1220.4" lengthAdjust="spacingAndGlyphs">NO SHORTCUT BEATS REAL PLAY.</text>
+    <text x="110" y="140" class="fm-p">SCORE = <tspan fill="#4A8FC4">0.2 × SPOT OVERLAP</tspan> + <tspan fill="#E8742A">0.5 × TIMING OVERLAP</tspan> + <tspan fill="#EDE3CC">[0.2 × (1 − EXTRA €) + 0.1 × (1 − LAB TIME)]</tspan></text>
+    <text x="110" y="200" class="fm-s">[ … ] counts only if timing overlap ≥ 0.9 · extra € = spend above the cheapest working setup, as a share of the €30k cap · buying more can only lower the score</text>
+    <text x="110" y="960" class="pt-big" style="font-size:150px;fill:#EDE3CC" textLength="985.5" lengthAdjust="spacingAndGlyphs">SCORED ON PHYSICS.</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
-    <h2 class="sr">Scored on the physics. No shortcut beats real play.</h2>
+    <h2 class="sr">Scored on physics.</h2>
     <aside class="notes"><b>~14 s.</b> The score is computed from the simulator's true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing, and 0.3 for money and lab time saved, but only once the setup really works. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.</aside>
+    <span class="sn">5</span>
   </section>
 
   <section class="slide poster " data-video>
     <svg class="poster-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="1920" height="1080" fill="#2E6F9E"/>
   <g filter="url(#pcutS)">
-  <g class="br-row" style="--d:0.2s"><text x="490" y="296" text-anchor="end" class="bl-p">Gemini 3.1 Pro</text><rect x="520" y="250" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="250" width="6" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="302" class="bv-p">0.000</text><text x="1700" y="296" class="rn-p">4 runs</text></g><g class="br-row" style="--d:0.32s"><text x="490" y="406" text-anchor="end" class="bl-p">Gemini 3.8 Flash</text><rect x="520" y="360" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="360" width="188.2" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="412" class="bv-p">0.192</text><text x="1700" y="406" class="rn-p">2 runs</text></g><g class="br-row" style="--d:0.44s"><text x="490" y="516" text-anchor="end" class="bl-p">Gemini 4 Hydrogen</text><rect x="520" y="470" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="470" width="195.9" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="522" class="bv-p">0.200</text><text x="1700" y="516" class="rn-p">1 run</text></g><g class="br-row" style="--d:0.56s"><text x="490" y="626" text-anchor="end" class="bl-p ph">[Claude, Level 2]</text><rect x="520" y="580" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="580" width="980" height="66" fill="none" stroke="#E8742A" stroke-width="4" stroke-dasharray="14 10"/><text x="1530" y="632" class="bv-p ph">[R]</text></g><g class="br-row" style="--d:0.6799999999999999s"><text x="490" y="736" text-anchor="end" class="bl-p b">Scripted reference</text><rect x="520" y="690" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="690" width="910.4" height="66" fill="#E8742A"/>
-      <text x="1530" y="742" class="bv-p">0.929</text><text x="1700" y="736" class="rn-p">10 seeds</text></g>
-  <path d="M715 215 V800" stroke="#16120F" stroke-width="5" stroke-dasharray="14 10"/>
-  <text x="729" y="236" class="rn-p ink">STOP-EARLY BASELINE 0.199</text>
+  <g class="br-row" style="--d:0.2s"><text x="490" y="246" text-anchor="end" class="bl-p">Gemini 3.1 Pro</text><rect x="520" y="200" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="200" width="6" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="252" class="bv-p">0.000</text><text x="1700" y="246" class="rn-p">4 runs</text></g><g class="br-row" style="--d:0.32s"><text x="490" y="366" text-anchor="end" class="bl-p">Gemini 3.8 Flash</text><rect x="520" y="320" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="320" width="188.2" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="372" class="bv-p">0.192</text><text x="1700" y="366" class="rn-p">2 runs</text></g><g class="br-row" style="--d:0.44s"><text x="490" y="486" text-anchor="end" class="bl-p">Gemini 4 Hydrogen</text><rect x="520" y="440" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="440" width="195.9" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="492" class="bv-p">0.200</text><text x="1700" y="486" class="rn-p">1 run</text></g><g class="br-row" style="--d:0.56s"><text x="490" y="606" text-anchor="end" class="bl-p">Claude · Level 2</text><rect x="520" y="560" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="560" width="664.1" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="612" class="bv-p">0.678</text><text x="1700" y="606" class="rn-p">3 runs</text></g><g class="br-row" style="--d:0.6799999999999999s"><text x="490" y="726" text-anchor="end" class="bl-p b">Scripted reference</text><rect x="520" y="680" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="680" width="910.4" height="66" fill="#E8742A"/>
+      <text x="1530" y="732" class="bv-p">0.929</text><text x="1700" y="726" class="rn-p">10 seeds</text></g>
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="100" class="pt-sm" style="font-size:30px;fill:#EDE3CC">Average reward, Level 1 · every archived Harbor run, rescored with today's grader</text><text x="110" y="136" class="pt-sm" style="font-size:30px;fill:#EDE3CC">Replay each one at kakitkelvinho.github.io/gss</text>
-    <text x="110" y="925" class="pt-big" style="font-size:120px;fill:#16120F" textLength="672" lengthAdjust="spacingAndGlyphs">THE AGENTS STOP</text><text x="110" y="1043" class="pt-big" style="font-size:120px;fill:#EDE3CC" textLength="1052.4" lengthAdjust="spacingAndGlyphs">WHERE THE TIMING STARTS.</text>
+    <text x="110" y="960" class="pt-big" style="font-size:120px;fill:#EDE3CC" textLength="1032" lengthAdjust="spacingAndGlyphs">AVERAGE SCORE OF MODELS</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
-    <h2 class="sr">The agents stop where the timing starts.</h2>
-    <aside class="notes"><b>~14 s.</b> Average reward per model. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash and Hydrogen aligned the spots and stopped there, at the stop-early line of about 0.2. Our scripted reference averages 0.93 over ten seeds. [Add the Level 2 Claude result once it is in.]</aside>
+    <h2 class="sr">Average score of models.</h2>
+    <aside class="notes"><b>~16 s.</b> Average reward per model. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash and Hydrogen aligned the spots and stopped at the stop-early line of about 0.2. Claude on the harder 90-degree level found time zero in two of three blind runs; the third chose the wrong detectors, ran short of time and submitted at a tape-measure guess 6.4 picoseconds off, so it averages 0.68. Our scripted reference averages 0.93 on every seed at both levels.</aside>
+    <span class="sn">6</span>
   </section>
 
   <section class="slide poster " data-video>
     <svg class="poster-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="1920" height="1080" fill="#E8742A"/>
-  <g transform="translate(110,215)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><rect x="20" y="24" width="250" height="64" fill="#16120F"/><path d="M60 88 L50 120 L96 88 Z" fill="#16120F"/><text x="145" y="72" text-anchor="middle" class="cm-p">SETUP COMPLETE!</text>
+  <g transform="translate(110,200)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><rect x="20" y="24" width="250" height="64" fill="#16120F"/><path d="M60 88 L50 120 L96 88 Z" fill="#16120F"/><text x="145" y="72" text-anchor="middle" class="cm-p">SETUP COMPLETE!</text>
    <rect x="318" y="120" width="46" height="250" fill="#2E6F9E"/><circle cx="318" cy="210" r="22" fill="#4A8FC4" stroke="#16120F" stroke-width="5"/>
    <circle cx="180" cy="210" r="28" fill="#E8742A"/><path d="M40 210 H150" stroke="#E8742A" stroke-width="10"/>
    <path d="M210 246 Q260 286 312 246" stroke="#16120F" stroke-width="4" stroke-dasharray="8 8" fill="none"/><text x="262" y="320" text-anchor="middle" class="cm-p2">46 PS LATE</text>
@@ -716,7 +699,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <rect x="68" y="46" width="84" height="38" fill="#E8742A"/><path d="M82 64 H104 M116 64 H138" stroke="#16120F" stroke-width="6"/><path d="M100 76 Q120 84 138 72" stroke="#16120F" stroke-width="5" fill="none"/>
   <circle cx="110" cy="196" r="14" fill="#EDE3CC"/>
   <path d="M110 14 V-6" stroke="#16120F" stroke-width="6"/><rect x="103" y="-16" width="14" height="14" fill="#E8742A"/></g></g></svg>
-      <text x="200" y="478" text-anchor="middle" class="cap-p">SPOTS ALIGNED,</text><text x="200" y="516" text-anchor="middle" class="cap-p2">pulses 46 ps apart</text></g><g transform="translate(543,215)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><rect x="24" y="30" width="352" height="210" fill="#16120F"/><path d="M40 110 L48 155.7 L56 162.1 L64 147.9 L72 121.3 L80 145.9 L88 169.3 L96 125.4 L104 125.9 L112 147.7 L120 113.2 L128 164.5 L136 137 L144 153.6 L152 117.4 L160 117.4 L168 115.6 L176 119.7 L184 113.1 L192 134.2 L200 156 L208 135.3 L216 132.1 L224 142.3 L232 156.2 L240 113.9 L248 165.9 L256 153.9 L264 154.2 L272 153.5 L280 117 L288 110.4 L296 140.7 L304 169.8 L312 137.5 L320 163.6 L328 127.1 L336 163.1 L344 158.7 L352 150.3 L360 121.3" stroke="#EDE3CC" stroke-width="4" fill="none"/>
+      </g><g transform="translate(543,200)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><rect x="24" y="30" width="352" height="210" fill="#16120F"/><path d="M40 110 L48 155.7 L56 162.1 L64 147.9 L72 121.3 L80 145.9 L88 169.3 L96 125.4 L104 125.9 L112 147.7 L120 113.2 L128 164.5 L136 137 L144 153.6 L152 117.4 L160 117.4 L168 115.6 L176 119.7 L184 113.1 L192 134.2 L200 156 L208 135.3 L216 132.1 L224 142.3 L232 156.2 L240 113.9 L248 165.9 L256 153.9 L264 154.2 L272 153.5 L280 117 L288 110.4 L296 140.7 L304 169.8 L312 137.5 L320 163.6 L328 127.1 L336 163.1 L344 158.7 L352 150.3 L360 121.3" stroke="#EDE3CC" stroke-width="4" fill="none"/>
    <text x="318" y="96" class="cm-q">?</text><text x="284" y="80" class="cm-q s">?</text>
    <g transform="translate(30,250) scale(0.72)">
   <path d="M8 240 L28 166 L80 148 L140 148 L192 166 L212 240 Z" fill="#16120F"/>
@@ -725,7 +708,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <rect x="68" y="46" width="84" height="38" fill="#E8742A"/><path d="M82 68 H104 M116 68 H138" stroke="#16120F" stroke-width="4"/>
   <circle cx="110" cy="196" r="14" fill="#EDE3CC"/>
   <path d="M110 14 V-6" stroke="#16120F" stroke-width="6"/><rect x="103" y="-16" width="14" height="14" fill="#E8742A"/></g><circle cx="296" cy="330" r="38" fill="none" stroke="#16120F" stroke-width="12"/><path d="M322 356 L360 396" stroke="#16120F" stroke-width="16"/></g></svg>
-      <text x="200" y="478" text-anchor="middle" class="cap-p">SHORT INTEGRATION:</text><text x="200" y="516" text-anchor="middle" class="cap-p2">peak lost in noise</text></g><g transform="translate(976,215)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><rect x="272" y="220" width="70" height="100" fill="#16120F"/><rect x="298" y="320" width="18" height="70" fill="#16120F"/><rect x="230" y="386" width="150" height="14" fill="#16120F"/>
+      </g><g transform="translate(976,200)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><rect x="272" y="220" width="70" height="100" fill="#16120F"/><rect x="298" y="320" width="18" height="70" fill="#16120F"/><rect x="230" y="386" width="150" height="14" fill="#16120F"/>
    <path d="M262 214 Q307 176 352 214 M276 222 L294 192 M338 222 L320 192 M307 178 V214" stroke="#16120F" stroke-width="2" fill="none"/>
    <g transform="translate(20,196) scale(0.75)">
   <path d="M8 240 L28 166 L80 148 L140 148 L192 166 L212 240 Z" fill="#16120F"/>
@@ -734,7 +717,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <rect x="68" y="46" width="84" height="38" fill="#E8742A"/><path d="M84 64 Q94 74 104 64 M116 64 Q126 74 136 64" stroke="#16120F" stroke-width="5" fill="none"/>
   <circle cx="110" cy="196" r="14" fill="#EDE3CC"/>
   <path d="M110 14 V-6" stroke="#16120F" stroke-width="6"/><rect x="103" y="-16" width="14" height="14" fill="#E8742A"/></g><text x="190" y="140" class="cm-z">Z</text><text x="220" y="104" class="cm-z s">Z</text><text x="244" y="76" class="cm-z s">Z</text></g></svg>
-      <text x="200" y="478" text-anchor="middle" class="cap-p">NEVER BLOCKED AN ARM</text><text x="200" y="516" text-anchor="middle" class="cap-p2">to check backgrounds</text></g><g transform="translate(1409,215)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><circle cx="290" cy="120" r="78" fill="#E8742A"/><path d="M290 120 V62 M290 120 L332 138" stroke="#16120F" stroke-width="9"/>
+      </g><g transform="translate(1409,200)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="#EDE3CC"/><circle cx="290" cy="120" r="78" fill="#E8742A"/><path d="M290 120 V62 M290 120 L332 138" stroke="#16120F" stroke-width="9"/>
    <g transform="translate(70,80) rotate(-18)"><rect x="-34" y="-18" width="68" height="36" fill="#2E6F9E"/><text y="10" text-anchor="middle" class="cm-e">€</text></g><g transform="translate(140,50) rotate(14)"><rect x="-34" y="-18" width="68" height="36" fill="#2E6F9E"/><text y="10" text-anchor="middle" class="cm-e">€</text></g><g transform="translate(56,160) rotate(22)"><rect x="-34" y="-18" width="68" height="36" fill="#2E6F9E"/><text y="10" text-anchor="middle" class="cm-e">€</text></g><g transform="translate(160,130) rotate(-8)"><rect x="-34" y="-18" width="68" height="36" fill="#2E6F9E"/><text y="10" text-anchor="middle" class="cm-e">€</text></g>
    <g transform="translate(90,236) scale(0.75)">
   <path d="M8 240 L28 166 L80 148 L140 148 L192 166 L212 240 Z" fill="#16120F"/>
@@ -743,14 +726,14 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <rect x="68" y="46" width="84" height="38" fill="#E8742A"/><circle cx="94" cy="70" r="6" fill="#16120F"/><circle cx="126" cy="70" r="6" fill="#16120F"/><path d="M82 58 L102 54 M138 58 L118 54" stroke="#16120F" stroke-width="4"/>
   <circle cx="110" cy="196" r="14" fill="#EDE3CC"/>
   <path d="M110 14 V-6" stroke="#16120F" stroke-width="6"/><rect x="103" y="-16" width="14" height="14" fill="#E8742A"/></g></g></svg>
-      <text x="200" y="478" text-anchor="middle" class="cap-p">€4,030 OVER BUDGET,</text><text x="200" y="516" text-anchor="middle" class="cap-p2">234 of 240 min used</text></g>
+      </g>
   <g filter="url(#pcut)">
-    <text x="110" y="100" class="pt-sm" style="font-size:32px;fill:#16120F">“The alignment and time-zero setup … has been completed and submitted.”</text><text x="110" y="138" class="pt-sm" style="font-size:32px;fill:#16120F">— Flash's final report</text>
-    <text x="110" y="935" class="pt-big" style="font-size:118px;fill:#16120F" textLength="893.3" lengthAdjust="spacingAndGlyphs">IT ALIGNED THE SPOTS.</text><text x="110" y="1047" class="pt-big" style="font-size:118px;fill:#EDE3CC" textLength="1247.3" lengthAdjust="spacingAndGlyphs">IT NEVER VERIFIED THE TIMING.</text>
+    <text x="110" y="900" class="pt-big" style="font-size:150px;fill:#16120F" textLength="870" lengthAdjust="spacingAndGlyphs">COMMON MISTAKES</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
-    <h2 class="sr">It aligned the spots. It never verified the timing.</h2>
+    <h2 class="sr">Common mistakes.</h2>
     <aside class="notes"><b>~16 s.</b> Flash reported “The alignment and time-zero setup has been completed and submitted”, while the pulses were 46 picoseconds apart. It scanned with a short integration time, so the peak drowned in noise; it never blocked one arm to check the backgrounds; and it overspent by €4,030 and used 234 of 240 minutes. Each failure is a decision, and the manuals describe the tools that avoid it.</aside>
+    <span class="sn">7</span>
   </section>
 
   <section class="slide poster " data-video>
@@ -766,29 +749,24 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     <text x="190" y="490" class="cmd"><tspan fill="#2E6F9E">harbor</tspan> run -p . -a opencode -m <tspan fill="#E8742A">&lt;model&gt;</tspan></text>
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="110" class="pt-sm" style="font-size:34px;fill:#EDE3CC">Fixed seeds · 77 tests · baselines regenerate docs/results.md</text><text x="110" y="150" class="pt-sm" style="font-size:34px;fill:#EDE3CC">Every run replays at kakitkelvinho.github.io/gss</text>
-    <text x="110" y="880" class="pt-big" style="font-size:150px;fill:#16120F" textLength="630" lengthAdjust="spacingAndGlyphs">ONE COMMAND</text><text x="110" y="1030" class="pt-big" style="font-size:150px;fill:#EDE3CC" textLength="625.5" lengthAdjust="spacingAndGlyphs">TO CHECK US.</text>
+    <text x="110" y="820" class="lk-p">kakitkelvinho.github.io/gss</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
-    <h2 class="sr">One command to check us.</h2>
+    <h2 class="sr">One command to check us. kakitkelvinho.github.io/gss</h2>
     <aside class="notes"><b>~6 s.</b> One Harbor command runs the reference or any agent; seeds are fixed, so every number in this deck reproduces, and every run can be replayed on our site.</aside>
+    <span class="sn">8</span>
   </section>
 
   <section class="slide poster " data-video>
     <svg class="poster-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="1920" height="1080" fill="#E8742A"/>
-  <g filter="url(#pcutS)"><text x="110" y="298" class="tk-n">CODING</text>
-    <rect x="640" y="220" width="1160" height="96" fill="#EDE3CC"/><text x="1776" y="288" text-anchor="end" class="tk-b">MONTHS</text>
-    <rect x="640" y="340" width="130" height="96" fill="#2E6F9E"/><text x="794" y="408" class="tk-b">HOURS, WITH AGENTS</text><text x="110" y="578" class="tk-n">LAB WORK</text>
-    <rect x="640" y="500" width="1160" height="96" fill="#EDE3CC"/><text x="1776" y="568" text-anchor="end" class="tk-b">MONTHS</text>
-    <rect x="640" y="620" width="130" height="96" fill="none" stroke="#16120F" stroke-width="6" stroke-dasharray="16 12"/><text x="794" y="688" class="tk-b">HOURS? NOT YET</text></g>
   <g filter="url(#pcut)">
-    <text x="110" y="110" class="pt-sm" style="font-size:34px;fill:#16120F">github.com/kakitkelvinho/gss · kakitkelvinho.github.io/gss</text>
-    <text x="110" y="915" class="pt-big" style="font-size:130px;fill:#16120F" textLength="1270.1" lengthAdjust="spacingAndGlyphs">AGENTS CUT CODING TO HOURS.</text><text x="110" y="1043" class="pt-big" style="font-size:130px;fill:#EDE3CC" textLength="776.1" lengthAdjust="spacingAndGlyphs">LAB WORK IS NEXT.</text>
+    <text x="110" y="500" class="pt-big" style="font-size:150px;fill:#16120F" textLength="1465.5" lengthAdjust="spacingAndGlyphs">AGENTS CUT CODING TO HOURS.</text><text x="110" y="660" class="pt-big" style="font-size:150px;fill:#EDE3CC" textLength="895.5" lengthAdjust="spacingAndGlyphs">LAB WORK IS NEXT.</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
     <h2 class="sr">Agents cut coding to hours. Lab work is next.</h2>
     <aside class="notes"><b>~8 s.</b> Coding used to take us months; agents now do it in hours. Lab work still takes us months. GSS is a lab where agents can practise, so one day they can do it in hours too.</aside>
+    <span class="sn">9</span>
   </section>
 
   <section class="slide split">
@@ -798,6 +776,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
       <div><p>Physics in the loop</p><ul><li>Ray tracing, clipping on optics and mounts, lens focusing.</li><li>Polarisation, detector wavelength limits, noise, and stage backlash.</li><li>Seeded labs make reruns reproducible.</li></ul></div>
     </div>
     <aside class="notes">The task is difficult because the agent must infer a procedure and correct errors while the clock runs. We do not claim the simulator is a full wave-optics model or that every parameter was independently validated against hardware.</aside>
+    <span class="sn">10</span>
   </section>
 
   <section class="slide">
@@ -805,6 +784,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     <p>Up to 0.2 for transmitted spatial overlap and 0.5 more as the pulses reach time zero.</p>
     <p class="muted" style="margin-top:42px">The final 0.3 rewards money and lab time left only when physical efficiency is at least 0.9. Reading or buying alone earns nothing.</p>
     <aside class="notes">Each component is computed from the simulator's true final state. Partial alignment now gives a training signal without paying for empty tables or tool-call spam. The success threshold is based on measured physical efficiency.</aside>
+    <span class="sn">11</span>
   </section>
 
   <section class="slide">
@@ -812,6 +792,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     <ul><li>More frontier-model runs per seed, so averages become distributions.</li><li>Level 2 (90° crossing) runs with stronger models <span class="ph">[update when the Claude Level 2 runs are in]</span>.</li><li>Training a smaller model on GSS experience (the stretch goal).</li></ul>
     <p class="muted" style="margin-top:35px">These are next steps, not claims about the current results.</p>
     <aside class="notes">Judges rerun three agent trials. We have seven scored Level 1 Gemini runs (four Pro, two Flash, one Hydrogen), all archived and replayable. The Carbon run made no tool calls because of a thinking-budget harness issue and is not counted.</aside>
+    <span class="sn">12</span>
   </section>
 
   <div class="foot">

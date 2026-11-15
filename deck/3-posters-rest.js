@@ -91,7 +91,7 @@ const nodes = [
   { k: 'buy', t: 'BUY', tools: ['buy'], x: 800, y: 92, side: 'R' },
   { k: 'build', t: 'BUILD', tools: ['place · rotate · move', 'remove · knob · install'], x: 1150, y: 140, side: 'R' },
   { k: 'look', t: 'LOOK', tools: ['ir_card · view_camera', 'measure_path · block'], x: 1150, y: 470, side: 'R' },
-  { k: 'tzero', t: 'FIND TIME ZERO', tools: ['move_stage · scan', 'read_signal'], x: 800, y: 590, side: 'R' },
+  { k: 'tzero', t: 'SCAN', tools: ['move_stage · scan', 'read_signal'], x: 800, y: 590, side: 'R' },
   { k: 'submit', t: 'SUBMIT', tools: ['submit'], x: 450, y: 470, side: 'L' },
 ];
 const p4 = poster(CREAM, `
@@ -111,30 +111,28 @@ const p4 = poster(CREAM, `
   '<b>~13 s.</b> About twenty tools in six groups. Reading manuals is free; anything physical costs simulated lab time. The agent only sees instrument readings, never the simulator\'s true state.');
 
 // ===== results: average score per policy (too few runs per model for distributions) =====
-// Level 1, all scored with today's grader. Reference = mean over seeds 1-10; model rows = every archived Harbor run.
+// Level 1 Harbor runs scored with today's grader, plus the three blind Claude playthroughs (Level 2, seed 1, CLI not Harbor).
+// Reference = mean over seeds 1-10 (Level 1 0.929, Level 2 0.928).
 const RES = [
   { lab: 'Gemini 3.1 Pro', v: 0.000, n: '4 runs' },
   { lab: 'Gemini 3.8 Flash', v: (0.1847 + 0.1994) / 2, n: '2 runs' },
   { lab: 'Gemini 4 Hydrogen', v: 0.1999, n: '1 run' },
-  { lab: '[Claude, Level 2]', ph: true },
+  { lab: 'Claude · Level 2', v: (0.905 + 0.197 + 0.931) / 3, n: '3 runs' },
   { lab: 'Scripted reference', v: 0.929, n: '10 seeds', ref: true }];
 const R0 = 520, R1 = 1500, rx = r => R0 + r * (R1 - R0), STOP = 0.199;
 const p5 = poster(BLUE, `
   <g filter="url(#pcutS)">
-  ${RES.map((r, i) => { const y = 250 + i * 110;
+  ${RES.map((r, i) => { const y = 200 + i * 120;
     const lab = `<text x="${R0 - 30}" y="${y + 46}" text-anchor="end" class="bl-p${r.ref ? ' b' : ''}${r.ph ? ' ph' : ''}">${r.lab}</text>`;
     const track = `<rect x="${R0}" y="${y}" width="${R1 - R0}" height="66" fill="${CREAM}" opacity=".14"/>`;
     if (r.ph) return `<g class="br-row" style="--d:${0.2 + i * 0.12}s">${lab}${track}<rect x="${R0}" y="${y}" width="${R1 - R0}" height="66" fill="none" stroke="${ORANGE}" stroke-width="4" stroke-dasharray="14 10"/><text x="${R1 + 30}" y="${y + 52}" class="bv-p ph">[R]</text></g>`;
     return `<g class="br-row" style="--d:${0.2 + i * 0.12}s">${lab}${track}<rect x="${R0}" y="${y}" width="${f1(Math.max(6, rx(r.v) - R0))}" height="66" fill="${r.ref ? ORANGE : CREAM}"/>
       <text x="${R1 + 30}" y="${y + 52}" class="bv-p">${r.v.toFixed(3)}</text><text x="${R1 + 200}" y="${y + 46}" class="rn-p">${r.n}</text></g>`; }).join('')}
-  <path d="M${f1(rx(STOP))} 215 V${250 + RES.length * 110}" stroke="${INK}" stroke-width="5" stroke-dasharray="14 10"/>
-  <text x="${f1(rx(STOP) + 14)}" y="236" class="rn-p ink">STOP-EARLY BASELINE 0.199</text>
   </g>
   <g filter="url(#pcut)">
-    ${small(['Average reward, Level 1 · every archived Harbor run, rescored with today\'s grader', 'Replay each one at kakitkelvinho.github.io/gss'], CREAM, 100, 30)}
-    ${title(['THE AGENTS STOP', 'WHERE THE TIMING STARTS.'], 120, 925, 118, [INK, CREAM])}
-  </g>`, 'The agents stop where the timing starts.',
-  '<b>~14 s.</b> Average reward per model. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash and Hydrogen aligned the spots and stopped there, at the stop-early line of about 0.2. Our scripted reference averages 0.93 over ten seeds. [Add the Level 2 Claude result once it is in.]');
+    ${title(['AVERAGE SCORE OF MODELS'], 120, 960, 118, [CREAM])}
+  </g>`, 'Average score of models.',
+  '<b>~16 s.</b> Average reward per model. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash and Hydrogen aligned the spots and stopped at the stop-early line of about 0.2. Claude on the harder 90-degree level found time zero in two of three blind runs; the third chose the wrong detectors, ran short of time and submitted at a tape-measure guess 6.4 picoseconds off, so it averages 0.68. Our scripted reference averages 0.93 on every seed at both levels.');
 
 // ===== slide 6: four cut-paper panels =====
 const noisy = (() => { let s = ''; for (let x = 40; x <= 360; x += 8) s += `${s ? ' L' : 'M'}${x} ${f1(140 + (rnd() - 0.5) * 60)}`; return s; })();
@@ -157,12 +155,11 @@ const pan = [
 const caps = [['SPOTS ALIGNED,', 'pulses 46 ps apart'], ['SHORT INTEGRATION:', 'peak lost in noise'], ['NEVER BLOCKED AN ARM', 'to check backgrounds'], ['€4,030 OVER BUDGET,', '234 of 240 min used']];
 const p6 = poster(ORANGE, `
   ${pan.map((c, i) => { const x = 110 + i * 433;
-    return `<g transform="translate(${x},215)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="${CREAM}"/>${c}</g></svg>
-      <text x="200" y="478" text-anchor="middle" class="cap-p">${caps[i][0]}</text><text x="200" y="516" text-anchor="middle" class="cap-p2">${caps[i][1]}</text></g>`; }).join('')}
+    return `<g transform="translate(${x},200)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="${CREAM}"/>${c}</g></svg>
+      </g>`; }).join('')}
   <g filter="url(#pcut)">
-    ${small(['“The alignment and time-zero setup … has been completed and submitted.”', '— Flash\'s final report'], INK, 100, 32)}
-    ${title(['IT ALIGNED THE SPOTS.', 'IT NEVER VERIFIED THE TIMING.'], 118, 935, 112, [INK, CREAM])}
-  </g>`, 'It aligned the spots. It never verified the timing.',
+    ${title(['COMMON MISTAKES'], 150, 900, 112, [INK])}
+  </g>`, 'Common mistakes.',
   '<b>~16 s.</b> Flash reported “The alignment and time-zero setup has been completed and submitted”, while the pulses were 46 picoseconds apart. It scanned with a short integration time, so the peak drowned in noise; it never blocked one arm to check the backgrounds; and it overspent by €4,030 and used 234 of 240 minutes. Each failure is a decision, and the manuals describe the tools that avoid it.');
 
 // ===== slide 7: the expert's real scan =====
@@ -192,13 +189,10 @@ const p7 = poster(CREAM, `
 
 // ===== slide 8: reward components =====
 const B0 = 470, B1 = 1560, bx = r => B0 + r * (B1 - B0);
-const bars = [['Do nothing', [], '0.000'], ['Exploit attempts†', [], '0.000'], ['Stop early', [[BLUE2, .199]], '0.199'],
+const bars = [['Do nothing', [], '0.000'], ['Exploit attempts', [], '0.000'], ['Stop early', [[BLUE2, .199]], '0.199'],
   ['Scripted reference', [[BLUE2, .200], [ORANGE, .500], [CREAM, .228]], '0.928']];
 const p8 = poster(INK, `
   <g filter="url(#pcutS)">
-    <rect x="${B0}" y="200" width="34" height="34" fill="${BLUE2}"/><text x="${B0 + 48}" y="230" class="lg-p">SPATIAL ≤ 0.2</text>
-    <rect x="${B0 + 300}" y="200" width="34" height="34" fill="${ORANGE}"/><text x="${B0 + 348}" y="230" class="lg-p">TIMING ≤ 0.5</text>
-    <rect x="${B0 + 580}" y="200" width="34" height="34" fill="${CREAM}"/><text x="${B0 + 628}" y="230" class="lg-p">EFFICIENCY ≤ 0.3, ONLY IF η ≥ 0.9</text>
     ${bars.map(([l, segs, v], i) => { const y = 300 + i * 110; let a = 0;
       return `<g class="br-row" style="--d:${0.2 + i * 0.12}s"><text x="${B0 - 30}" y="${y + 44}" text-anchor="end" class="bl-p${i === bars.length - 1 ? ' b' : ''}">${l}</text>
         <rect x="${B0}" y="${y}" width="${B1 - B0}" height="62" fill="${CREAM}" opacity=".12"/>
@@ -206,9 +200,10 @@ const p8 = poster(INK, `
         <text x="${B1 + 30}" y="${y + 48}" class="bv-p">${v}</text></g>`; }).join('')}
   </g>
   <g filter="url(#pcut)">
-    ${small(['†Absurd arguments, 100,000 mirrors, status-call spam, verifier calls without its token — all in the test suite', 'Grader and simulator run outside the agent\'s container'], CREAM, 100, 28)}
-    ${title(['SCORED ON THE PHYSICS.', 'NO SHORTCUT BEATS REAL PLAY.'], 120, 925, 118, [CREAM, ORANGE])}
-  </g>`, 'Scored on the physics. No shortcut beats real play.',
+    <text x="110" y="140" class="fm-p">SCORE = <tspan fill="${BLUE2}">0.2 × SPOT OVERLAP</tspan> + <tspan fill="${ORANGE}">0.5 × TIMING OVERLAP</tspan> + <tspan fill="${CREAM}">[0.2 × (1 − EXTRA €) + 0.1 × (1 − LAB TIME)]</tspan></text>
+    <text x="110" y="200" class="fm-s">[ … ] counts only if timing overlap ≥ 0.9 · extra € = spend above the cheapest working setup, as a share of the €30k cap · buying more can only lower the score</text>
+    ${title(['SCORED ON PHYSICS.'], 150, 960, 118, [CREAM])}
+  </g>`, 'Scored on physics.',
   '<b>~14 s.</b> The score is computed from the simulator\'s true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing, and 0.3 for money and lab time saved, but only once the setup really works. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.');
 
 // ===== slide 9: one command =====
@@ -223,9 +218,8 @@ const p9 = poster(BLUE, `
     <text x="190" y="490" class="cmd"><tspan fill="${BLUE}">harbor</tspan> run -p . -a opencode -m <tspan fill="${ORANGE}">&lt;model&gt;</tspan></text>
   </g>
   <g filter="url(#pcut)">
-    ${small(['Fixed seeds · 77 tests · baselines regenerate docs/results.md', 'Every run replays at kakitkelvinho.github.io/gss'], CREAM, 110, 34)}
-    ${title(['ONE COMMAND', 'TO CHECK US.'], 150, 880, 150, [INK, CREAM])}
-  </g>`, 'One command to check us.',
+    <text x="110" y="820" class="lk-p">kakitkelvinho.github.io/gss</text>
+  </g>`, 'One command to check us. kakitkelvinho.github.io/gss',
   '<b>~6 s.</b> One Harbor command runs the reference or any agent; seeds are fixed, so every number in this deck reproduces, and every run can be replayed on our site.');
 
 // ===== slide 10: takeaway =====
@@ -235,17 +229,15 @@ const trow = (y, name, done) => `<text x="110" y="${y + 78}" class="tk-n">${name
     ${done ? `<rect x="${TB0}" y="${y + 120}" width="130" height="${TH}" fill="${BLUE}"/><text x="${TB0 + 154}" y="${y + 188}" class="tk-b">HOURS, WITH AGENTS</text>`
            : `<rect x="${TB0}" y="${y + 120}" width="130" height="${TH}" fill="none" stroke="${INK}" stroke-width="6" stroke-dasharray="16 12"/><text x="${TB0 + 154}" y="${y + 188}" class="tk-b">HOURS? NOT YET</text>`}`;
 const p10 = poster(ORANGE, `
-  <g filter="url(#pcutS)">${trow(220, 'CODING', true)}${trow(500, 'LAB WORK', false)}</g>
   <g filter="url(#pcut)">
-    ${small(['github.com/kakitkelvinho/gss · kakitkelvinho.github.io/gss'], INK, 110, 34)}
-    ${title(['AGENTS CUT CODING TO HOURS.', 'LAB WORK IS NEXT.'], 130, 915, 128, [INK, CREAM])}
+    ${title(['AGENTS CUT CODING TO HOURS.', 'LAB WORK IS NEXT.'], 150, 500, 160, [INK, CREAM])}
   </g>`, 'Agents cut coding to hours. Lab work is next.',
   '<b>~8 s.</b> Coding used to take us months; agents now do it in hours. Lab work still takes us months. GSS is a lab where agents can practise, so one day they can do it in hours too.');
 
 // ---- swap sections 3..10 ----
 const secs = [...html.matchAll(/  <section class="slide[^"]*"[^>]*>[\s\S]*?<\/section>\n/g)];
 const start = secs[2].index, end = secs[9].index + secs[9][0].length;
-html = html.slice(0, start) + [p3, p7, p4, p8, p5, p6, p9, p10].join('\n') + html.slice(end);  // task, scan, lab, scoring, results, failures, command, takeaway
+html = html.slice(0, start) + [p7, p4, p8, p5, p6, p9, p10].join('\n') + html.slice(end);  // scan, lab, scoring, results, failures, command, takeaway (task slide dropped)
 
 const css = `
   /* ===== v6: all video slides are posters; backups on cream paper ===== */
@@ -266,6 +258,11 @@ const css = `
   .bl-p.ph, .bv-p.ph { fill:${ORANGE}; } .rn-p { font:500 26px Oswald, Impact, sans-serif; fill:${CREAM}; letter-spacing:.04em; } .rn-p.ink { fill:${INK}; }
   .tk-n { font:400 96px "Bebas Neue", Impact, sans-serif; fill:${INK}; } .tk-b { font:400 54px "Bebas Neue", Impact, sans-serif; fill:${INK}; }
   .bv-p { font:400 60px "Bebas Neue", Impact, sans-serif; fill:${CREAM}; }
+  .fm-p { font:500 44px Oswald, Impact, sans-serif; fill:${CREAM}; letter-spacing:.02em; }
+  .fm-s { font:500 24px Oswald, Impact, sans-serif; fill:${CREAM}; opacity:.8; letter-spacing:.03em; text-transform:uppercase; }
+  .lk-p { font:400 120px "Bebas Neue", Impact, sans-serif; fill:${CREAM}; letter-spacing:.02em; }
+  .slide .sn { position:absolute; right:36px; bottom:26px; z-index:5; min-width:56px; padding:6px 12px; text-align:center;
+    background:${INK}; color:${CREAM}; font:400 38px/1 "Bebas Neue", Impact, sans-serif; letter-spacing:.04em; }
   .cmd { font:700 64px "Courier New", Courier, monospace; fill:${INK}; }
   @keyframes ppO { 0%,8% { transform:translate(0,0) scale(1.4); opacity:0; } 14% { opacity:1; } 52% { transform:translate(940px,-400px) scale(.3); opacity:1; } 56%,100% { transform:translate(940px,-400px) scale(.3); opacity:0; } }
   @keyframes ppB { 0%,8% { transform:translate(0,0) scale(1.4); opacity:0; } 14% { opacity:1; } 52% { transform:translate(-860px,-340px) scale(.3); opacity:1; } 56%,100% { transform:translate(-860px,-340px) scale(.3); opacity:0; } }
@@ -285,6 +282,8 @@ const css = `
     .pp-b { transform:translate(-860px,-340px) scale(.3) !important; opacity:1 !important; }
   }
 `;
+let sn = 0;
+html = html.replace(/(  <section class="slide[^"]*"[^>]*>[\s\S]*?)(\n?\s*<\/section>\n)/g, (m, a, b) => `${a}\n    <span class="sn">${++sn}</span>${b}`);
 html = html.replace('</style>', css + '</style>').replace(/<title>.*?<\/title>/, '<title>GSS · Find Time Zero (v6)</title>');
 fs.writeFileSync(OUT, html);
 console.log('wrote', OUT, fs.statSync(OUT).size, 'sections', [...html.matchAll(/<section class="slide/g)].length);
