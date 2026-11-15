@@ -11,7 +11,7 @@ services:
       dockerfile: environment/sim/Dockerfile
     environment:
       GSS_SEED: "${GSS_SEED:-1}"
-      GSS_LEVEL: "${GSS_LEVEL:-1}"
+      GSS_LEVEL: "${GSS_LEVEL:-2}"    # default: Level 2 (90° crossing); GSS_LEVEL=1 for the collinear level
     expose:
       - "8000"
     healthcheck:

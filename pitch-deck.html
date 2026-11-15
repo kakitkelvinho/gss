@@ -650,16 +650,16 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
         <rect x="470" y="520" width="216.9" height="62" fill="#4A8FC4"/>
         <text x="1590" y="568" class="bv-p">0.199</text></g><g class="br-row" style="--d:0.56s"><text x="440" y="674" text-anchor="end" class="bl-p b">Scripted reference</text>
         <rect x="470" y="630" width="1090" height="62" fill="#EDE3CC" opacity=".12"/>
-        <rect x="470" y="630" width="218" height="62" fill="#4A8FC4"/><rect x="688" y="630" width="545" height="62" fill="#E8742A"/><rect x="1233" y="630" width="248.5" height="62" fill="#EDE3CC"/>
-        <text x="1590" y="678" class="bv-p">0.928</text></g>
+        <rect x="470" y="630" width="218" height="62" fill="#4A8FC4"/><rect x="688" y="630" width="509" height="62" fill="#E8742A"/><rect x="1197" y="630" width="182" height="62" fill="#EDE3CC"/>
+        <text x="1590" y="678" class="bv-p">0.835</text></g>
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="160" class="fm-p">SCORE = <tspan fill="#4A8FC4">0.2 × SPOT OVERLAP</tspan> + <tspan fill="#E8742A">0.5 × TIMING OVERLAP</tspan> + <tspan fill="#EDE3CC">[0.2 × (1 − EXTRA €) + 0.1 × (1 − LAB TIME)]</tspan></text>
+    <text x="110" y="160" class="fm-p">SCORE = <tspan fill="#4A8FC4">0.2 × SPOT OVERLAP</tspan> + <tspan fill="#E8742A">0.5 × TIMING × PRECISION</tspan> + <tspan fill="#EDE3CC">[0.2 × MIN € ÷ € + 0.1 × (1 − LAB TIME)²]</tspan></text>
     <text x="110" y="960" class="pt-big" style="font-size:150px;fill:#EDE3CC" textLength="985.5" lengthAdjust="spacingAndGlyphs">SCORED ON PHYSICS.</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
     <h2 class="sr">Scored on physics.</h2>
-    <aside class="notes"><b>~14 s.</b> The score is computed from the simulator's true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing, and 0.3 for money and lab time saved, but only once the setup really works. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.</aside>
+    <aside class="notes"><b>~14 s.</b> The score is computed from the simulator's true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing (falling with every femtosecond of error), and 0.3 for money and lab time saved, but only once the setup really works: spend is credited as the cheapest workable design over what was spent, and lab time quadratically. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.</aside>
     <span class="sn">5</span>
   </section>
 
@@ -667,19 +667,19 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     <svg class="poster-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="1920" height="1080" fill="#2E6F9E"/>
   <g filter="url(#pcutS)">
-  <g class="br-row" style="--d:0.2s"><text x="490" y="246" text-anchor="end" class="bl-p">Gemini 3.1 Pro</text><rect x="520" y="200" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="200" width="6" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="252" class="bv-p">0.000</text><text x="1700" y="246" class="rn-p">4 runs</text></g><g class="br-row" style="--d:0.32s"><text x="490" y="366" text-anchor="end" class="bl-p">Gemini 3.8 Flash</text><rect x="520" y="320" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="320" width="188.2" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="372" class="bv-p">0.192</text><text x="1700" y="366" class="rn-p">2 runs</text></g><g class="br-row" style="--d:0.44s"><text x="490" y="486" text-anchor="end" class="bl-p">Gemini 4 Hydrogen</text><rect x="520" y="440" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="440" width="195.9" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="492" class="bv-p">0.200</text><text x="1700" y="486" class="rn-p">1 run</text></g><g class="br-row" style="--d:0.56s"><text x="490" y="606" text-anchor="end" class="bl-p">Claude · Level 2</text><rect x="520" y="560" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="560" width="664.1" height="66" fill="#EDE3CC"/>
-      <text x="1530" y="612" class="bv-p">0.678</text><text x="1700" y="606" class="rn-p">3 runs</text></g><g class="br-row" style="--d:0.6799999999999999s"><text x="490" y="726" text-anchor="end" class="bl-p b">Scripted reference</text><rect x="520" y="680" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="680" width="910.4" height="66" fill="#E8742A"/>
-      <text x="1530" y="732" class="bv-p">0.929</text><text x="1700" y="726" class="rn-p">10 seeds</text></g>
+  <g class="br-row" style="--d:0.2s"><text x="490" y="246" text-anchor="end" class="bl-p">Gemini 3.1 Pro · L1</text><rect x="520" y="200" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="200" width="6" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="252" class="bv-p">0.000</text><text x="1700" y="246" class="rn-p">4 runs</text></g><g class="br-row" style="--d:0.32s"><text x="490" y="366" text-anchor="end" class="bl-p">Gemini 3.8 Flash · L1</text><rect x="520" y="320" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="320" width="389.8" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="372" class="bv-p">0.398</text><text x="1700" y="366" class="rn-p">3 runs</text></g><g class="br-row" style="--d:0.44s"><text x="490" y="486" text-anchor="end" class="bl-p">Gemini 4 Hydrogen · L1</text><rect x="520" y="440" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="440" width="195.9" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="492" class="bv-p">0.200</text><text x="1700" y="486" class="rn-p">1 run</text></g><g class="br-row" style="--d:0.56s"><text x="490" y="606" text-anchor="end" class="bl-p">Claude · L2</text><rect x="520" y="560" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="560" width="691.6" height="66" fill="#EDE3CC"/>
+      <text x="1530" y="612" class="bv-p">0.706</text><text x="1700" y="606" class="rn-p">6 runs</text></g><g class="br-row" style="--d:0.6799999999999999s"><text x="490" y="726" text-anchor="end" class="bl-p b">Scripted reference · L2</text><rect x="520" y="680" width="980" height="66" fill="#EDE3CC" opacity=".14"/><rect x="520" y="680" width="818.3" height="66" fill="#E8742A"/>
+      <text x="1530" y="732" class="bv-p">0.835</text><text x="1700" y="726" class="rn-p">10 seeds</text></g>
   </g>
   <g filter="url(#pcut)">
     <text x="110" y="960" class="pt-big" style="font-size:120px;fill:#EDE3CC" textLength="1032" lengthAdjust="spacingAndGlyphs">AVERAGE SCORE OF MODELS</text>
   </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
     </svg>
     <h2 class="sr">Average score of models.</h2>
-    <aside class="notes"><b>~16 s.</b> Average reward per model. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash and Hydrogen aligned the spots and stopped at the stop-early line of about 0.2. Claude on the harder 90-degree level found time zero in two of three blind runs; the third chose the wrong detectors, ran short of time and submitted at a tape-measure guess 6.4 picoseconds off, so it averages 0.68. Our scripted reference averages 0.93 on every seed at both levels.</aside>
+    <aside class="notes"><b>~16 s.</b> Average reward per model, all re-scored with the current, tougher grader. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash aligned the spots and stopped near 0.2 twice, and once found time zero for 0.81. Hydrogen stopped at the stop-early line of about 0.2. Claude played six blind runs on the harder 90-degree level: four found time zero (0.85 to 0.90), one lost power at the retroreflector (0.54), and one chose the wrong detectors and submitted at a tape-measure guess 6.4 picoseconds off (0.20), averaging 0.71. Our scripted reference averages 0.84 over ten seeds at that level: the score now rewards precise timing, minimum spend and fast work, so even the reference leaves points on the table.</aside>
     <span class="sn">6</span>
   </section>
 

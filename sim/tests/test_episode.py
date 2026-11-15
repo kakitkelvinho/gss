@@ -132,7 +132,16 @@ def test_reward_grades_physics_and_gates_efficiency():
     assert success["reward"] == pytest.approx(1.0)
     assert success["success"]
     costly = RW.score(1.0, 1.0, 1.0, 1.0, cost=K.SPEND_CAP, time_frac=1.0, c_min_eur=950.0)
-    assert costly["reward"] == pytest.approx(0.7)
+    assert costly["reward"] == pytest.approx(0.7 + K.ALPHA * 950.0 / K.SPEND_CAP)
+    # Tougher grading: spend credit is C_min / cost, lab-time credit falls quadratically, and timing
+    # credit falls with the absolute timing error.
+    twice = RW.score(1.0, 1.0, 1.0, 1.0, cost=1900.0, time_frac=0.5, c_min_eur=950.0)
+    assert twice["efficiency_score"] == pytest.approx(K.ALPHA * 0.5 + K.BETA * 0.25)
+    cheap = RW.score(1.0, 1.0, 1.0, 1.0, cost=500.0, time_frac=0.0, c_min_eur=950.0)
+    assert cheap["efficiency_score"] == pytest.approx(K.ALPHA + K.BETA)  # capped at full credit
+    late = RW.score(1.0, 1.0, 1.0, 1.0, dt_fs=K.TAU_SCORE_FS, **base)
+    assert late["temporal_score"] == pytest.approx(0.5 * math.exp(-1))
+    assert RW.score(1.0, 1.0, 1.0, 1.0, dt_fs=0.0, **base)["reward"] == pytest.approx(1.0)
 
 
 def test_timeout_auto_submits_and_locks():

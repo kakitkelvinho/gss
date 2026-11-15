@@ -276,16 +276,18 @@ function scoreSvg(run, step) {
   return `<svg class="graph" viewBox="0 0 270 34" preserveAspectRatio="none" aria-label="Score history"><path d="M0 32 H270" stroke="var(--line)"/><path d="${path}" fill="none" stroke="#16120F" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg>`;
 }
 // ---- Score breakdown: the grader in sim/reward.py, recomputed from the replay's diagnostic truth at this step. ----
-// reward = 0.2 x spatial + 0.5 x timing + 0.3 efficiency (efficiency only once timing >= 0.9).
+// reward = 0.2 x spatial + 0.5 x timing x precision + 0.3 efficiency (efficiency only once timing >= 0.9);
+// precision = exp(-(dt/60 fs)^2), spend credit = C_min/cost, time credit = (1 - time used)^2.
 // spatial = T_800 x T_opa x O; timing = eta = T_800 x T_opa x O x exp(-(dt / tau)^2).
-const GRADER = { spatial: 0.2, timing: 0.5, alpha: 0.2, beta: 0.1, success: 0.9, tau: { 1: 70.04, 2: 186.21 }, mmPerFs: 0.000299792458 };
+const GRADER = { spatial: 0.2, timing: 0.5, alpha: 0.2, beta: 0.1, success: 0.9, tau: { 1: 70.04, 2: 186.21 }, tauScore: 60, mmPerFs: 0.000299792458 };
 function fmtDt(fs) { const a = Math.abs(fs); return a >= 1000 ? `${(a / 1000).toFixed(1)} ps` : `${Math.round(a)} fs`; }
 function endName(end) { return end === 'sample' ? 'the sample' : String(end || 'nowhere').replace(/^mount of /, 'the mount of ').replace(/^lens mount$/, 'the lens mount'); }
 function breakdown(run, call) {
   const t = call.truth || {}, meta = run.meta || {}, level = meta.level || 1, T8 = t.T_800 || 0, To = t.T_opa || 0, O = t.O || 0, eta = Math.max(0, Math.min(1, t.eta || 0));
-  const spatial = GRADER.spatial * Math.max(0, Math.min(1, T8 * To * O)), timing = GRADER.timing * eta, success = eta >= GRADER.success;
-  const cap = meta.spend_cap_eur || 30000, cmin = meta.c_min_eur || 0, costFrac = Math.max(0, Math.min(1, ((call.snapshot?.cost_eur || 0) - cmin) / (cap - cmin))), timeFrac = Math.max(0, Math.min(1, (call.t_s || 0) / (meta.budget_s || 14400)));
-  const efficiency = success ? GRADER.alpha * (1 - costFrac) + GRADER.beta * (1 - timeFrac) : 0, total = Math.min(1, spatial + timing + efficiency);
+  const precision = Number.isFinite(t.dt_fs) ? Math.exp(-((t.dt_fs / GRADER.tauScore) ** 2)) : 1;
+  const spatial = GRADER.spatial * Math.max(0, Math.min(1, T8 * To * O)), timing = GRADER.timing * eta * precision, success = eta >= GRADER.success;
+  const cost = call.snapshot?.cost_eur || 0, cmin = meta.c_min_eur || 0, costCredit = cost > 0 ? Math.max(0, Math.min(1, cmin / cost)) : 1, timeFrac = Math.max(0, Math.min(1, (call.t_s || 0) / (meta.budget_s || 14400))), timeCredit = (1 - timeFrac) ** 2;
+  const efficiency = success ? GRADER.alpha * costCredit + GRADER.beta * timeCredit : 0, total = Math.min(1, spatial + timing + efficiency);
   const tau = GRADER.tau[level] || GRADER.tau[1], reach = T8 * To * O, window = reach > GRADER.success ? tau * Math.sqrt(Math.log(reach / GRADER.success)) : null;
   const isFinal = call.tool === 'submit' || state.step === run.trajectory.length - 1, recorded = Number(t.reward ?? total);
   let reason;
@@ -296,12 +298,12 @@ function breakdown(run, call) {
   else reason = `Pulses meet in space and time (Δt ${fmtDt(t.dt_fs)})`;
   const verdict = success ? (isFinal ? 'Passed' : 'Working') : isFinal ? 'Failed' : 'Not yet';
   const row = (label, weight, value, points, note) => `<div class="bd-row"><span class="bd-label">${label} <em>×${weight.toFixed(1)}</em></span><span class="bd-value">${note}</span><span class="bd-bar"><i style="width:${(points / weight * 100).toFixed(1)}%"></i></span><strong>${points.toFixed(2)}</strong></div>`;
-  const legacy = isFinal && Math.abs(recorded - total) > 0.005 ? `<p class="bd-note">Recorded score ${recorded.toFixed(3)} came from an earlier grader. Today's grader gives ${total.toFixed(3)}.</p>` : '';
-  return `<div class="bd-head"><span class="bd-verdict ${success ? 'ok' : isFinal ? 'bad' : ''}">${verdict}</span>${run.old_scorer ? '<span class="bd-old" title="This run was graded by an earlier version of the scorer">Old scorer</span>' : ''}<span class="bd-total">${(isFinal ? recorded : total).toFixed(3)}</span></div>
+  const legacy = isFinal && Math.abs(recorded - total) > 0.005 ? `<p class="bd-note">Score under today's grader. The verifier recorded ${recorded.toFixed(3)} with an earlier, more lenient grader.</p>` : '';
+  return `<div class="bd-head"><span class="bd-verdict ${success ? 'ok' : isFinal ? 'bad' : ''}">${verdict}</span>${run.old_scorer ? '<span class="bd-old" title="This run was graded by an earlier version of the scorer">Old scorer</span>' : ''}<span class="bd-total">${total.toFixed(3)}</span></div>
     <p class="bd-reason">${esc(reason)}</p>
     ${row('Spot overlap', GRADER.spatial, O, spatial, `${(O * 100).toFixed(1)}%${T8 * To < 0.99 ? ` · T ${(T8 * To * 100).toFixed(0)}%` : ''}`)}
-    ${row('Timing', GRADER.timing, eta, timing, Number.isFinite(t.dt_fs) ? `Δt ${fmtDt(t.dt_fs)}` : 'no overlap')}
-    ${row('Efficiency', 0.3, efficiency, efficiency, success ? `cost ${Math.round((1 - costFrac) * 100)}% · time ${Math.round((1 - timeFrac) * 100)}%` : 'locked until timing ≥ 0.9')}${legacy}`;
+    ${row('Timing', GRADER.timing, eta, timing, Number.isFinite(t.dt_fs) ? `Δt ${fmtDt(t.dt_fs)} · precision ${Math.round(precision * 100)}%` : 'no overlap')}
+    ${row('Efficiency', 0.3, efficiency, efficiency, success ? `cost ${Math.round(costCredit * 100)}% · time ${Math.round(timeCredit * 100)}%` : 'locked until timing ≥ 0.9')}${legacy}`;
 }
 // Level badge: a 0.85 at Level 1 (collinear) is not comparable with a 0.85 at Level 2 (90° crossing).
 function levelBadge(run, compact) {

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from functools import lru_cache
 
 from sim import catalogue as cat
@@ -48,19 +49,23 @@ def c_min(lam_o: float, level: int = 1) -> float:
 
 
 def score(eta: float, overlap: float, t_800: float, t_opa: float,
-          cost: float, time_frac: float, c_min_eur: float) -> dict[str, float | bool]:
+          cost: float, time_frac: float, c_min_eur: float,
+          dt_fs: float | None = None) -> dict[str, float | bool]:
     """Spatial credit requires two transmitted beams; timing credit requires overlap.
 
     The 0.3 efficiency bonus is gated by physical success, not purchases or tool use.
+    Timing credit also falls with the absolute timing error (TAU_SCORE_FS), spend credit is the
+    cheapest workable design's cost over the spend, and lab-time credit falls quadratically.
     """
     spatial = max(0.0, min(1.0, t_800 * t_opa * overlap))
     timed = max(0.0, min(1.0, eta))
     success = timed >= 0.9
-    cost_frac = max(0.0, min(1.0, (cost - c_min_eur) / (K.SPEND_CAP - c_min_eur)))
+    precision = 1.0 if dt_fs is None else math.exp(-(dt_fs / K.TAU_SCORE_FS) ** 2)
+    cost_credit = 1.0 if cost <= 0 else max(0.0, min(1.0, c_min_eur / cost))
     time_frac = max(0.0, min(1.0, time_frac))
     spatial_score = 0.2 * spatial
-    temporal_score = 0.5 * timed
-    efficiency_score = (K.ALPHA * (1.0 - cost_frac) + K.BETA * (1.0 - time_frac)) if success else 0.0
+    temporal_score = 0.5 * timed * precision
+    efficiency_score = (K.ALPHA * cost_credit + K.BETA * (1.0 - time_frac) ** 2) if success else 0.0
     return {"reward": min(1.0, spatial_score + temporal_score + efficiency_score),
             "spatial_score": spatial_score, "temporal_score": temporal_score,
             "efficiency_score": efficiency_score, "success": success}

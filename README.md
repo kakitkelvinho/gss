@@ -55,7 +55,7 @@ from the catalogue, datasheets and manuals:
   - the free Si alignment camera can't see 1300 nm, so that seed needs the VIS-SWIR camera;
   - fast photodiodes give only a coarse (~10 ps) arrival time, and only for wavelengths in their range.
 
-## Level 2: 90° crossing (`GSS_LEVEL=2`)
+## Level 2: 90° crossing (the default; `GSS_LEVEL=1` selects the collinear level)
 
 The beams must cross at a full angle of 90° at the sample (each 45° from the normal), through a mount with
 **one f = 100 mm lens per beam**; the same lens for both beams doesn't count. What changes:
@@ -91,13 +91,17 @@ The reward is computed from the **simulator's true final state**, whatever detec
 $$S = T_{800}T_\text{opa}O,\qquad
 \eta = S\exp\!\left[-\left(\frac{\Delta t}{\tau_c}\right)^2\right]$$
 
-$$R = 0.2S + 0.5\eta + \mathbf{1}_{\eta\geq0.9}\left[0.2(1-c) + 0.1\left(1-\frac{t_\text{lab}}{4\,\text{h}}\right)\right],\qquad
-c = \operatorname{clip}\!\left(\frac{C-C_\text{min}}{C_\text{cap}-C_\text{min}},0,1\right)$$
+$$R = 0.2S + 0.5\,\eta\,e^{-(\Delta t/\tau_s)^2} + \mathbf{1}_{\eta\geq0.9}\left[0.2\min\!\left(1,\frac{C_\text{min}}{C}\right) + 0.1\left(1-\frac{t_\text{lab}}{4\,\text{h}}\right)^{2}\right]$$
 
 - $O$ is the normalised overlap of the two focal spots.
-- $\Delta t$ is the true delay error, and $\tau_c \approx 70$ fs.
+- $\Delta t$ is the true delay error, $\tau_c \approx 70$ fs (L1; the 90° crossing broadens it to about
+  186 fs in L2), and $\tau_s = 60$ fs sets how precisely the score wants time zero: 16 fs off keeps
+  about 93% of the timing credit, 50 fs off about half.
 - $T$ is the clipping transmission of each arm.
-- $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength and level (L1: €7,450 at 1300 nm, €950 at 600 nm, €1,700 at 450 nm; L2: €7,300 / €1,550 / €1,550; brute-forced from the catalogue with the detector model: stage, the minimum mirrors (2 in L1, 1 in L2), diagnostic + filter, and a camera that sees 1300 nm), and $C_\text{cap}$ = €30k.
+- $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength and level (L1: €7,450 at 1300 nm, €950 at 600 nm, €1,700 at 450 nm; L2: €7,300 / €1,550 / €1,550; brute-forced from the catalogue with the detector model: stage, the minimum mirrors (2 in L1, 1 in L2), diagnostic + filter, and a camera that sees 1300 nm). Spending more than $C_\text{min}$ lowers the spend credit in proportion, and lab-time credit falls with
+  the square of the fraction of the 4 h used. Known gap: at L2 with a 600 nm OPA the model counts only GaN + filter
+  (€1,550), but blind players found time zero there with GaP and built for €1,250–1,400; spend below
+  $C_\text{min}$ simply earns full spend credit (see docs/DECISIONS.md).
 - $S$ awards up to 0.2 for transmitted spatial overlap. Timing awards up to another 0.5. Cost and
   time can earn the last 0.3 only when the true final efficiency $\eta$ is at least 0.9. No points
   are awarded for reading, purchases, tool calls, or measurements themselves.
@@ -131,7 +135,7 @@ step, with the score explained, at **<https://kakitkelvinho.github.io/gss/>** (s
 harbor run -p . -a opencode -m <provider/model>   # one agent run (needs Docker)
 harbor run -p . -a oracle                          # reference (scripted expert) run
 GSS_SEED=3 harbor run -p . -a opencode -m <provider/model>   # another seed (default 1)
-GSS_LEVEL=2 harbor run -p . -a opencode -m <provider/model>  # 90 deg crossing (default level 1)
+GSS_LEVEL=1 harbor run -p . -a opencode -m <provider/model>  # collinear level (default is level 2, 90 deg crossing)
 ```
 
 To watch your runs instead of reading the terminal output, start the viewer in a second terminal
@@ -168,10 +172,10 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 
 | level | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|---|
-| 1 | reference (scripted expert) | 0.931 | 0.925 | 47.2% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | reference (scripted expert) | 0.818 | 0.777 | 47.2% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 1 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 1 | stop-early (spatial overlap, no timing scan) | 0.199 | 0.197 | 39.3% | spatial credit only, R ≤ 0.2 ✅ |
-| 2 | reference (scripted expert) | 0.941 | 0.935 | 55.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 2 | reference (scripted expert) | 0.835 | 0.781 | 55.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 
@@ -180,7 +184,23 @@ own runs to the repo and the [live viewer](https://kakitkelvinho.github.io/gss/)
 `python3 scripts/publish_runs.py <your harbor jobs folder>`, then commit `runs/` and `viewer/runs/` and push;
 the site rebuilds on every push to `main`.
 
-Historical blind playthroughs by fresh Claude agents with no access to the code, under earlier task
+Agent results so far, by level. Scores are only comparable within one level; the default level is 2.
+
+| level | agent | how it was run | R (current grader) | R as recorded |
+|---|---|---|---|---|
+| 1 | Gemini 3.8 Flash (OpenCode), seed 1 | Harbor | 0.809 | 0.851 |
+| 1 | Gemini 3.1 Pro Preview (OpenCode), seeds 1–3 | Harbor, 4 trials | 0.000 each | 0.000 each |
+| 2 | Claude, blind subagents, seed 1 | local server, not Harbor | 0.846, 0.886, 0.197 | 0.905, 0.931, 0.197 |
+| 2 | Claude, blind subagents, seed 3 (600 nm) | local server, not Harbor | 0.897, 0.868, 0.540 | 0.957, 0.927, 0.544 |
+
+The recorded scores came from the earlier, more lenient grader; replaying each run re-scores it with the
+current one (the physics is unchanged, so the replays match exactly). Same-seed references under the current
+grader ([docs/results.md](docs/results.md), [docs/results_l2.md](docs/results_l2.md)): Level 1 seed 1 0.869;
+Level 2 seed 1 0.898, seed 3 0.828. The blind runs and their
+players' feedback are in [docs/playthroughs.md](docs/playthroughs.md); every run above can be replayed in the
+[viewer](https://kakitkelvinho.github.io/gss/).
+
+Historical blind playthroughs by fresh Claude agents with no access to the code, on Level 1 under earlier task
 versions ([docs/playthroughs.md](docs/playthroughs.md)):
 on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
 (R ≈ 0.93); after the de-hint and buildability changes, 2 runs scored R = 0.88 and 0.72 (slower, with partial
@@ -188,7 +208,7 @@ failures such as clipping at the lens edge and timing off by backlash).
 
 Four OpenCode + Gemini 3.1 Pro Preview trials on Level 1 (seeds 1–3, seed 1 repeated) scored
 0.000 under the graded reward; all four failed to route both beams to the sample. The same-seed
-reference scores are 0.925–0.933. See the [run report](docs/gemini-pro-results.md) and
+reference scores are 0.777–0.869 under the current grader (0.925–0.933 under the earlier one). See the [run report](docs/gemini-pro-results.md) and
 [static replay](viewer/prototype.html). `python scripts/summarise_jobs.py jobs/` writes a local
 score and failure summary for future runs; `python3 scripts/export_viewer_runs.py jobs`
 adds finished runs as independent files in `viewer/runs/`. The static [run archive](viewer/stats.html)

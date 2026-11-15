@@ -4,7 +4,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 
 - OPA wavelength 1300 nm. Parts bought: DL-C25 motorised delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7450)
 - Lab time: 113.2 min of 240 (47.2%), 110 tool calls
-- Result: eta = 0.9965, R = 0.9247, O = 0.9966, |dt| = 0.5 fs
+- Result: eta = 0.9965, R = 0.8694, O = 0.9966, |dt| = 0.5 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|

@@ -223,7 +223,8 @@ class Episode:
             area = (max(x[0] for x in xs) - min(x[0] for x in xs)) * (max(x[2] for x in xs) - min(x[2] for x in xs)) / 1e6
         self.final = {
             **RW.score(tr["eta"], tr["O"], tr["T_800"], tr["T_opa"],
-                       self.cost, self.t / K.BUDGET_S, self.c_min),
+                       self.cost, self.t / K.BUDGET_S, self.c_min,
+                       None if dt is None else abs(dt)),
             "eta": tr["eta"],
             "O": tr["O"],
             "abs_dt_fs": None if dt is None else abs(dt),

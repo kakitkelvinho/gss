@@ -50,7 +50,9 @@ def test_reference_collect_grade(tmp_path):
     vdir = tmp_path / "logs" / "verifier"
     reward = float((vdir / "reward.txt").read_text())
     rj = json.loads((vdir / "reward.json").read_text())
-    assert reward >= 0.9 and rj["reward"] == reward
+    # The reference wins the physics (eta >= 0.9) but not every efficiency point under the tougher
+    # grader (seed 2 spends EUR 4600 against C_min EUR 1700): its reward is about 0.80.
+    assert reward >= 0.75 and rj["reward"] == reward and rj["success"] == 1
     assert all(isinstance(v, (int, float)) for v in rj.values())
     assert (vdir / "trajectory.json").exists()
 

@@ -124,7 +124,19 @@ def harbor_usage(trial: Path) -> dict | None:
     return usage or None
 
 
+def _abs_dt(truth: dict):
+    dt = truth.get("dt_fs")
+    return None if dt is None else abs(dt)
+
+
+# Score fields come from the grader, not the physics. Replay must reproduce the physics exactly; the
+# score is recomputed with today's grader (and tag_scorer records when it differs from the logged one).
+GRADER_KEYS = {"reward", "spatial_score", "temporal_score", "efficiency_score", "success"}
+
+
 def diagnostics_match(actual: dict, recorded: dict) -> bool:
+    actual = {k: v for k, v in actual.items() if k not in GRADER_KEYS}
+    recorded = {k: v for k, v in recorded.items() if k not in GRADER_KEYS}
     if actual.keys() != recorded.keys():
         return False
     for key, value in actual.items():
@@ -149,7 +161,7 @@ def export_run(verifier_dir: Path, jobs_dir: Path):
             raise ValueError(f"simulator replay diverged at {verifier_dir}, step {step['i']}")
         truth = dict(step["truth"])
         truth.update(CURRENT_REWARD.score(truth["eta"], truth["O"], truth["T_800"], truth["T_opa"],
-                              ep.cost, ep.t / K.BUDGET_S, ep.c_min))
+                              ep.cost, ep.t / K.BUDGET_S, ep.c_min, _abs_dt(truth)))
         steps.append({**step, "truth": truth, "snapshot": snapshot(ep, step["tool"], response)})
     if not diagnostics_match(ep.result(), diagnostics):
         raise ValueError(f"final diagnostics differ at {verifier_dir}")
@@ -175,11 +187,37 @@ def tag_scorer(run):
     meta, last = run["meta"], run["trajectory"][-1]
     t = last["truth"]
     today = CURRENT_REWARD.score(t["eta"], t["O"], t["T_800"], t["T_opa"], last["snapshot"]["cost_eur"],
-                     last["t_s"] / meta["budget_s"], meta["c_min_eur"])["reward"]
+                     last["t_s"] / meta["budget_s"], meta["c_min_eur"], _abs_dt(t))["reward"]
     run["today_reward"] = round(today, 6)
     run["old_scorer"] = abs(today - run["diagnostics"]["reward"]) > 0.005
     run["label"] = run["label"].removesuffix(" (old scorer)") + (" (old scorer)" if run["old_scorer"] else "")
     return run
+
+
+def rescore_archive(runs_dir: Path) -> int:
+    """Recompute every step's score fields and today_reward with today's grader.
+
+    Only the grader's output changes: the physics in each step's truth (eta, O, T, dt) and the
+    verifier's recorded diagnostics are kept, so the viewer can still show what was recorded.
+    """
+    n = 0
+    for path in sorted(runs_dir.glob("*.json")):
+        run = json.loads(path.read_text())
+        meta = run["meta"]
+        for step in run["trajectory"]:
+            truth = step["truth"]
+            if "eta" not in truth:
+                continue
+            truth.update(CURRENT_REWARD.score(truth["eta"], truth["O"], truth["T_800"], truth["T_opa"],
+                                              (step.get("snapshot") or {}).get("cost_eur", 0.0),
+                                              step["t_s"] / meta["budget_s"], meta["c_min_eur"], _abs_dt(truth)))
+        run = tag_scorer(run)
+        if path.name != file_for(run["id"]):
+            raise ValueError(f"run filename does not match its ID: {path}")
+        # Overwrite in place (save_run refuses to change an archived run, which is right for exports).
+        path.write_text(json.dumps(run, separators=(",", ":"), ensure_ascii=False) + "\n")
+        n += 1
+    return n
 
 
 def read_bundle(path: Path):
@@ -198,7 +236,15 @@ def main():
     parser.add_argument("--runs", type=Path, default=ROOT / "viewer/runs")
     parser.add_argument("--import-bundle", type=Path, help="one-time import of the old bundle")
     parser.add_argument("--sim-root", type=Path, help="checkout with the simulator version used for replay")
+    parser.add_argument("--rescore", action="store_true",
+                        help="re-score every archived run with today's grader (after a scoring change)")
     args = parser.parse_args()
+    if args.rescore:
+        n = rescore_archive(args.runs)
+        index = build_index(args.runs, ROOT / "viewer/runs_index.json")
+        print(f"re-scored {n} runs with today's grader; {index['summary']['count']} total")
+        if not args.jobs and not args.import_bundle:
+            return
     if not args.jobs and not args.import_bundle:
         parser.error("provide jobs or --import-bundle")
     count = 0

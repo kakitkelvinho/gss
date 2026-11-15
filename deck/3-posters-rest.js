@@ -111,14 +111,15 @@ const p4 = poster(CREAM, `
   '<b>~13 s.</b> About twenty tools in six groups. Reading manuals is free; anything physical costs simulated lab time. The agent only sees instrument readings, never the simulator\'s true state.');
 
 // ===== results: average score per policy (too few runs per model for distributions) =====
-// Level 1 Harbor runs scored with today's grader, plus the three blind Claude playthroughs (Level 2, seed 1, CLI not Harbor).
-// Reference = mean over seeds 1-10 (Level 1 0.929, Level 2 0.928).
+// All scores under the current (tougher) grader, re-scored from replays (2026-11-15).
+// Gemini rows: Level 1 Harbor runs. Claude: six blind playthroughs, Level 2 seeds 1 and 3 (CLI, not Harbor).
+// Reference = mean over seeds 1-10 at Level 2, the default level (Level 1: 0.818).
 const RES = [
-  { lab: 'Gemini 3.1 Pro', v: 0.000, n: '4 runs' },
-  { lab: 'Gemini 3.8 Flash', v: (0.1847 + 0.1994) / 2, n: '2 runs' },
-  { lab: 'Gemini 4 Hydrogen', v: 0.1999, n: '1 run' },
-  { lab: 'Claude · Level 2', v: (0.905 + 0.197 + 0.931) / 3, n: '3 runs' },
-  { lab: 'Scripted reference', v: 0.929, n: '10 seeds', ref: true }];
+  { lab: 'Gemini 3.1 Pro · L1', v: 0.000, n: '4 runs' },
+  { lab: 'Gemini 3.8 Flash · L1', v: (0.8093 + 0.1847 + 0.1994) / 3, n: '3 runs' },
+  { lab: 'Gemini 4 Hydrogen · L1', v: 0.1999, n: '1 run' },
+  { lab: 'Claude · L2', v: (0.846 + 0.886 + 0.197 + 0.897 + 0.868 + 0.540) / 6, n: '6 runs' },
+  { lab: 'Scripted reference · L2', v: 0.835, n: '10 seeds', ref: true }];
 const R0 = 520, R1 = 1500, rx = r => R0 + r * (R1 - R0), STOP = 0.199;
 const p5 = poster(BLUE, `
   <g filter="url(#pcutS)">
@@ -132,7 +133,7 @@ const p5 = poster(BLUE, `
   <g filter="url(#pcut)">
     ${title(['AVERAGE SCORE OF MODELS'], 120, 960, 118, [CREAM])}
   </g>`, 'Average score of models.',
-  '<b>~16 s.</b> Average reward per model. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash and Hydrogen aligned the spots and stopped at the stop-early line of about 0.2. Claude on the harder 90-degree level found time zero in two of three blind runs; the third chose the wrong detectors, ran short of time and submitted at a tape-measure guess 6.4 picoseconds off, so it averages 0.68. Our scripted reference averages 0.93 on every seed at both levels.');
+  '<b>~16 s.</b> Average reward per model, all re-scored with the current, tougher grader. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash aligned the spots and stopped near 0.2 twice, and once found time zero for 0.81. Hydrogen stopped at the stop-early line of about 0.2. Claude played six blind runs on the harder 90-degree level: four found time zero (0.85 to 0.90), one lost power at the retroreflector (0.54), and one chose the wrong detectors and submitted at a tape-measure guess 6.4 picoseconds off (0.20), averaging 0.71. Our scripted reference averages 0.84 over ten seeds at that level: the score now rewards precise timing, minimum spend and fast work, so even the reference leaves points on the table.');
 
 // ===== slide 6: four cut-paper panels =====
 const noisy = (() => { let s = ''; for (let x = 40; x <= 360; x += 8) s += `${s ? ' L' : 'M'}${x} ${f1(140 + (rnd() - 0.5) * 60)}`; return s; })();
@@ -190,7 +191,7 @@ const p7 = poster(CREAM, `
 // ===== slide 8: reward components =====
 const B0 = 470, B1 = 1560, bx = r => B0 + r * (B1 - B0);
 const bars = [['Do nothing', [], '0.000'], ['Exploit attempts', [], '0.000'], ['Stop early', [[BLUE2, .199]], '0.199'],
-  ['Scripted reference', [[BLUE2, .200], [ORANGE, .500], [CREAM, .228]], '0.928']];
+  ['Scripted reference', [[BLUE2, .200], [ORANGE, .467], [CREAM, .167]], '0.835']];
 const p8 = poster(INK, `
   <g filter="url(#pcutS)">
     ${bars.map(([l, segs, v], i) => { const y = 300 + i * 110; let a = 0;
@@ -200,10 +201,10 @@ const p8 = poster(INK, `
         <text x="${B1 + 30}" y="${y + 48}" class="bv-p">${v}</text></g>`; }).join('')}
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="160" class="fm-p">SCORE = <tspan fill="${BLUE2}">0.2 × SPOT OVERLAP</tspan> + <tspan fill="${ORANGE}">0.5 × TIMING OVERLAP</tspan> + <tspan fill="${CREAM}">[0.2 × (1 − EXTRA €) + 0.1 × (1 − LAB TIME)]</tspan></text>
+    <text x="110" y="160" class="fm-p">SCORE = <tspan fill="${BLUE2}">0.2 × SPOT OVERLAP</tspan> + <tspan fill="${ORANGE}">0.5 × TIMING × PRECISION</tspan> + <tspan fill="${CREAM}">[0.2 × MIN € ÷ € + 0.1 × (1 − LAB TIME)²]</tspan></text>
     ${title(['SCORED ON PHYSICS.'], 150, 960, 118, [CREAM])}
   </g>`, 'Scored on physics.',
-  '<b>~14 s.</b> The score is computed from the simulator\'s true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing, and 0.3 for money and lab time saved, but only once the setup really works. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.');
+  '<b>~14 s.</b> The score is computed from the simulator\'s true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing (falling with every femtosecond of error), and 0.3 for money and lab time saved, but only once the setup really works: spend is credited as the cheapest workable design over what was spent, and lab time quadratically. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.');
 
 // ===== slide 9: one command =====
 const p9 = poster(BLUE, `

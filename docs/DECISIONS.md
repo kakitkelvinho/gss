@@ -138,7 +138,10 @@ Takes precedence over the L1 catalogue, signal model and C_min above.
 
 ## Level 2: 90° crossing (Sat 2026-11-14)
 
-- Selected with `GSS_LEVEL=2` (server env, docker-compose passes it through); L1 is the default. `Episode(seed, level)`.
+- Selected with `GSS_LEVEL=2` (server env, docker-compose passes it through). `Episode(seed, level)`.
+  **Update 2026-11-15:** docker-compose now defaults to L2, so a plain `harbor run -p .` (what the
+  judges run) gets the 90° crossing. L1 was the easier case (Gemini 3.8 Flash scored 0.851 there).
+  `GSS_LEVEL=1` still selects L1. `server/app.py` keeps L1 as its own fallback, for direct runs and tests.
 - **Mount:** `place(sample, x, z, height, yaw)` puts the sample point (common focus) at (x, z, height), yaw = front normal. Lens A takes beams travelling at yaw + 135°, lens B at yaw + 225°, each 100 mm before the sample point on its axis. Both beams through the same lens → O = 0 (not the required geometry).
 - **Spots** are computed on the tilted sample plane (h = horizontal in-plane axis, v = up); both are stretched by 1/cos45 along h. O is the product of per-axis 1D overlaps.
 - **Broadening (user decision: reward uses the broadened width):** τ_eff² = τ_c² + (2 a sin45 / c)², a = W_t/2 = √2·52 µm/2 → τ_eff ≈ 186 fs; cross-term peak × τ_c/τ_eff ≈ 0.37.
@@ -156,3 +159,25 @@ PR #8 landed on main first; both are combined:
 - **Datasheets de-hinted:** no signal sizes or explanations; band gaps, emission bands, passbands, spectral ranges and noise only. The L2 manual no longer states the broadened window (~186 fs) or the reduced peak; it states the geometry and the requirement. The OPA manual states the visible extension adds ~580 mm and gives the calibrated internal path for the current configuration.
 - **Minimum mirrors:** PR #8 found 2 suffice in L1; by the same argument L2 needs 1 (OPA beam straight into one lens, the 800 nm return from the retroreflector turned once onto the other). `N_MIN_MIRRORS = {1: 2, 2: 1}`. C_min: L1 €7450 / €950 / €1700 (1300 / 600 / 450 nm); L2 €7300 / €1550 / €1550.
 - The alignment camera's field of view is ±4 mm (was ±2.5 in PR #8's manual text, which now reads the constant).
+
+## Tougher grading (Sun 2026-11-15)
+
+- **Why:** blind Claude runs and the reference all clustered at 0.93–0.96, so the score couldn't tell
+  a good run from an excellent one.
+- **What changed:** the grader only (`sim/reward.py`, `TAU_SCORE_FS` in `sim/constants.py`). The physics
+  and eta are unchanged, so recorded runs still replay exactly.
+  - **Timing:** temporal credit × exp(−(|Δt| / 60 fs)²). 16 fs off keeps about 93%, 50 fs off about half.
+  - **Spend:** credit is 0.2 × min(1, C_min / cost). The old penalty was measured against the EUR 30k
+    cap and barely moved.
+  - **Lab time:** credit is 0.1 × (1 − time used)².
+- **Effect:** reference means fall from 0.931 to 0.818 (L1) and from 0.941 to 0.835 (L2). Every seed
+  still passes eta ≥ 0.9. No recorded run scores above 0.90.
+- **Re-scoring:** `export_viewer_runs.py --rescore` re-scores the archived viewer runs. The export now
+  compares only the physics with the recorded diagnostics, and recomputes the score fields. The viewer's
+  JS copy of the grader (`viewer/prototype.js`) matches `sim/reward.py` and shows the current score,
+  noting the recorded one.
+- **Open:** C_min at L2 / 600 nm assumes GaN + 550/40 (EUR 1550), because the C_min model rates GaP as
+  not viable there. But all three blind seed 3 players found time zero with GaP, and two built for
+  EUR 1250–1400. The C_min model and the simulator disagree on GaP there. Either make GaP fail there
+  (the intended trap), or include it in C_min (about EUR 800). This matters more now that spend credit
+  is C_min / cost.

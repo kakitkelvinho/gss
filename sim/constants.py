@@ -66,8 +66,11 @@ LENS_MOUNT_R = 25.4  # 2" lens-mount ring around the 1" lens
 BUDGET_S = 4 * 3600.0
 MIN_ACTION_S = 5.0
 SPEND_CAP = 30000.0
-ALPHA = 0.2
-BETA = 0.1  # soft lab-time penalty: using the whole budget costs 10% of the reward
+ALPHA = 0.2  # spend credit: ALPHA * min(1, C_min / cost)
+BETA = 0.1   # lab-time credit: BETA * (1 - lab_time_frac)^2
+# Timing precision in the score (grader only; the physics' eta is unchanged): temporal credit is
+# multiplied by exp(-(dt / TAU_SCORE_FS)^2), so a run 16 fs off keeps ~93% and 25 fs off ~84%.
+TAU_SCORE_FS = 60.0
 
 # Detector models (see physics.py). Counts are for the reference alignment (T = O = 1).
 CROSS_A = 1000.0  # cross term at time zero for a phase-matched crystal / allowed two-photon process

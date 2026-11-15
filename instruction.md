@@ -37,8 +37,10 @@ Do it **as cheaply as possible** and within **4 hours of lab time**.
 The score (0 to 1) is computed from the simulator's true final state:
 
 - up to 0.2 for transmitted spatial overlap at the sample;
-- up to 0.5 more for temporal overlap (the overlap window is about 100 fs);
-- up to 0.2 for low spend and 0.1 for lab time left, awarded only when final physical efficiency
-  is at least 0.9.
+- up to 0.5 more for temporal overlap. It needs the physical overlap of the two pulses, and it
+  also falls with the remaining timing error: about 7% less at 16 fs off, about half at 50 fs off;
+- up to 0.2 for low spend (in proportion to the cheapest workable design's cost divided by your
+  spend) and up to 0.1 for lab time left (falling with the square of the fraction used), awarded
+  only when final physical efficiency is at least 0.9.
 
 Reading, buying parts, and making measurements do not earn points on their own.
