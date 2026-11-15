@@ -12,31 +12,45 @@ Open `http://localhost:8766/prototype.html`. Playback floats at the top left. Th
 
 ## Static run data
 
-`runs_bundle.js` is a checked-in, static export. It includes the four Gemini 3.1 Pro Level 1
-trials and earlier demonstration runs; the ignored `jobs/` directories are not needed to view it.
-The run menu shows each model, seed, level, and final score. A run can also be opened directly by
+Each run is a checked-in JSON file under `viewer/runs/`. The generated `runs_index.json` lists
+scores, failure tags, and replay paths. Two contributors can add different runs without editing
+a shared bundle. The ignored `jobs/` directories are not needed to view the archive. The run menu
+shows each model, seed, level, and final score. A run can also be opened directly by
 its stable ID, for example:
 
 ```text
 prototype.html?run=2026-11-15__01-34-04/gss-scoring__y799vDQ&step=136
 ```
 
-To add completed Harbor runs to the same static bundle, use the simulator version that produced
+To add completed Harbor runs, use the simulator version that produced
 them and run:
 
 ```sh
-python3 scripts/export_viewer_runs.py /path/to/jobs --append-existing
+python3 scripts/export_viewer_runs.py /path/to/jobs
 ```
 
+If that job used an older checkout, pass it explicitly. For example:
+
+```sh
+python3 scripts/export_viewer_runs.py /path/to/older/jobs --sim-root /path/to/older
+```
+
+The archive also records Harbor's token counts, reported API cost, and agent wall time when
+available. `stats.html` shows these alongside score, model, seed, level, calls, and failure tags.
+Usage totals state how many runs have data; a missing cost is not counted as zero.
+
 The exporter replays each action and checks the recorded physics and final diagnostics before
-writing verifier-only poses and beam paths. It skips cancelled jobs. A plain static file host can
-serve `prototype.html`, its CSS and JavaScript, and `runs_bundle.js`; no API key, database, or
-Harbor service is needed for playback. The bundle exposes simulator truth for explanation and
+writing verifier-only poses and beam paths. It skips cancelled jobs and unsupported ancient
+verifier formats. It also rebuilds the local ignored `runs_index.json`. Commit only new files
+under `viewer/runs/`, then push or open a PR. Do not commit `jobs/`. After pulling another person's
+runs, run `python3 scripts/build_run_index.py` locally before starting the server. Pages runs the
+same command automatically on deployment. A plain static file host can serve the viewer files;
+no API key, database, or Harbor service is needed for playback. The archive exposes simulator truth for explanation and
 must never be mounted in the playing agent's container.
 
 Left and right arrow keys or comma and period step through calls; Space plays or pauses. Escape closes a menu. Within a menu, arrows, Home, and End move focus. The current call's coordinate marker and the table's axis labels use millimetres.
 
-The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the bundled real run snapshots. The robot pose is illustrative and inferred from the tool name; it stands beyond the front edge of the table. The score trace shows fractional values already present in the simulator's reward. No scoring code was changed.
+The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the archived real run snapshots. The robot pose is illustrative and inferred from the tool name; it stands beyond the front edge of the table. The score trace shows fractional values already present in the simulator's reward. No scoring code was changed.
 
 The look follows the screen-print posters in `pitch-deck-v6.html`: charcoal room, cream paper, orange and blue ink, Bebas Neue headlines with Oswald labels, cut-paper edges (the deck's `pcut` displacement filters) and a grain-and-wear overlay. Each step reads as a poster: the action is the cream headline and the exact call is the orange line under it. 
 
