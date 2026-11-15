@@ -247,13 +247,19 @@ def manuals(lab) -> dict[str, str]:
         "mirror": (
             "Kinematic mirror mount. place(mirror-N, x, z, height, yaw): yaw is the direction the "
             "reflecting face points (its normal) in the table plane. knob(mirror, 'yaw'|'pitch', "
-            "delta_mrad) tilts the mirror; range +/-50 mrad, actuator repeatability ~2%. rotate(part, deg) "
+            "delta_mrad) tilts the mirror; range +/-50 mrad, actuator repeatability ~2%. Signs: +yaw turns the "
+            "mirror's normal from +x toward +z (the same sense as place's yaw), +pitch tilts it up. Response "
+            "of a beam in the table plane: a yaw turn of d mrad turns the reflected beam by 2d mrad in the "
+            "table plane (same sign); a pitch turn of d mrad raises the reflected beam by 2d x cos(angle of "
+            "incidence) mrad (~1.41d at 45 deg incidence, less at grazing incidence). rotate(part, deg) "
             "loosens the base, turns it and re-tightens (re-seat error ~0.2 deg)."
         ),
         "periscope": (
             "In-line periscope. place(periscope-N, x, z, height, yaw, height_in): yaw is the beam "
             "travel direction (in and out), height_in the input beam height, height the output "
-            "height. Knobs act on the top mirror."
+            "height. Knobs act on the top mirror (signs as for a mirror): a yaw turn of d mrad turns the "
+            "output beam by ~d mrad in the table plane (same sign), a pitch turn of d mrad raises it by "
+            "~2d mrad."
         ),
         "photodiode": (
             "Fast photodiode on the 1 GHz scope: read_signal returns the arrival time of each pulse "

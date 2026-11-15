@@ -149,10 +149,10 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 
 | level | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|---|
-| 1 | reference (scripted expert) | 0.929 | 0.923 | 52.1% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | reference (scripted expert) | 0.931 | 0.925 | 47.2% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 1 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 1 | stop-early (spatial overlap, no timing scan) | 0.199 | 0.197 | 39.3% | spatial credit only, R ≤ 0.2 ✅ |
-| 2 | reference (scripted expert) | 0.928 | 0.917 | 48.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 2 | reference (scripted expert) | 0.941 | 0.935 | 55.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 
@@ -169,7 +169,7 @@ failures such as clipping at the lens edge and timing off by backlash).
 
 Four OpenCode + Gemini 3.1 Pro Preview trials on Level 1 (seeds 1–3, seed 1 repeated) scored
 0.000 under the graded reward; all four failed to route both beams to the sample. The same-seed
-reference scores are 0.917–0.926. See the [run report](docs/gemini-pro-results.md) and
+reference scores are 0.925–0.933. See the [run report](docs/gemini-pro-results.md) and
 [static replay](viewer/prototype.html). `python scripts/summarise_jobs.py jobs/` writes a local
 score and failure summary for future runs; `python3 scripts/export_viewer_runs.py jobs`
 adds finished runs as independent files in `viewer/runs/`. The static [run archive](viewer/stats.html)

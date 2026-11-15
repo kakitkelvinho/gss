@@ -32,7 +32,10 @@ class EpisodeOver(Exception):
 
 
 class Expert:
-    def __init__(self, call: Callable[..., dict], verbose: bool = False):
+    def __init__(self, call: Callable[..., dict], verbose: bool = False, manual_l2: bool = True,
+                 tape: bool = False):
+        self.manual_l2, self.tape = manual_l2, tape
+        self.cstep_frac, self.ct_int, self.snr_min = 0.45, 0.4, 8.0
         self._call = call
         self.verbose = verbose
         self.notes: list[str] = []
@@ -212,7 +215,12 @@ class Expert:
     def _run(self, stop_early):
         self.read_facts()
         zp, hp, zo, ho = self.z_p, self.h_p, self.z_o, self.h_o
-        self.c("buy", items={"DL-C25": 1, "MIR-1": 4, "PER-1": 1, **self.detection_parts()})
+        # L2's broadened peak (~28 um of stage, 1/e) needs only ~250 coarse points, so the EUR 400 manual
+        # stage is fast enough there; L1's ~10 um peak needs the motorised stage's 0.3 s per point.
+        self.stage = "DL-M25" if (self.level == 2 and self.manual_l2) else "DL-C25"
+        if self.stage == "DL-M25":  # ~3 s per hand-turned point: fewer, longer points (step ~0.9 of the 1/e half-width)
+            self.cstep_frac, self.ct_int, self.snr_min = 0.9, 1.0, 6.0
+        self.c("buy", items={self.stage: 1, "MIR-1": 4, "PER-1": 1, **self.detection_parts()})
         travel, x_mid = 25.0, 12.5
         if self.level == 2:
             self.layout_l2(x_mid)
@@ -312,17 +320,21 @@ class Expert:
         self.aim_at_point("mirror-4", "800nm", (X_Q, P800_LENS_Z, hp), (LENS[0], P800_LENS_Z, hp), "x")
 
     def find_time_zero(self, travel):
-        # Time zero: predict from tape measurements, coarse scan, fine scan
-        lp = self.c("measure_path", arm="800nm")["path_mm"]
-        lq = self.c("measure_path", arm="opa")["path_mm"]
-        st = self.c("status")["inventory"]["stage"]["position_mm"]
-        x0 = st + (lq + self.L_opa - lp) / 2.0
+        # Time zero: predict, coarse scan, fine scan. The layout put time zero at mid-travel; the tape
+        # measure (+/-5 mm per arm, 3 min a reading) adds nothing to that, so it's off by default.
+        if self.tape:
+            lp = self.c("measure_path", arm="800nm")["path_mm"]
+            lq = self.c("measure_path", arm="opa")["path_mm"]
+            st = self.c("status")["inventory"]["stage"]["position_mm"]
+            x0 = st + (lq + self.L_opa - lp) / 2.0
+        else:
+            x0 = travel / 2.0
         self.note(f"predicted time zero at stage {x0:.3f} mm")
-        # Coarse search outward from the prediction (tape measure is good to +/-5 mm per arm, so time
-        # zero can sit up to ~6 mm of stage away): scan the middle first and stop as soon as a peak
-        # stands clearly above the noise. Step ~0.45 of the peak's 1/e half-width.
+        # Coarse search outward from the prediction (placement errors can put time zero a few mm of stage
+        # away): scan the middle first and stop as soon as a peak stands clearly above the noise. Step
+        # 0.45 of the peak's 1/e half-width on the motorised stage, 0.9 on the manual one.
         tau = self.tau_stage
-        cstep = round(max(0.005, 0.45 * tau), 3)
+        cstep = round(max(0.005, self.cstep_frac * tau), 3)
         n = max(3, round(1.2 * tau / cstep))
         k = [math.exp(-((i * cstep) / tau) ** 2) for i in range(-n, n + 1)]
         pts: dict[float, float] = {}
@@ -330,7 +342,7 @@ class Expert:
         def scan(a, b):
             a, b = max(0.0, a), min(travel, b)
             if b - a >= cstep:
-                for x, y in self.c("scan", start_mm=round(a, 4), end_mm=round(b, 4), step_mm=cstep, t_int=0.4)["points"]:
+                for x, y in self.c("scan", start_mm=round(a, 4), end_mm=round(b, 4), step_mm=cstep, t_int=self.ct_int)["points"]:
                     pts[round(x, 4)] = y
 
         def best():
@@ -347,7 +359,7 @@ class Expert:
         scan(x0 - edges[0], x0 + edges[0])
         xc, snr, base = best()
         for inner, outer in zip(edges, edges[1:]):
-            if snr >= 8.0:
+            if snr >= self.snr_min:
                 break
             scan(x0 - outer, x0 - inner)
             scan(x0 + inner, x0 + outer)
@@ -365,6 +377,8 @@ class Expert:
         w = sum(fy[i] for i in sel)
         x_peak = sum(fx[i] * fy[i] for i in sel) / w if w > 0 else fx[imax]
         self.note(f"fine peak at {x_peak:.5f} mm")
+        # Approach from below, like the scans, so a manual stage's backlash is the same as during the scans
+        self.c("move_stage", position_mm=round(max(0.0, x_peak - 0.05), 5))
         self.c("move_stage", position_mm=round(x_peak, 5))
         # Re-check the overlap
         ok, _ = self.steer("mirror-4", self.cam_diff, 3.0, 0.3, max_iter=2, J=self.J_cam)

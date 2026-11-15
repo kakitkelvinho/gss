@@ -2,9 +2,9 @@
 
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
-- OPA wavelength 1300 nm. Parts bought: DL-C25 delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7300)
-- Lab time: 115.0 min of 240 (47.9%), 119 tool calls
-- Result: eta = 0.9962, R = 0.9227, O = 0.9972, |dt| = 5.7 fs
+- OPA wavelength 1300 nm. Parts bought: DL-M25 manual delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 8250; C_min = EUR 7300)
+- Lab time: 122.2 min of 240 (50.9%), 115 tool calls
+- Result: eta = 0.9969, R = 0.9386, O = 0.9972, |dt| = 3.2 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|
@@ -12,7 +12,7 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 1 | 0.0 | read_manual | `{"device": "opa"}` |
 | 2 | 0.0 | read_manual | `{"device": "delay_stage"}` |
 | 3 | 0.0 | read_manual | `{"device": "sample_mount"}` |
-| 4 | 15.0 | buy | `{"items": {"DL-C25": 1, "MIR-1": 4, "PER-1": 1, "GAP-TPA": 1, "CAM-VSWIR": 1}}` |
+| 4 | 15.0 | buy | `{"items": {"DL-M25": 1, "MIR-1": 4, "PER-1": 1, "GAP-TPA": 1, "CAM-VSWIR": 1}}` |
 | 5 | 20.1 | place | `{"part": "sample", "x": 1200.0, "z": 600.0, "height": 120.0, "yaw_deg": 0.0}` |
 | 6 | 20.2 | unblock | `{"arm": "opa"}` |
 | 7 | 25.4 | place | `{"part": "periscope-1", "x": 2050.0, "z": 935.0, "height": 120.0, "yaw_deg": 180.0, "height_in": 158.0}` |
@@ -114,16 +114,12 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 103 | 92.4 | knob | `{"part": "mirror-4", "axis": "pitch", "delta_mrad": 0.0106}` |
 | 104 | 92.6 | view_camera | `{"plane": "sample"}` |
 | 105 | 92.8 | view_camera | `{"plane": "sample"}` |
-| 106 | 95.8 | measure_path | `{"arm": "800nm"}` |
-| 107 | 98.8 | measure_path | `{"arm": "opa"}` |
-| 108 | 98.8 | status | `{}` |
-| 109 | 101.7 | scan | `{"start_mm": 13.1, "end_mm": 16.1, "step_mm": 0.013, "t_int": 0.4}` |
-| 110 | 103.5 | scan | `{"start_mm": 11.1, "end_mm": 13.1, "step_mm": 0.013, "t_int": 0.4}` |
-| 111 | 105.4 | scan | `{"start_mm": 16.1, "end_mm": 18.1, "step_mm": 0.013, "t_int": 0.4}` |
-| 112 | 107.8 | scan | `{"start_mm": 8.6, "end_mm": 11.1, "step_mm": 0.013, "t_int": 0.4}` |
-| 113 | 110.2 | scan | `{"start_mm": 18.1, "end_mm": 20.6, "step_mm": 0.013, "t_int": 0.4}` |
-| 114 | 114.5 | scan | `{"start_mm": 15.3285, "end_mm": 15.5515, "step_mm": 0.002, "t_int": 2.0}` |
-| 115 | 114.6 | move_stage | `{"position_mm": 15.43793}` |
-| 116 | 114.8 | view_camera | `{"plane": "sample"}` |
-| 117 | 115.0 | view_camera | `{"plane": "sample"}` |
-| 118 | 115.0 | submit | `{}` |
+| 106 | 101.2 | scan | `{"start_mm": 11.0, "end_mm": 14.0, "step_mm": 0.025, "t_int": 1.0}` |
+| 107 | 106.7 | scan | `{"start_mm": 9.0, "end_mm": 11.0, "step_mm": 0.025, "t_int": 1.0}` |
+| 108 | 112.2 | scan | `{"start_mm": 14.0, "end_mm": 16.0, "step_mm": 0.025, "t_int": 1.0}` |
+| 109 | 121.6 | scan | `{"start_mm": 15.3385, "end_mm": 15.5615, "step_mm": 0.002, "t_int": 2.0}` |
+| 110 | 121.7 | move_stage | `{"position_mm": 15.39007}` |
+| 111 | 121.8 | move_stage | `{"position_mm": 15.44007}` |
+| 112 | 122.0 | view_camera | `{"plane": "sample"}` |
+| 113 | 122.2 | view_camera | `{"plane": "sample"}` |
+| 114 | 122.2 | submit | `{}` |
