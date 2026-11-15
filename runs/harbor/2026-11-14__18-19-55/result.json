@@ -1,0 +1,154 @@
+{
+    "schema_version": 1,
+    "id": "0a572504-93aa-4eee-8ada-f865672f614b",
+    "started_at": "2026-11-14T18:20:08.995246",
+    "updated_at": "2026-11-14T18:51:28.023222",
+    "finished_at": "2026-11-14T18:51:28.023222",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__gemini-3.8-flash__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "O": 0.9331110499605935,
+                        "T_800": 1.0,
+                        "T_opa": 0.9896950343547756,
+                        "abs_dt_fs": 46056.70878855303,
+                        "c_min_eur": 7450.0,
+                        "cost_eur": 11480.0,
+                        "design_viable": 1.0,
+                        "eta": 0.0,
+                        "footprint_m2": 1.1271,
+                        "lab_time_frac": 0.9755,
+                        "lab_time_min": 234.12,
+                        "level": 1.0,
+                        "malformed_calls": 0.0,
+                        "opa_lambda_nm": 1300.0,
+                        "parts_placed": 7.0,
+                        "reward": 0.0,
+                        "seed": 1.0,
+                        "stray_events": 0.0,
+                        "stray_time_min": 0.0,
+                        "tool_calls": 149.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "eta": {
+                        "0.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "O": {
+                        "0.9331110499605935": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "abs_dt_fs": {
+                        "46056.70878855303": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "T_800": {
+                        "1.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "T_opa": {
+                        "0.9896950343547756": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "opa_lambda_nm": {
+                        "1300.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "design_viable": {
+                        "1": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "level": {
+                        "1": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "cost_eur": {
+                        "11480.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "7450.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "234.12": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.9755": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "tool_calls": {
+                        "149": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "stray_events": {
+                        "0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "0.0": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "parts_placed": {
+                        "7": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "1.1271": [
+                            "gss__5MASNh3"
+                        ]
+                    },
+                    "seed": {
+                        "1": [
+                            "gss__5MASNh3"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 15435861,
+        "n_cache_tokens": 14991578,
+        "n_output_tokens": 24430,
+        "cost_usd": 1.9002155999999994
+    }
+}

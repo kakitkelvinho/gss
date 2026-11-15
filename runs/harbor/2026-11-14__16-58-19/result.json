@@ -1,0 +1,152 @@
+{
+    "schema_version": 1,
+    "id": "b7eb882b-cc11-4b59-b3e7-8f842d59b045",
+    "started_at": "2026-11-14T16:58:21.982115",
+    "updated_at": "2026-11-14T17:01:30.550458",
+    "finished_at": "2026-11-14T17:01:30.550458",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 1,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__google/gemini-4-carbon__adhoc": {
+                "n_trials": 1,
+                "n_errors": 1,
+                "metrics": [
+                    {
+                        "O": 0.0,
+                        "T_800": 0.0,
+                        "T_opa": 0.0,
+                        "c_min_eur": 7450.0,
+                        "cost_eur": 0.0,
+                        "design_viable": 0.0,
+                        "eta": 0.0,
+                        "footprint_m2": 0.0,
+                        "lab_time_frac": 0.0,
+                        "lab_time_min": 0.0,
+                        "level": 1.0,
+                        "malformed_calls": 0.0,
+                        "opa_lambda_nm": 1300.0,
+                        "parts_placed": 0.0,
+                        "reward": 0.0,
+                        "seed": 1.0,
+                        "stray_events": 0.0,
+                        "stray_time_min": 0.0,
+                        "tool_calls": 0.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "eta": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "O": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "T_800": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "T_opa": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "opa_lambda_nm": {
+                        "1300.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "design_viable": {
+                        "0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "level": {
+                        "1": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "cost_eur": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "7450.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "tool_calls": {
+                        "0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "stray_events": {
+                        "0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "parts_placed": {
+                        "0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "0.0": [
+                            "gss__WdbpKed"
+                        ]
+                    },
+                    "seed": {
+                        "1": [
+                            "gss__WdbpKed"
+                        ]
+                    }
+                },
+                "exception_stats": {
+                    "NonZeroAgentExitCodeError": [
+                        "gss__WdbpKed"
+                    ]
+                }
+            }
+        },
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null
+    }
+}

@@ -1,0 +1,142 @@
+{
+    "schema_version": 1,
+    "id": "282c9db1-0ac0-4d9e-864d-753b0fadcbf1",
+    "started_at": "2026-11-14T15:29:47.629548",
+    "updated_at": "2026-11-14T15:32:32.340386",
+    "finished_at": "2026-11-14T15:32:32.340386",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "O": 0.9984454221952248,
+                        "T_probe": 1.0,
+                        "T_pump": 1.0,
+                        "abs_dt_fs": 0.5337855740279994,
+                        "c_min_eur": 2200.0,
+                        "cost_eur": 4800.0,
+                        "design_viable": 1.0,
+                        "eta": 0.9983874270118946,
+                        "footprint_m2": 0.7904,
+                        "lab_time_frac": 0.6098,
+                        "lab_time_min": 146.36,
+                        "malformed_calls": 0.0,
+                        "parts_placed": 7.0,
+                        "reward": 0.9188259401467054,
+                        "seed": 1.0,
+                        "stray_events": 3.0,
+                        "stray_time_min": 46.86,
+                        "tool_calls": 103.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.9188259401467054": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "eta": {
+                        "0.9983874270118946": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "O": {
+                        "0.9984454221952248": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "abs_dt_fs": {
+                        "0.5337855740279994": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "T_pump": {
+                        "1.0": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "T_probe": {
+                        "1.0": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "design_viable": {
+                        "1": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "cost_eur": {
+                        "4800.0": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "2200.0": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "146.36": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.6098": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "tool_calls": {
+                        "103": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "0": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "stray_events": {
+                        "3": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "46.86": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "parts_placed": {
+                        "7": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "0.7904": [
+                            "gss__JeccZa5"
+                        ]
+                    },
+                    "seed": {
+                        "1": [
+                            "gss__JeccZa5"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": null,
+        "n_cache_tokens": null,
+        "n_output_tokens": null,
+        "cost_usd": null
+    }
+}

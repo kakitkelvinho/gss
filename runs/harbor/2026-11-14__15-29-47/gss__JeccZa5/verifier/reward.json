@@ -1,0 +1,20 @@
+{
+ "reward": 0.9188259401467054,
+ "eta": 0.9983874270118946,
+ "O": 0.9984454221952248,
+ "abs_dt_fs": 0.5337855740279994,
+ "T_pump": 1.0,
+ "T_probe": 1.0,
+ "design_viable": 1,
+ "cost_eur": 4800.0,
+ "c_min_eur": 2200.0,
+ "lab_time_min": 146.36,
+ "lab_time_frac": 0.6098,
+ "tool_calls": 103,
+ "malformed_calls": 0,
+ "stray_events": 3,
+ "stray_time_min": 46.86,
+ "parts_placed": 7,
+ "footprint_m2": 0.7904,
+ "seed": 1
+}

@@ -155,8 +155,10 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 
-Raw Harbor job folders for the oracle and Gemini runs, with their verifier scores, are in
-[runs/harbor/](runs/harbor/).
+Raw Harbor job folders, with their verifier scores, are in [runs/harbor/](runs/harbor/). To add your
+own runs to the repo and the [live viewer](https://kakitkelvinho.github.io/gss/):
+`python3 scripts/publish_runs.py <your harbor jobs folder>`, then commit `runs/` and `viewer/runs/` and push;
+the site rebuilds on every push to `main`.
 
 Historical blind playthroughs by fresh Claude agents with no access to the code, under earlier task
 versions ([docs/playthroughs.md](docs/playthroughs.md)):

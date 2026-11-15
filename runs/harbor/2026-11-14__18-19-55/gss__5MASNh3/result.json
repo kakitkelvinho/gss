@@ -1,0 +1,153 @@
+{
+    "schema_version": 1,
+    "id": "986a4708-5325-4362-b726-cbb47bd8a073",
+    "task_name": "gss/find-time-zero",
+    "trial_name": "gss__5MASNh3",
+    "trial_uri": "file:///Users/hok5/Documents/gss/jobs/2026-11-14__18-19-55/gss__5MASNh3",
+    "task_id": {
+        "path": "."
+    },
+    "source": null,
+    "task_checksum": "cd3ab8737ff8ae63d8d968323ea830952b370876375b4005d2f9531441ba4b00",
+    "config": {
+        "schema_version": 1,
+        "task": {
+            "path": ".",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "gss__5MASNh3",
+        "trials_dir": "jobs/2026-11-14__18-19-55",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "opencode",
+            "import_path": null,
+            "model_name": "gemini/gemini-3.8-flash",
+            "base_url": null,
+            "model_api_key_name": null,
+            "model_api_format": null,
+            "skip_model_parsing": false,
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "override_error_policy": {},
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "0a572504-93aa-4eee-8ada-f865672f614b",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "opencode",
+        "version": "1.19.5",
+        "model_info": {
+            "name": "gemini-3.8-flash",
+            "provider": "gemini"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 15435861,
+        "n_cache_tokens": 14991578,
+        "n_output_tokens": 24430,
+        "cost_usd": 1.9002155999999994,
+        "model_usage": {
+            "gemini/gemini-3.8-flash": {
+                "n_input_tokens": 15435861,
+                "n_cache_tokens": 14991578,
+                "n_output_tokens": 24430,
+                "cost_usd": 1.9002155999999994
+            }
+        },
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0,
+            "eta": 0.0,
+            "O": 0.9331110499605935,
+            "abs_dt_fs": 46056.70878855303,
+            "T_800": 1.0,
+            "T_opa": 0.9896950343547756,
+            "opa_lambda_nm": 1300.0,
+            "design_viable": 1,
+            "level": 1,
+            "cost_eur": 11480.0,
+            "c_min_eur": 7450.0,
+            "lab_time_min": 234.12,
+            "lab_time_frac": 0.9755,
+            "tool_calls": 149,
+            "malformed_calls": 0,
+            "stray_events": 0,
+            "stray_time_min": 0.0,
+            "parts_placed": 7,
+            "footprint_m2": 1.1271,
+            "seed": 1
+        }
+    },
+    "verifier_environment_mode": "separate",
+    "exception_info": null,
+    "started_at": "2026-11-14T16:20:09.157787Z",
+    "finished_at": "2026-11-14T16:51:27.905590Z",
+    "environment_setup": {
+        "started_at": "2026-11-14T16:20:28.377165Z",
+        "finished_at": "2026-11-14T16:20:40.323149Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-11-14T16:20:40.323893Z",
+        "finished_at": "2026-11-14T16:24:48.532022Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-11-14T16:24:48.535692Z",
+        "finished_at": "2026-11-14T16:50:58.869010Z"
+    },
+    "verifier": {
+        "started_at": "2026-11-14T16:51:11.798078Z",
+        "finished_at": "2026-11-14T16:51:27.905386Z"
+    },
+    "step_results": null,
+    "reward_valid": true
+}

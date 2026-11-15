@@ -217,7 +217,11 @@ def main():
             if not {"level", "T_800", "T_opa", "opa_lambda_nm"} <= diagnostics.keys():
                 print(f"skipped unsupported old verifier format: {path}")
                 continue
-            run = tag_scorer(export_run(path.parent, jobs_dir))
+            try:
+                run = tag_scorer(export_run(path.parent, jobs_dir))
+            except ValueError as err:  # recorded under another simulator version: skip, don't block the rest
+                print(f"skipped {run_id}: {err} (re-run with --sim-root <checkout of the commit it ran on>)")
+                continue
             save_run(run, args.runs)
             count += 1
             print(f"exported {run['id']} ({len(run['trajectory'])} calls)")
