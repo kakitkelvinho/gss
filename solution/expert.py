@@ -318,20 +318,40 @@ class Expert:
         st = self.c("status")["inventory"]["stage"]["position_mm"]
         x0 = st + (lq + self.L_opa - lp) / 2.0
         self.note(f"predicted time zero at stage {x0:.3f} mm")
-        lo, hi = max(0.0, x0 - 6.0), min(travel, x0 + 6.0)
-        coarse = self.c("scan", start_mm=round(lo, 4), end_mm=round(hi, 4), step_mm=0.005, t_int=0.4)["points"]
-        xs = [p[0] for p in coarse]
-        ys = [p[1] for p in coarse]
-        base = statistics.median(ys)
+        # Coarse search outward from the prediction (tape measure is good to +/-5 mm per arm, so time
+        # zero can sit up to ~6 mm of stage away): scan the middle first and stop as soon as a peak
+        # stands clearly above the noise. Step ~0.45 of the peak's 1/e half-width.
         tau = self.tau_stage
-        n = max(6, round(1.2 * tau / 0.005))
-        k = [math.exp(-((i * 0.005) / tau) ** 2) for i in range(-n, n + 1)]
-        best_i, best_v = 0, -math.inf
-        for i in range(len(ys)):
-            v = sum(k[j + n] * (ys[i + j] - base) for j in range(-n, n + 1) if 0 <= i + j < len(ys))
-            if v > best_v:
-                best_i, best_v = i, v
-        xc = xs[best_i]
+        cstep = round(max(0.005, 0.45 * tau), 3)
+        n = max(3, round(1.2 * tau / cstep))
+        k = [math.exp(-((i * cstep) / tau) ** 2) for i in range(-n, n + 1)]
+        pts: dict[float, float] = {}
+
+        def scan(a, b):
+            a, b = max(0.0, a), min(travel, b)
+            if b - a >= cstep:
+                for x, y in self.c("scan", start_mm=round(a, 4), end_mm=round(b, 4), step_mm=cstep, t_int=0.4)["points"]:
+                    pts[round(x, 4)] = y
+
+        def best():
+            xs = sorted(pts)
+            ys = [pts[x] for x in xs]
+            base = statistics.median(ys)
+            f = [sum(k[j + n] * (ys[i + j] - base) for j in range(-n, n + 1) if 0 <= i + j < len(ys))
+                 for i in range(len(ys))]
+            mad = statistics.median(abs(v - statistics.median(f)) for v in f) or 1e-9
+            i = max(range(len(f)), key=lambda i: f[i])
+            return xs[i], f[i] / (1.4826 * mad), base
+
+        edges = [1.5, 3.5, 6.0]
+        scan(x0 - edges[0], x0 + edges[0])
+        xc, snr, base = best()
+        for inner, outer in zip(edges, edges[1:]):
+            if snr >= 8.0:
+                break
+            scan(x0 - outer, x0 - inner)
+            scan(x0 + inner, x0 + outer)
+            xc, snr, base = best()
         self.note(f"coarse peak at {xc:.4f} mm")
         half = 4 * tau
         step = 0.001 if tau < 0.015 else 0.002
@@ -360,7 +380,10 @@ def run_in_process(seed: int, stop_early: bool = False, verbose: bool = False, l
 
 
 if __name__ == "__main__":
+    import os
     import sys
+
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repo root, for `sim`
 
     seeds = [int(s) for s in sys.argv[1:]] or list(range(1, 11))
     for s in seeds:

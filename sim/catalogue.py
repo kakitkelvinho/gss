@@ -165,7 +165,10 @@ def manuals(lab) -> dict[str, str]:
            "1/e^2 radius and relative_power (fraction of that beam's output power reaching the sample, ~2% "
            "reading noise). The camera does not distinguish wavelengths: spots are listed by position.")
     l1_sample = (
-        "Sample mount with an f = 100 mm achromatic lens. place(sample, x, z, height, yaw): (x, z, "
+        "Sample mount with an f = 100 mm achromatic lens. Required geometry for this experiment "
+        "(non-collinear pump-probe): both beams go through this one lens, each travelling along the lens "
+        "axis direction, side by side or one above the other within the clear aperture; the lens crosses "
+        "them at the sample. place(sample, x, z, height, yaw): (x, z, "
         "height) is the lens centre, yaw the direction light travels through the lens. The sample "
         "position (and the installed diagnostic) is the lens focal plane. Lens clear aperture radius "
         f"{K.LENS_R} mm, held in a 2\" mount ring (outer radius {K.LENS_MOUNT_R} mm). install(part_id) swaps "
@@ -209,7 +212,8 @@ def manuals(lab) -> dict[str, str]:
             f"You walk on a walkway 300 mm outside the table edge (tool responses give your position as "
             f"you_at, or 'desk') at 0.5 m/s, and can reach 0.6 m in from the table edge. "
             f"Status, catalogue, datasheets and manuals are digital and can be read anywhere without lab time. "
-            f"Buying, camera and signal reads, motorised stage moves and scans happen at the desk; "
+            f"Buying (each order takes ~15 min to place and receive), camera and signal reads, motorised "
+            f"stage moves and scans happen at the desk; "
             f"knobs, placement, the IR card and the tape measure happen at the table. "
             f"knob(..., watch=true) also returns a camera frame if you are within 1.5 m of the desk. "
             f"measure_path is a tape measure along the beam (good to about +/-5 mm).\n"

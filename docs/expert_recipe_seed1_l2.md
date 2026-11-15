@@ -3,8 +3,8 @@
 By-product of the reference run: what the scripted expert did, in order, with lab time.
 
 - OPA wavelength 1300 nm. Parts bought: DL-C25 delay stage, 4 x MIR-1 mirror, 1 x PER-1 periscope, CAM-VSWIR, GAP-TPA (EUR 10350; C_min = EUR 7300)
-- Lab time: 131.9 min of 240 (54.9%), 115 tool calls
-- Result: eta = 0.9969, R = 0.9161, O = 0.9972, |dt| = 3.2 fs
+- Lab time: 115.0 min of 240 (47.9%), 119 tool calls
+- Result: eta = 0.9962, R = 0.9227, O = 0.9972, |dt| = 5.7 fs
 
 | # | t (min) | tool | args |
 |---|---|---|---|
@@ -117,9 +117,13 @@ By-product of the reference run: what the scripted expert did, in order, with la
 | 106 | 95.8 | measure_path | `{"arm": "800nm"}` |
 | 107 | 98.8 | measure_path | `{"arm": "opa"}` |
 | 108 | 98.8 | status | `{}` |
-| 109 | 127.0 | scan | `{"start_mm": 8.6, "end_mm": 20.6, "step_mm": 0.005, "t_int": 0.4}` |
-| 110 | 131.4 | scan | `{"start_mm": 15.3185, "end_mm": 15.5415, "step_mm": 0.002, "t_int": 2.0}` |
-| 111 | 131.5 | move_stage | `{"position_mm": 15.43749}` |
-| 112 | 131.6 | view_camera | `{"plane": "sample"}` |
-| 113 | 131.8 | view_camera | `{"plane": "sample"}` |
-| 114 | 131.9 | submit | `{}` |
+| 109 | 101.7 | scan | `{"start_mm": 13.1, "end_mm": 16.1, "step_mm": 0.013, "t_int": 0.4}` |
+| 110 | 103.5 | scan | `{"start_mm": 11.1, "end_mm": 13.1, "step_mm": 0.013, "t_int": 0.4}` |
+| 111 | 105.4 | scan | `{"start_mm": 16.1, "end_mm": 18.1, "step_mm": 0.013, "t_int": 0.4}` |
+| 112 | 107.8 | scan | `{"start_mm": 8.6, "end_mm": 11.1, "step_mm": 0.013, "t_int": 0.4}` |
+| 113 | 110.2 | scan | `{"start_mm": 18.1, "end_mm": 20.6, "step_mm": 0.013, "t_int": 0.4}` |
+| 114 | 114.5 | scan | `{"start_mm": 15.3285, "end_mm": 15.5515, "step_mm": 0.002, "t_int": 2.0}` |
+| 115 | 114.6 | move_stage | `{"position_mm": 15.43793}` |
+| 116 | 114.8 | view_camera | `{"plane": "sample"}` |
+| 117 | 115.0 | view_camera | `{"plane": "sample"}` |
+| 118 | 115.0 | submit | `{}` |

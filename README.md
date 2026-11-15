@@ -137,6 +137,7 @@ uv run pytest                          # 77 tests: physics, routes, L2, ledger, 
 uv run python solution/expert.py 1 2 3 # in-process expert on seeds 1-3
 uv run python scripts/baselines.py     # reference / do-nothing / stop-early over MCP -> docs/results.md
 uv run python scripts/baselines.py --level 2   # same for L2 -> docs/results_l2.md
+uv run python scripts/blind_playthrough.py setup <folder outside repo> --level 2   # blind test by a fresh agent (no API key)
 ```
 
 ## Results
@@ -148,10 +149,10 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 
 | level | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|---|
-| 1 | reference (scripted expert) | 0.922 | 0.917 | 55.1% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | reference (scripted expert) | 0.929 | 0.923 | 52.1% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 1 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 1 | stop-early (spatial overlap, no timing scan) | 0.199 | 0.197 | 39.3% | spatial credit only, R ≤ 0.2 ✅ |
-| 2 | reference (scripted expert) | 0.920 | 0.908 | 54.9% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 2 | reference (scripted expert) | 0.928 | 0.917 | 48.5% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 

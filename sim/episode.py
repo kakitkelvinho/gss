@@ -38,7 +38,7 @@ TOOL_SPECS: dict[str, dict] = {
     "get_datasheet": dict(desc="Datasheet of one catalogue item.", params={"part_id": ("str", True)}),
     "read_manual": dict(desc="Read a device manual: table, opa, delay_stage, sample_mount, signal_camera, mirror, "
                              "periscope, photodiode, nonlinear, ir_card.", params={"device": ("str", True)}),
-    "buy": dict(desc="Place one buy order. items: list of catalogue part ids (repeat an id to buy several), "
+    "buy": dict(desc="Place one buy order (~15 min of lab time at the desk per order). items: list of catalogue part ids (repeat an id to buy several), "
                      "or an object {part_id: quantity}.", params={"items": ("items", True)}),
     "place": dict(desc="Place an inventory part on the table. x, z, height in mm; yaw_deg in degrees "
                        "(see the part's manual for what yaw means). Periscopes also take height_in.",
