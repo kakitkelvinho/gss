@@ -7,3 +7,8 @@ __pycache__/
 *.pyc
 .pytest_cache/
 deck/out/
+video/**/*.mp4
+video/**/*.wav
+video/**/preview/
+video/**/_segments/
+.DS_Store
