@@ -3,7 +3,7 @@ name: viewer-pages
 on:
   push:
     branches: [main]
-    paths: [viewer/**, .github/workflows/pages.yml]
+    paths: [viewer/**, scripts/build_run_index.py, .github/workflows/pages.yml]
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,6 +20,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - run: python3 scripts/build_run_index.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

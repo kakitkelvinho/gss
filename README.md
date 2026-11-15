@@ -165,8 +165,9 @@ Four OpenCode + Gemini 3.1 Pro Preview trials on Level 1 (seeds 1–3, seed 1 re
 0.000 under the graded reward; all four failed to route both beams to the sample. The same-seed
 reference scores are 0.917–0.926. See the [run report](docs/gemini-pro-results.md) and
 [static replay](viewer/prototype.html). `python scripts/summarise_jobs.py jobs/` writes a local
-score and failure summary for future runs; `python scripts/export_viewer_runs.py jobs --append-existing`
-adds finished runs to the checked-in static viewer bundle.
+score and failure summary for future runs; `python3 scripts/export_viewer_runs.py jobs`
+adds finished runs as independent files in `viewer/runs/`. The static [run archive](viewer/stats.html)
+aggregates recorded scores by model and level. See [contribution instructions](viewer/PROTOTYPE.md#static-run-data).
 
 ## Layout
 

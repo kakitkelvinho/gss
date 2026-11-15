@@ -9,7 +9,7 @@ These were valid task failures: none of the four trials brought both beams to th
 same time, so their maximum spatial overlap remained zero. The two `timeout` labels below mean
 the **simulated four-hour lab budget**, not a Harbor agent timeout. The [static replay](../viewer/prototype.html)
 contains verifier-only geometry snapshots for every action. Re-export from the local Harbor jobs
-with `python3 scripts/export_viewer_runs.py jobs --append-existing`.
+with `python3 scripts/export_viewer_runs.py jobs`.
 
 R = graded final reward; eta = transmitted spatial and temporal overlap; O = spatial overlap; |dt| = timing error.
 

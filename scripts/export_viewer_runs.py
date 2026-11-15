@@ -1,10 +1,10 @@
-"""Export finished Harbor runs as a static viewer bundle.
+"""Export finished Harbor runs as independent static replay files.
 
 Replay is deterministic: every recorded action must reproduce its logged time, physics and
 final diagnostics before a run is published. The export contains verifier geometry, never
 OpenCode's database, credentials, or raw Harbor configuration.
 
-    python3 scripts/export_viewer_runs.py ../gss-scoring/jobs --append-existing
+    python3 scripts/export_viewer_runs.py jobs/
 """
 
 from __future__ import annotations
@@ -13,15 +13,28 @@ import argparse
 import json
 import math
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
+from datetime import datetime
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.summarise_jobs import analyse  # noqa: E402
+from scripts.build_run_index import build_index, file_for, save_run  # noqa: E402
+from sim import reward as CURRENT_REWARD  # noqa: E402
+
+early = argparse.ArgumentParser(add_help=False)
+early.add_argument("--sim-root", type=Path)
+source_root = early.parse_known_args()[0].sim_root
+if source_root and source_root.resolve() != ROOT:
+    if not (source_root / "sim/episode.py").exists():
+        raise ValueError(f"no simulator at {source_root}")
+    for name in list(sys.modules):
+        if name == "sim" or name.startswith("sim."):
+            del sys.modules[name]
+    sys.path.insert(0, str(source_root.resolve()))
+
 from sim import constants as K  # noqa: E402
-from sim import reward as RW  # noqa: E402
 from sim import vec as V  # noqa: E402
 from sim.episode import Episode  # noqa: E402
 from sim.optics import Lens  # noqa: E402
@@ -94,6 +107,23 @@ def run_meta(ep):
             "walk_offset_mm": K.WALK_OFFSET, "ports": ports, "housings_mm": housings}
 
 
+def harbor_usage(trial: Path) -> dict | None:
+    """Copy only numeric usage and timing fields, never Harbor's config or rollout."""
+    path = trial / "result.json"
+    if not path.exists():
+        return None
+    result = json.loads(path.read_text())
+    agent = result.get("agent_result") or {}
+    usage = {key: agent[key] for key in ("n_input_tokens", "n_cache_tokens", "n_output_tokens", "cost_usd")
+             if isinstance(agent.get(key), (int, float)) and not isinstance(agent[key], bool)}
+    execution = result.get("agent_execution") or {}
+    if execution.get("started_at") and execution.get("finished_at"):
+        start = datetime.fromisoformat(execution["started_at"].replace("Z", "+00:00"))
+        finish = datetime.fromisoformat(execution["finished_at"].replace("Z", "+00:00"))
+        usage["wall_time_s"] = round((finish - start).total_seconds(), 3)
+    return usage or None
+
+
 def export_run(verifier_dir: Path, jobs_dir: Path):
     diagnostics = json.loads((verifier_dir / "diagnostics.json").read_text())
     recorded = json.loads((verifier_dir / "trajectory.json").read_text())["trajectory"]
@@ -105,7 +135,7 @@ def export_run(verifier_dir: Path, jobs_dir: Path):
         if replayed["t_s"] != step["t_s"] or replayed["truth"] != step["truth"]:
             raise ValueError(f"simulator replay diverged at {verifier_dir}, step {step['i']}")
         truth = dict(step["truth"])
-        truth.update(RW.score(truth["eta"], truth["O"], truth["T_800"], truth["T_opa"],
+        truth.update(CURRENT_REWARD.score(truth["eta"], truth["O"], truth["T_800"], truth["T_opa"],
                               ep.cost, ep.t / K.BUDGET_S, ep.c_min))
         steps.append({**step, "truth": truth, "snapshot": snapshot(ep, step["tool"], response)})
     if ep.result() != diagnostics:
@@ -121,7 +151,7 @@ def export_run(verifier_dir: Path, jobs_dir: Path):
     tags, _ = analyse(diagnostics, recorded)
     return {"id": run_id, "label": label, "model": model, "is_demo": False,
             "meta": run_meta(ep), "diagnostics": diagnostics,
-            "failure_tags": tags, "trajectory": steps}
+            "failure_tags": tags, "agent_usage": harbor_usage(trial), "trajectory": steps}
 
 
 def tag_scorer(run):
@@ -131,7 +161,7 @@ def tag_scorer(run):
         return run
     meta, last = run["meta"], run["trajectory"][-1]
     t = last["truth"]
-    today = RW.score(t["eta"], t["O"], t["T_800"], t["T_opa"], last["snapshot"]["cost_eur"],
+    today = CURRENT_REWARD.score(t["eta"], t["O"], t["T_800"], t["T_opa"], last["snapshot"]["cost_eur"],
                      last["t_s"] / meta["budget_s"], meta["c_min_eur"])["reward"]
     run["today_reward"] = round(today, 6)
     run["old_scorer"] = abs(today - run["diagnostics"]["reward"]) > 0.005
@@ -151,27 +181,50 @@ def read_bundle(path: Path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("jobs", type=Path, help="Harbor jobs directory")
-    parser.add_argument("--output", type=Path, default=ROOT / "viewer/runs_bundle.js")
-    parser.add_argument("--append-existing", action="store_true", help="retain previously exported runs")
+    parser.add_argument("jobs", type=Path, nargs="?", help="Harbor jobs directory")
+    parser.add_argument("--runs", type=Path, default=ROOT / "viewer/runs")
+    parser.add_argument("--import-bundle", type=Path, help="one-time import of the old bundle")
+    parser.add_argument("--sim-root", type=Path, help="checkout with the simulator version used for replay")
     args = parser.parse_args()
-    jobs_dir = args.jobs.resolve()
-    files = sorted(jobs_dir.glob("*/**/verifier/diagnostics.json"))
-    runs = {}
-    if args.append_existing and args.output.exists():
-        runs = {run["id"]: run for run in read_bundle(args.output)["runs"]}
-    for path in files:
-        if not (path.parent / "trajectory.json").exists():
-            continue
-        run = export_run(path.parent, jobs_dir)
-        runs[run["id"]] = run
-        print(f"exported {run['id']} ({len(run['trajectory'])} calls)")
-    if not runs:
+    if not args.jobs and not args.import_bundle:
+        parser.error("provide jobs or --import-bundle")
+    count = 0
+    if args.import_bundle:
+        for run in read_bundle(args.import_bundle)["runs"]:
+            save_run(tag_scorer(run), args.runs)
+            count += 1
+    if args.jobs:
+        jobs_dir = args.jobs.resolve()
+        files = sorted(jobs_dir.glob("*/**/verifier/diagnostics.json"))
+        for path in files:
+            if not (path.parent / "trajectory.json").exists():
+                continue
+            diagnostics = json.loads(path.read_text())
+            trial = path.parent.parent
+            run_id = trial.relative_to(jobs_dir).as_posix()
+            archived = args.runs / file_for(run_id)
+            if archived.exists():
+                run = json.loads(archived.read_text())
+                if run["id"] != run_id or run["diagnostics"] != diagnostics:
+                    raise ValueError(f"archived run differs from verifier diagnostics: {run_id}")
+                usage = harbor_usage(trial)
+                if usage and run.get("agent_usage") != usage:
+                    run["agent_usage"] = usage
+                    archived.write_text(json.dumps(run, separators=(",", ":"), ensure_ascii=False) + "\n")
+                    print(f"added Harbor usage to {run_id}")
+                count += 1
+                continue
+            if not {"level", "T_800", "T_opa", "opa_lambda_nm"} <= diagnostics.keys():
+                print(f"skipped unsupported old verifier format: {path}")
+                continue
+            run = tag_scorer(export_run(path.parent, jobs_dir))
+            save_run(run, args.runs)
+            count += 1
+            print(f"exported {run['id']} ({len(run['trajectory'])} calls)")
+    if not count:
         parser.error("no finished runs with verifier trajectories found")
-    bundle = {"schema_version": SCHEMA, "generated_at": datetime.now(timezone.utc).isoformat(),
-              "runs": [tag_scorer(run) for run in runs.values()]}
-    args.output.write_text(PREFIX + json.dumps(bundle, separators=(",", ":"), ensure_ascii=False) + ";\n")
-    print(f"wrote {len(runs)} runs to {args.output}")
+    index = build_index(args.runs, ROOT / "viewer/runs_index.json")
+    print(f"archived {count} runs; {index['summary']['count']} total")
 
 
 if __name__ == "__main__":
