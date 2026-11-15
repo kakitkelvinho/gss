@@ -1,7 +1,7 @@
 # Find time zero
 
 You are working in a (simulated) ultrafast optics lab. You control it **only through the tools of
-the MCP server `gss`**. Each tool call is an action in the lab and costs simulated lab time.
+the MCP server `gss`**. Physical actions cost simulated lab time; reading information is free.
 
 ## Goal
 
@@ -26,7 +26,8 @@ Do it **as cheaply as possible** and within **4 hours of lab time**.
 
 ## Rules
 
-- Only the tools change the lab. Every action takes lab time; walking around the table takes time too.
+- Only the tools change the lab. Physical actions take lab time; walking around the table takes time too.
+  `status`, `list_catalogue`, `get_datasheet`, and `read_manual` take no lab time.
 - The episode ends when you call `submit` or when the 4 hours of lab time run out (whatever state the lab is in then is scored).
 - After the episode ends, every tool returns "episode over".
 
@@ -34,9 +35,9 @@ Do it **as cheaply as possible** and within **4 hours of lab time**.
 
 The score (0 to 1) is computed from the simulator's true final state:
 
-- how well the two focal spots overlap at the sample, times
-- how close the two pulses are in time (the overlap window is about 100 fs), times
-- how much of each beam actually reaches the sample,
+- up to 0.2 for transmitted spatial overlap at the sample;
+- up to 0.5 more for temporal overlap (the overlap window is about 100 fs);
+- up to 0.2 for low spend and 0.1 for lab time left, awarded only when final physical efficiency
+  is at least 0.9.
 
-reduced by up to 20% for spending more than the cheapest set of parts that could do the job, and by up to
-10% for the lab time used (10% if you use all 4 hours).
+Reading, buying parts, and making measurements do not earn points on their own.

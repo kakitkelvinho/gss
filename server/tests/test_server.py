@@ -128,7 +128,7 @@ def test_raw_http_goes_through_the_same_accounting(server):
     r = raw_jsonrpc(server, "read_signal", {"t_int": 10})
     assert r["lab_time_used_min"] == pytest.approx(11 / 60, abs=0.01)
     r = raw_jsonrpc(server, "status", {})
-    assert r["lab_time_used_min"] == pytest.approx(16 / 60, abs=0.01)
+    assert r["lab_time_used_min"] == pytest.approx(11 / 60, abs=0.01)
 
 
 def test_exploit_checklist(server):
@@ -146,8 +146,8 @@ def test_exploit_checklist(server):
     assert "doesn't fit" in res[1]["outcome"]
     assert "error" in res[5] or "refused" in res[5].get("outcome", "")
     assert "error" in res[6]
-    # repeated reads are not free
+    # repeated status reads reveal no new information and cannot change the score
     used = [r["lab_time_used_min"] for r in res[7:]]
-    assert all(b > a for a, b in zip(used, used[1:]))
+    assert all(b == a for a, b in zip(used, used[1:]))
     code, final = get(f"{server}/verifier/result", TOKEN)
     assert final["reward"] == 0.0 and final["cost_eur"] == 0.0

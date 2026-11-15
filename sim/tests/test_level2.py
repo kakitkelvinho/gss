@@ -127,4 +127,6 @@ def test_expert_l2(seed):
 def test_stop_early_and_do_nothing_l2(seed):
     assert Episode(seed, level=2).result()["reward"] == 0.0
     ep, _ = run_in_process(seed, stop_early=True, level=2)
-    assert ep.result()["reward"] < 0.05
+    r = ep.result()
+    assert r["reward"] == pytest.approx(r["spatial_score"], abs=1e-6)
+    assert 0.15 < r["reward"] <= 0.2

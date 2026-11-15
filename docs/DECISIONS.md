@@ -53,22 +53,22 @@ Q-numbers refer to the grilling session.
 - Layout and alignment: `place(part, x, z, height, yaw_deg)` 5 min, with ±1 mm and yaw σ≈0.5° error · `rotate(part, Δdeg)` 2 min, σ≈0.2° ·
   `move(part, x, z)` 3 min · `remove(part)` 1 min · `knob(mirror, yaw|pitch, Δmrad, watch=false)` 30 s (tuned down from 1 min so the expert fits in 65% of the budget), ±50 mrad range, 2% error ·
   `ir_card(part | x,z,height)` 30 s, ±0.5 mm. (Q32′)
-- Information: `list_catalogue` 1 min · `get_datasheet` 2 min · `read_manual` 5 min (includes `"table"`) · `measure_path(arm)` 3 min, ±5 mm, can't see inside the OPA · `buy`. (Q19)
+- Information: `status`, `list_catalogue`, `get_datasheet`, and `read_manual` take no lab time (includes `"table"`); `measure_path(arm)` takes 3 min, ±5 mm, and can't see inside the OPA. (Updated after pitch critique)
 - Measurement: `view_camera(plane)` 10 s, centroid + 1/e² radius per visible beam, 5.5 µm pixels, 0.3 px noise, 0.1 px quantisation, 5 mm field of view (Q14′) ·
   `block/unblock(arm)` 5 s · `move_stage` 2 s + travel · `read_signal(t_int)` t_int + 1 s, t_int ∈ [0.01, 10] s ·
   `scan(start, end, step, t_int)` Σ(t_int + 0.3 s + travel), ≤ 5000 points. (Q18)
 - `submit()` ends the episode.
 - **Walking:** the person has a position. They walk around the table's edge at 0.5 m/s and can reach 0.6 m in from the edge. Camera, signal and scan reads happen at the desk.
   `knob(watch=true)` returns a camera reading for free only when within 1.5 m of the desk. (Q38, Q39)
-- Every action costs at least 5 s. Every response is compact JSON with units in the key names, `lab_time_remaining_min` and the person's position. (Q19, Q20)
+- Every physical action costs at least 5 s; passive information reads are free. Every response is compact JSON with units in the key names, `lab_time_remaining_min` and the person's position. (Updated after pitch critique)
 - Malformed arguments are rejected with a message and still cost 5 s. Physically impossible actions come back as lab outcomes ("mount doesn't fit there", "knob at end of travel") and cost the time wasted finding out. (Q42)
 - Budget 4 h. An action that would pass 4 h is refused and the episode auto-submits. After submit or timeout, every tool returns "episode over". (Q8, Q41)
 
 ## Reward and diagnostics
 - η = T_pump·T_probe·O·exp(−(Δt/τ_c)²), computed from true state, whatever detector was bought.
-- R = η·(1 − 0.2·(C − C_min)/(C_cap − C_min) − 0.1·t_lab/t_budget), with C_cap = €30k. The soft time term (added after the first blind playthrough, user decision) makes slow trial-and-error cost reward, not just budget.
+- R = 0.2·T_pump·T_probe·O + 0.5·η + 1[η ≥ 0.9]·(0.2·(1 − c) + 0.1·(1 − t_lab/t_budget)), where c = clip((C − C_min)/(C_cap − C_min), 0, 1) and C_cap = €30k. Spatial and temporal progress is graded from final measured physics; cost and time count only on success. (Updated after pitch critique)
 - C_min is computed per seed: the cheapest stage + the correct-cut BBO + the minimum mirrors/periscopes that can physically make up the path difference, found by an offline layout search. (Q6, Q27)
-- Logged in `reward.json`, not in R: O, |Δt|, T per arm, design viable, cost, lab time, tool calls, stray-beam count and time, footprint. (Q26, Q43)
+- Logged alongside R in `reward.json`: score components, success, O, |Δt|, T per arm, design viable, cost, lab time, tool calls, stray-beam count and time, footprint. (Updated after pitch critique)
 
 ## Integrity
 - `/verifier/*` lives on the sim server and needs a bearer token held only in the sim container's env and in `tests/`. Without the token it returns 404, and it never changes state. (Q22)
@@ -77,7 +77,7 @@ Q-numbers refer to the grilling session.
   The sim writes QUOP-format setup JSON, using an exporter written at the event. No QUOP code is copied, and QUOP is not modified for the hackathon. This is disclosed in the README. (Q23‴)
 
 ## Pass criteria and plan
-- Reference run: η ≥ 0.9 on every seed 1–10, using ≤ 65% of the budget. Do-nothing and stop-early both get R < 0.05 on every seed. (Q11, Q41)
+- Reference run: η ≥ 0.9 on every seed 1–10, using ≤ 65% of the budget. Do-nothing gets R = 0; stop-early earns spatial credit up to 0.2. (Updated after pitch critique)
 - Steps, with a commit and push after each:
   1. `sim/` + pytest, including an in-process expert.
   2. MCP server + verifier route.
@@ -135,7 +135,7 @@ Takes precedence over the L1 catalogue, signal model and C_min above.
   - Decoys: wrong-cut BBO; BBO-SFG-600/450 (343/288 nm, camera blind); GaN at 1300 nm; GaP at 450 nm; no filter; 775 shortpass; UV stack.
 - `design_viable` and C_min are brute-forced from the same detector model (`sim/reward.py`), so the two can't drift apart.
 - New tool `uninstall('filter'|'diagnostic')`; `install` also takes filters. Manuals: `nonlinear` (replaces `bbo`), `signal_camera`.
-- Reference run picks its route from photon energies (GaP when E_opa < 2.26 eV < E_800 + E_opa, else GaN + 550/40; VIS-SWIR camera at 1300 nm): η ≥ 0.995, R ≈ 0.91–0.92 on seeds 1–10.
+- Reference run picks its route from photon energies (GaP when E_opa < 2.26 eV < E_800 + E_opa, else GaN + 550/40; VIS-SWIR camera at 1300 nm): η ≥ 0.987, R ≈ 0.917–0.928 on Level 1 seeds 1–10 under the graded reward.
 
 ## Level 2: 90° crossing (Sat 2026-11-14)
 

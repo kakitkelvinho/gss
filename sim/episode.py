@@ -1,6 +1,7 @@
 """One lab episode. `Episode.call(tool, args)` is the ONLY entry point for agent actions.
 
-It validates arguments, walks the person around the table, charges lab time, applies the action,
+It validates arguments, walks the person around the table for physical actions, charges lab time,
+applies the action,
 and logs the true state after every step. The MCP layer forwards calls here and nothing else.
 """
 
@@ -73,6 +74,8 @@ TOOL_SPECS: dict[str, dict] = {
                          "t_int": ("num", True)}),
     "submit": dict(desc="Submit: you are done. Ends the episode.", params={}),
 }
+
+FREE_INFO_TOOLS = frozenset({"status", "list_catalogue", "get_datasheet", "read_manual"})
 
 COORD_LIMIT = 1.0e5
 KNOB_S = 30.0  # tuned from 60 s (DECISIONS Q32') so the expert fits in 65% of the budget
@@ -167,7 +170,7 @@ class Episode:
             self.malformed += 1
             return self._charge_and_respond(tool, args, K.MIN_ACTION_S, None, {"error": str(e)})
         walk_s, new_pos = self._walk(plan.loc)
-        total = max(K.MIN_ACTION_S, walk_s + plan.cost_s)
+        total = 0.0 if tool in FREE_INFO_TOOLS else max(K.MIN_ACTION_S, walk_s + plan.cost_s)
         if self.t + total > K.BUDGET_S:
             self._end("timeout")
             res = {"error": "not enough lab time left for this action; the episode is over (auto-submitted)"}
@@ -219,7 +222,8 @@ class Episode:
         if len(xs) >= 2:
             area = (max(x[0] for x in xs) - min(x[0] for x in xs)) * (max(x[2] for x in xs) - min(x[2] for x in xs)) / 1e6
         self.final = {
-            "reward": RW.reward(tr["eta"], self.cost, self.t / K.BUDGET_S, self.c_min),
+            **RW.score(tr["eta"], tr["O"], tr["T_800"], tr["T_opa"],
+                       self.cost, self.t / K.BUDGET_S, self.c_min),
             "eta": tr["eta"],
             "O": tr["O"],
             "abs_dt_fs": None if dt is None else abs(dt),
@@ -463,7 +467,7 @@ class Episode:
                     "alignment_camera": self.align_cam or "free Si camera (400-1000 nm)",
                     "shutters_open": dict(self.shutter_open), "spent_eur": self.cost,
                     "spend_cap_eur": K.SPEND_CAP}
-        return Plan(None, 5.0, run)
+        return Plan(None, 0.0, run)
 
     def _t_list_catalogue(self, slot=None):
         if slot is not None and slot not in cat.SLOTS:
@@ -473,20 +477,20 @@ class Episode:
             items = [{"part_id": pid, "slot": p["slot"], "name": p["name"], "price_eur": p["price"]}
                      for pid, p in cat.PARTS.items() if slot is None or p["slot"] == slot]
             return {"slots": cat.SLOTS, "items": items, "free_equipment": cat.FREE_EQUIPMENT}
-        return Plan("desk", 60.0, run)
+        return Plan(None, 0.0, run)
 
     def _t_get_datasheet(self, part_id):
         if part_id not in cat.PARTS:
             raise BadArgs(f"unknown catalogue part {part_id!r}")
         p = cat.PARTS[part_id]
-        return Plan("desk", 120.0, lambda: {"part_id": part_id, "name": p["name"], "price_eur": p["price"],
+        return Plan(None, 0.0, lambda: {"part_id": part_id, "name": p["name"], "price_eur": p["price"],
                                             "datasheet": p["datasheet"]})
 
     def _t_read_manual(self, device):
         m = cat.manuals(self.lab)
         if device not in m:
             raise BadArgs(f"no manual {device!r}; manuals: {sorted(m)}")
-        return Plan("desk", 300.0, lambda: {"device": device, "manual": m[device]})
+        return Plan(None, 0.0, lambda: {"device": device, "manual": m[device]})
 
     def _t_buy(self, items):
         price = sum(cat.PARTS[k]["price"] * q for k, q in items.items())

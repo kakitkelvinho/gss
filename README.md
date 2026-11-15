@@ -13,7 +13,8 @@ and the `opa` arm (60 fs, from an OPA whose output is 1300, 600 or 450 nm depend
 the sample and to make both pulses **arrive within ~100 fs of each other**, as cheaply as possible
 and within **4 h of simulated lab time**. Everything is done through ~20 MCP tools: `buy`, `place`,
 `knob`, `ir_card`, `view_camera`, `measure_path`, `move_stage`, `scan`, `read_signal`, `submit`,
-and so on. Every action costs lab time, and walking around the table costs time too.
+and so on. Physical actions cost lab time, and walking around the table costs time too. Reading
+manuals, datasheets, the catalogue, and status is free.
 
 `instruction.md` gives only the goal and the constraints. The agent has to work out the method
 from the catalogue, datasheets and manuals:
@@ -59,7 +60,7 @@ The beams must cross at a full angle of 90° at the sample (each 45° from the n
 - Short lever arms near the two lenses, and a ±0.5° sample-mount yaw error magnified by the tilt, make
   beam steering harder.
 
-Scripted expert, seeds 1–10 over MCP: L1 R = 0.91–0.92, L2 R = 0.89–0.92, both within 65% of the budget.
+The scripted expert succeeds on seeds 1–10 over MCP at both levels within 65% of the lab budget.
 
 ## Why it's hard (and fair)
 
@@ -76,22 +77,29 @@ converging noisy alignment steps, and then scanning efficiently. Typical ways to
 
 The reward is computed from the **simulator's true final state**, whatever detector was bought:
 
-$$\eta = T_{800}\,T_\text{opa}\;O\;\exp\!\left[-\left(\frac{\Delta t}{\tau_c}\right)^2\right],\qquad
-R = \eta\left(1 - 0.2\,\frac{C - C_\text{min}}{C_\text{cap} - C_\text{min}} - 0.1\,\frac{t_\text{lab}}{4\,\text{h}}\right)$$
+$$S = T_{800}T_\text{opa}O,\qquad
+\eta = S\exp\!\left[-\left(\frac{\Delta t}{\tau_c}\right)^2\right]$$
+
+$$R = 0.2S + 0.5\eta + \mathbf{1}_{\eta\geq0.9}\left[0.2(1-c) + 0.1\left(1-\frac{t_\text{lab}}{4\,\text{h}}\right)\right],\qquad
+c = \operatorname{clip}\!\left(\frac{C-C_\text{min}}{C_\text{cap}-C_\text{min}},0,1\right)$$
 
 - $O$ is the normalised overlap of the two focal spots.
 - $\Delta t$ is the true delay error, and $\tau_c \approx 70$ fs.
 - $T$ is the clipping transmission of each arm.
 - $C$ is the total spend. $C_\text{min}$ is the cheapest workable design for the seed's OPA wavelength and level (L1: €7,450 at 1300 nm, €950 at 600 nm, €1,700 at 450 nm; L2: €7,300 / €1,550 / €1,550; brute-forced from the catalogue with the detector model: stage, the minimum mirrors (2 in L1, 1 in L2), diagnostic + filter, and a camera that sees 1300 nm), and $C_\text{cap}$ = €30k.
-- $t_\text{lab}$ is the lab time used: every action takes physical time, so brute-force iteration (swarm-style knob searches, blind scans) is penalised softly here and hard-capped by the 4 h budget.
+- $S$ awards up to 0.2 for transmitted spatial overlap. Timing awards up to another 0.5. Cost and
+  time can earn the last 0.3 only when the true final efficiency $\eta$ is at least 0.9. No points
+  are awarded for reading, purchases, tool calls, or measurements themselves.
+- $t_\text{lab}$ is physical lab time: alignment and scans use time, while passive information reads
+  are free. The 4 h budget still caps physical work.
 
-Diagnostics go to `reward.json` but are not part of the reward: O, |Δt|, T per arm, design
-viability, cost, lab time, tool calls, stray-beam events and time, and footprint.
+Diagnostics include each score component, success, O, |Δt|, T per arm, design viability, cost,
+lab time, tool calls, stray-beam events and time, and footprint.
 
 **Reward integrity**
-- Every action, including raw HTTP calls to `/mcp`, goes through `Episode.call`, which validates
-  arguments and charges lab time inside the sim. Malformed calls cost 5 s, and every action costs
-  at least 5 s.
+- Every tool call, including raw HTTP calls to `/mcp`, goes through `Episode.call`, which validates
+  arguments and charges physical actions inside the sim. Malformed calls cost 5 s. Passive reads
+  cost no lab time and cannot improve the score by themselves.
 - The agent's container holds no simulator code or state. Its only route to the sim is
   `http://sim:8000/mcp`. There are no `/state` or debug routes, and tool outputs are noisy and
   quantised.
@@ -125,7 +133,7 @@ Without Docker:
 
 ```bash
 uv sync
-uv run pytest                          # 76 tests: physics, routes, L2, ledger, exploits, MCP server, Harbor flow
+uv run pytest                          # 77 tests: physics, routes, L2, ledger, exploits, MCP server, Harbor flow
 uv run python solution/expert.py 1 2 3 # in-process expert on seeds 1-3
 uv run python scripts/baselines.py     # reference / do-nothing / stop-early over MCP -> docs/results.md
 uv run python scripts/baselines.py --level 2   # same for L2 -> docs/results_l2.md
@@ -140,12 +148,12 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 
 | level | policy | mean R | min R | max lab time | pass criterion |
 |---|---|---|---|---|---|
-| 1 | reference (scripted expert) | 0.912 | 0.906 | 63.4% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
-| 1 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| 1 | stop-early (viable design + spatial overlap, no timing scan) | 0.000 | 0.000 | 47.6% | R < 0.05 ✅ |
-| 2 | reference (scripted expert) | 0.910 | 0.891 | 63.3% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
-| 2 | do-nothing | 0.000 | 0.000 | 0.0% | R < 0.05 ✅ |
-| 2 | stop-early | 0.000 | 0.000 | 47.0% | R < 0.05 ✅ |
+| 1 | reference (scripted expert) | 0.922 | 0.917 | 55.1% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 1 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
+| 1 | stop-early (spatial overlap, no timing scan) | 0.199 | 0.197 | 39.3% | spatial credit only, R ≤ 0.2 ✅ |
+| 2 | reference (scripted expert) | 0.920 | 0.908 | 54.9% | η ≥ 0.9 and ≤ 65% of budget on every seed ✅ |
+| 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
+| 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 
 Blind playthroughs by fresh Claude agents with no access to the code ([docs/playthroughs.md](docs/playthroughs.md)):
 on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
