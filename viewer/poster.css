@@ -136,3 +136,10 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 #new-runs .new-run { font: 500 14px var(--label); letter-spacing: .04em; text-align: left; color: var(--ink); background: var(--paper); border: 2px solid var(--orange); padding: 8px 12px; cursor: pointer; }
 #new-runs .new-run:hover, #new-runs .new-run:focus-visible { background: var(--orange); }
 #new-runs .new-run-close { align-self: flex-end; font: 500 16px var(--label); color: var(--paper); background: var(--ink2); border: 1px solid var(--kraft); width: 28px; height: 28px; cursor: pointer; }
+
+/* Level badge (prototype.js levelBadge): scores are only comparable within one level. */
+.level-badge { display: inline-block; flex: none; padding: 3px 7px 1px; font: 600 11px var(--label); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; border: 2px solid var(--ink); color: var(--ink); background: var(--paper2); }
+.level-badge.level-2 { background: var(--orange); }
+.level-badge.level-1 { background: var(--blue); color: var(--paper2); }
+.level-row { margin: 0 0 10px; }
+.level-row .level-badge { font-size: 13px; padding: 5px 9px 3px; }

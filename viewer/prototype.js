@@ -303,6 +303,13 @@ function breakdown(run, call) {
     ${row('Timing', GRADER.timing, eta, timing, Number.isFinite(t.dt_fs) ? `Δt ${fmtDt(t.dt_fs)}` : 'no overlap')}
     ${row('Efficiency', 0.3, efficiency, efficiency, success ? `cost ${Math.round((1 - costFrac) * 100)}% · time ${Math.round((1 - timeFrac) * 100)}%` : 'locked until timing ≥ 0.9')}${legacy}`;
 }
+// Level badge: a 0.85 at Level 1 (collinear) is not comparable with a 0.85 at Level 2 (90° crossing).
+function levelBadge(run, compact) {
+  const level = Number(run.level ?? run.meta?.level), seed = run.seed ?? run.meta?.seed, nm = run.meta?.opa_lambda_nm;
+  const name = level === 2 ? '90° crossing' : level === 1 ? 'collinear' : '';
+  const text = compact ? `L${level}` : `Level ${level}${name ? ` · ${name}` : ''}${seed != null ? ` · seed ${seed}` : ''}${nm ? ` · OPA ${Math.round(nm)} nm` : ''}`;
+  return `<span class="level-badge level-${level}" title="Scores are only comparable within the same level">${esc(text)}</span>`;
+}
 function runName(run, index) { return `Run ${index + 1} · ${run.model} · seed ${run.seed ?? run.meta?.seed} · L${run.level ?? run.meta?.level} · R ${Number(run.reward ?? run.diagnostics?.reward ?? 0).toFixed(3)}${run.old_scorer ? ' (old scorer)' : ''}`; }
 function groupCalls(trajectory) {
   const groups = []; let setup = null;
@@ -350,12 +357,12 @@ function render() {
   app.innerHTML = `<main class="app ${state.railOpen ? '' : 'rail-closed'}">
     <section class="scene-shell"><div class="scene">${sceneSvg(call)}</div></section>
     <div class="player" aria-label="Playback">
-      <button class="run-trigger" data-action="run" aria-label="Choose run" aria-expanded="${state.menu === 'run'}" aria-haspopup="menu">▤</button><span class="run-label">${esc(runName(run, state.run))}</span>
+      <button class="run-trigger" data-action="run" aria-label="Choose run" aria-expanded="${state.menu === 'run'}" aria-haspopup="menu">▤</button><span class="run-label">${esc(runName(run, state.run))}</span>${levelBadge(run, true)}
       <button data-action="prev" aria-label="Previous step" title="← or ,">‹</button><button data-action="play" aria-label="${state.playing ? 'Pause' : 'Play'}" aria-pressed="${state.playing}" title="Space">${state.playing ? 'Ⅱ' : '▶'}</button><button data-action="next" aria-label="Next step" title="→ or .">›</button>
       <input class="scrub" type="range" min="0" max="${trajectory.length-1}" value="${state.step}" aria-label="Scrub steps"><span class="counter">${state.step+1}/${trajectory.length}</span><button data-action="speed" aria-label="Playback speed" aria-expanded="${state.menu === 'speed'}" aria-haspopup="menu">${state.speed}×</button>
     </div>
     <aside class="sidebar"><section class="call-panel"><div class="panel-heading">Steps <small>${trajectory.length} calls</small></div><div class="current-call">${state.step + 1}/${trajectory.length} · ${esc(cleanTool(call.tool))}${Object.keys(call.args || {}).length ? ` · ${esc(shortArgs(call.args))}` : ''}</div><div class="call-stack">${stepsMarkup(trajectory)}</div></section>
-      <section class="score-panel"><div class="totals"><div><span>Money</span><strong>${money(call.snapshot?.cost_eur)}</strong><small>of ${money(run.meta.spend_cap_eur)}</small></div><div><span>Lab time</span><strong>${fmtTime(call.t_s)}</strong><small>of ${fmtTime(run.meta.budget_s)}</small></div></div><div class="breakdown">${breakdown(run, call)}</div>${scoreSvg(run,state.step)}</section></aside>
+      <section class="score-panel"><div class="level-row">${levelBadge(run, false)}</div><div class="totals"><div><span>Money</span><strong>${money(call.snapshot?.cost_eur)}</strong><small>of ${money(run.meta.spend_cap_eur)}</small></div><div><span>Lab time</span><strong>${fmtTime(call.t_s)}</strong><small>of ${fmtTime(run.meta.budget_s)}</small></div></div><div class="breakdown">${breakdown(run, call)}</div>${scoreSvg(run,state.step)}</section></aside>
     <button class="rail-toggle" data-action="rail" aria-label="${state.railOpen ? 'Hide steps' : 'Show steps'}" title="${state.railOpen ? 'Hide steps' : 'Show steps'}">${state.railOpen ? '‹' : '›'}</button>
     <button class="corner-button parts-trigger" data-action="parts" aria-label="Parts" aria-expanded="${state.menu === 'parts'}" aria-haspopup="menu">≡</button><span class="hint">Parts</span>
     <button class="corner-button view-trigger" data-action="view" aria-label="View" aria-expanded="${state.menu === 'view'}" aria-haspopup="menu">▣</button><span class="view-hint">View</span>
