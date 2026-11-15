@@ -1,6 +1,7 @@
 .env
 node_modules/
 jobs/
+viewer/runs_index.json
 .venv/
 __pycache__/
 *.pyc
