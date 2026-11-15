@@ -300,13 +300,13 @@ function breakdown(run, call) {
   const verdict = success ? (isFinal ? 'Passed' : 'Working') : isFinal ? 'Failed' : 'Not yet';
   const row = (label, weight, value, points, note) => `<div class="bd-row"><span class="bd-label">${label} <em>×${weight.toFixed(1)}</em></span><span class="bd-value">${note}</span><span class="bd-bar"><i style="width:${(points / weight * 100).toFixed(1)}%"></i></span><strong>${points.toFixed(2)}</strong></div>`;
   const legacy = isFinal && Math.abs(recorded - total) > 0.005 ? `<p class="bd-note">Recorded score ${recorded.toFixed(3)} came from an earlier grader. Today's grader gives ${total.toFixed(3)}.</p>` : '';
-  return `<div class="bd-head"><span class="bd-verdict ${success ? 'ok' : isFinal ? 'bad' : ''}">${verdict}</span><span class="bd-total">${(isFinal ? recorded : total).toFixed(3)}</span></div>
+  return `<div class="bd-head"><span class="bd-verdict ${success ? 'ok' : isFinal ? 'bad' : ''}">${verdict}</span>${run.old_scorer ? '<span class="bd-old" title="This run was graded by an earlier version of the scorer">Old scorer</span>' : ''}<span class="bd-total">${(isFinal ? recorded : total).toFixed(3)}</span></div>
     <p class="bd-reason">${esc(reason)}</p>
     ${row('Spot overlap', GRADER.spatial, O, spatial, `${(O * 100).toFixed(1)}%${T8 * To < 0.99 ? ` · T ${(T8 * To * 100).toFixed(0)}%` : ''}`)}
     ${row('Timing', GRADER.timing, eta, timing, Number.isFinite(t.dt_fs) ? `Δt ${fmtDt(t.dt_fs)}` : 'no overlap')}
     ${row('Efficiency', 0.3, efficiency, efficiency, success ? `cost ${Math.round((1 - costFrac) * 100)}% · time ${Math.round((1 - timeFrac) * 100)}%` : 'locked until timing ≥ 0.9')}${legacy}`;
 }
-function runName(run, index) { return `Run ${index + 1} · ${run.model} · seed ${run.meta.seed} · L${run.meta.level} · R ${Number(run.diagnostics?.reward || 0).toFixed(3)}`; }
+function runName(run, index) { return `Run ${index + 1} · ${run.model} · seed ${run.meta.seed} · L${run.meta.level} · R ${Number(run.diagnostics?.reward || 0).toFixed(3)}${run.old_scorer ? ' (old scorer)' : ''}`; }
 function groupCalls(trajectory) {
   const groups = []; let setup = null;
   trajectory.forEach((call, index) => {

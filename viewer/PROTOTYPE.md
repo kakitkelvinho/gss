@@ -47,3 +47,11 @@ The worker stands at the replay's `you_mm` position: behind the table, in front 
 Camera: drag to orbit (yaw −80° to 20°, pitch 15° to 85°), shift-drag to pan, scroll to zoom toward the cursor (0.6× to 6×), and double-click or View → Reset camera to return to the default. The orbit is limited on purpose: the rulers, desk and worker placement are correct within that range, not all the way around. For repeatable video shots, the URL takes `step`, `yaw`, `pitch`, `zoom`, `panx`, `pany` and `rail=closed`, for example `prototype.html?step=108&yaw=-55&pitch=72&zoom=1.8&rail=closed`.
 
 Score breakdown: the orange block recomputes the grader from `sim/reward.py` using the replay's diagnostic truth at the current step. It shows spot overlap ×0.2, timing ×0.5 and efficiency ×0.3 (locked until timing reaches 0.9), plus one plain sentence on why the run fails: a blocked beam, missed spots, or pulses that arrive too far apart, with the gap in fs or ps and in mm of path against the window this level allows. If a run was scored by an earlier grader, the recorded score is shown, with a note giving what today's grader would award.
+
+## Hosting
+
+`.github/workflows/pages.yml` publishes `viewer/` to GitHub Pages on every push to `main` that
+touches it: <https://kakitkelvinho.github.io/gss/> (`index.html` forwards to `prototype.html` and keeps
+the query string). Runs whose recorded verifier reward differs from today's `sim/reward.py` are
+marked `old_scorer` by the exporter and show "(old scorer)" in the run menu and an "Old scorer" tag
+in the score panel.

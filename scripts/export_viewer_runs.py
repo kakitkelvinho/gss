@@ -124,6 +124,21 @@ def export_run(verifier_dir: Path, jobs_dir: Path):
             "failure_tags": tags, "trajectory": steps}
 
 
+def tag_scorer(run):
+    """Mark runs whose verifier reward came from an earlier grader than today's sim/reward.py."""
+    if not run["trajectory"]:
+        run["old_scorer"] = False
+        return run
+    meta, last = run["meta"], run["trajectory"][-1]
+    t = last["truth"]
+    today = RW.score(t["eta"], t["O"], t["T_800"], t["T_opa"], last["snapshot"]["cost_eur"],
+                     last["t_s"] / meta["budget_s"], meta["c_min_eur"])["reward"]
+    run["today_reward"] = round(today, 6)
+    run["old_scorer"] = abs(today - run["diagnostics"]["reward"]) > 0.005
+    run["label"] = run["label"].removesuffix(" (old scorer)") + (" (old scorer)" if run["old_scorer"] else "")
+    return run
+
+
 def read_bundle(path: Path):
     content = path.read_text()
     if not content.startswith(PREFIX):
@@ -154,7 +169,7 @@ def main():
     if not runs:
         parser.error("no finished runs with verifier trajectories found")
     bundle = {"schema_version": SCHEMA, "generated_at": datetime.now(timezone.utc).isoformat(),
-              "runs": list(runs.values())}
+              "runs": [tag_scorer(run) for run in runs.values()]}
     args.output.write_text(PREFIX + json.dumps(bundle, separators=(",", ":"), ensure_ascii=False) + ";\n")
     print(f"wrote {len(runs)} runs to {args.output}")
 

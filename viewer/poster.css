@@ -128,3 +128,4 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 .bd-bar i { display: block; height: 100%; background: var(--ink); }
 .bd-note { margin: 2px 0 0; font: 500 10px/1.3 var(--label); letter-spacing: .03em; color: rgba(22,18,15,.75); }
 .score-panel .totals strong { font-size: 36px; }
+.bd-head .bd-old { margin: 0 auto 0 8px; padding: 3px 6px 1px; border: 2px solid var(--ink); font: 600 10px var(--label); letter-spacing: .12em; text-transform: uppercase; }
