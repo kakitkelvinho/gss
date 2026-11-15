@@ -26,6 +26,7 @@ Do it **as cheaply as possible** and within **4 hours of lab time**.
 
 ## Rules
 
+- Work in steps: plan briefly, then call a tool, and keep going from what the tools return.
 - Only the tools change the lab. Physical actions take lab time; walking around the table takes time too.
   `status`, `list_catalogue`, `get_datasheet`, and `read_manual` take no lab time.
 - The episode ends when you call `submit` or when the 4 hours of lab time run out (whatever state the lab is in then is scored).
