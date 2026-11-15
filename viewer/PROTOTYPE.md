@@ -10,6 +10,30 @@ python3 -m http.server 8766 --directory viewer
 
 Open `http://localhost:8766/prototype.html`. Playback floats at the top left. The call rail groups each optic's setup and can be collapsed to give the scene more room. Expand a group to inspect its individual calls. Money and lab time lead the telemetry; the private replay score is secondary. Run, speed, parts, and top view use the same small menu pattern.
 
+## Static run data
+
+`runs_bundle.js` is a checked-in, static export. It includes the four Gemini 3.1 Pro Level 1
+trials and earlier demonstration runs; the ignored `jobs/` directories are not needed to view it.
+The run menu shows each model, seed, level, and final score. A run can also be opened directly by
+its stable ID, for example:
+
+```text
+prototype.html?run=2026-11-15__01-34-04/gss-scoring__y799vDQ&step=136
+```
+
+To add completed Harbor runs to the same static bundle, use the simulator version that produced
+them and run:
+
+```sh
+python3 scripts/export_viewer_runs.py /path/to/jobs --append-existing
+```
+
+The exporter replays each action and checks the recorded physics and final diagnostics before
+writing verifier-only poses and beam paths. It skips cancelled jobs. A plain static file host can
+serve `prototype.html`, its CSS and JavaScript, and `runs_bundle.js`; no API key, database, or
+Harbor service is needed for playback. The bundle exposes simulator truth for explanation and
+must never be mounted in the playing agent's container.
+
 Left and right arrow keys or comma and period step through calls; Space plays or pauses. Escape closes a menu. Within a menu, arrows, Home, and End move focus. The current call's coordinate marker and the table's axis labels use millimetres.
 
 The call timeline, optics, beams, spend, lab time, and current diagnostic reward come from the bundled real run snapshots. The robot pose is illustrative and inferred from the tool name; it stands beyond the front edge of the table. The score trace shows fractional values already present in the simulator's reward. No scoring code was changed.

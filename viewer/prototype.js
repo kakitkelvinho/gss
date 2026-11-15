@@ -5,7 +5,10 @@ const query = new URLSearchParams(location.search), num = (key, fallback) => Num
 const DEFAULT_CAM = { yaw: -14, pitch: 38, zoom: 1, panX: 0, panY: 0 };
 const CAM_LIMITS = { yaw: [-80, 20], pitch: [15, 85], zoom: [0.6, 6] };
 const clamp = (v, [lo, hi]) => Math.max(lo, Math.min(hi, v));
-const state = { cam: { yaw: clamp(num('yaw', DEFAULT_CAM.yaw), CAM_LIMITS.yaw), pitch: clamp(num('pitch', DEFAULT_CAM.pitch), CAM_LIMITS.pitch), zoom: clamp(num('zoom', 1), CAM_LIMITS.zoom), panX: num('panx', 0), panY: num('pany', 0) }, run: 3, step: Math.max(0, Number(new URLSearchParams(location.search).get('step') ?? 108)), playing: false, speed: 1, timer: null, menu: null, railOpen: new URLSearchParams(location.search).get('rail') !== 'closed', expanded: new Set(), selectedPart: null };
+const runById = runs.findIndex(run => run.id === query.get('run'));
+const initialRun = runById >= 0 ? runById : clamp(Math.trunc(num('run', 3)), [0, Math.max(0, runs.length - 1)]);
+const initialStep = clamp(Math.trunc(num('step', 108)), [0, Math.max(0, (runs[initialRun]?.trajectory.length || 1) - 1)]);
+const state = { cam: { yaw: clamp(num('yaw', DEFAULT_CAM.yaw), CAM_LIMITS.yaw), pitch: clamp(num('pitch', DEFAULT_CAM.pitch), CAM_LIMITS.pitch), zoom: clamp(num('zoom', 1), CAM_LIMITS.zoom), panX: num('panx', 0), panY: num('pany', 0) }, run: initialRun, step: initialStep, playing: false, speed: 1, timer: null, menu: null, railOpen: new URLSearchParams(location.search).get('rail') !== 'closed', expanded: new Set(), selectedPart: null };
 
 function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
 function fmtTime(seconds) { const n = Math.round(seconds || 0); return `${Math.floor(n / 3600)}:${String(Math.floor(n % 3600 / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`; }
@@ -275,7 +278,7 @@ function scoreSvg(run, step) {
   const path = values.map((v, i) => `${i ? 'L' : 'M'}${(i / Math.max(end, 1) * 270).toFixed(1)},${(32 - v * 29).toFixed(1)}`).join(' ');
   return `<svg class="graph" viewBox="0 0 270 34" preserveAspectRatio="none" aria-label="Score history"><path d="M0 32 H270" stroke="var(--line)"/><path d="${path}" fill="none" stroke="#16120F" stroke-width="2.4" vector-effect="non-scaling-stroke"/></svg>`;
 }
-function runName(run, index) { return `Run ${index + 1} · L${run.meta.level} · ${run.meta.opa_lambda_nm} nm`; }
+function runName(run, index) { return `Run ${index + 1} · ${run.model} · seed ${run.meta.seed} · L${run.meta.level} · R ${Number(run.diagnostics?.reward || 0).toFixed(3)}`; }
 function groupCalls(trajectory) {
   const groups = []; let setup = null;
   trajectory.forEach((call, index) => {

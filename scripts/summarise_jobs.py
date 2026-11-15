@@ -218,7 +218,7 @@ def main():
         sys.exit(f"no diagnostics.json found under {a.jobs}")
 
     L = ["# GSS run summary", "",
-         "R = reward; eta = overlap score before cost/time penalties; O = spot overlap; |dt| = timing error.",
+         "R = graded final reward; eta = transmitted spatial and temporal overlap; O = spatial overlap; |dt| = timing error.",
          "", "| run | model | seed | level | OPA nm | R | eta | O | abs dt (fs) | EUR (C_min) | min | calls | ended | tags |",
          "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for name, model, r, tags in runs:

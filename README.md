@@ -155,13 +155,18 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 
-Blind playthroughs by fresh Claude agents with no access to the code ([docs/playthroughs.md](docs/playthroughs.md)):
+Historical blind playthroughs by fresh Claude agents with no access to the code, under earlier task
+versions ([docs/playthroughs.md](docs/playthroughs.md)):
 on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
 (R ≈ 0.93); after the de-hint and buildability changes, 2 runs scored R = 0.88 and 0.72 (slower, with partial
 failures such as clipping at the lens edge and timing off by backlash).
 
-Frontier-agent runs (OpenCode): *TODO, these need inference credits.* After the runs,
-`python scripts/summarise_jobs.py jobs/` writes `jobs/summary.md` (scores plus a failure diagnosis per run).
+Four OpenCode + Gemini 3.1 Pro Preview trials on Level 1 (seeds 1–3, seed 1 repeated) scored
+0.000 under the graded reward; all four failed to route both beams to the sample. The same-seed
+reference scores are 0.917–0.926. See the [run report](docs/gemini-pro-results.md) and
+[static replay](viewer/prototype.html). `python scripts/summarise_jobs.py jobs/` writes a local
+score and failure summary for future runs; `python scripts/export_viewer_runs.py jobs --append-existing`
+adds finished runs to the checked-in static viewer bundle.
 
 ## Layout
 
