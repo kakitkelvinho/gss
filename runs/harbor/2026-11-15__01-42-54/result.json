@@ -1,0 +1,172 @@
+{
+    "schema_version": 1,
+    "id": "118d1634-031e-4fca-bcc7-3a5bb91aaaf5",
+    "started_at": "2026-11-15T01:42:56.280243",
+    "updated_at": "2026-11-15T01:52:13.060519",
+    "finished_at": "2026-11-15T01:52:13.060519",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__gemini-3.1-pro-preview__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "O": 0.0,
+                        "T_800": 0.0,
+                        "T_opa": 1.0,
+                        "c_min_eur": 950.0,
+                        "cost_eur": 7030.0,
+                        "design_viable": 1.0,
+                        "efficiency_score": 0.0,
+                        "eta": 0.0,
+                        "footprint_m2": 0.9697,
+                        "lab_time_frac": 0.9917,
+                        "lab_time_min": 238.01,
+                        "level": 1.0,
+                        "malformed_calls": 2.0,
+                        "opa_lambda_nm": 600.0,
+                        "parts_placed": 10.0,
+                        "reward": 0.0,
+                        "seed": 3.0,
+                        "spatial_score": 0.0,
+                        "stray_events": 12.0,
+                        "stray_time_min": 95.83,
+                        "success": 0.0,
+                        "temporal_score": 0.0,
+                        "tool_calls": 145.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "spatial_score": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "temporal_score": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "efficiency_score": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "success": {
+                        "0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "eta": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "O": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "T_800": {
+                        "0.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "T_opa": {
+                        "1.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "opa_lambda_nm": {
+                        "600.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "design_viable": {
+                        "1": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "level": {
+                        "1": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "cost_eur": {
+                        "7030.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "950.0": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "238.01": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.9917": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "tool_calls": {
+                        "145": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "2": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "stray_events": {
+                        "12": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "95.83": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "parts_placed": {
+                        "10": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "0.9697": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    },
+                    "seed": {
+                        "3": [
+                            "gss-scoring__P4CSFoh"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 5226583,
+        "n_cache_tokens": 4879589,
+        "n_output_tokens": 4217,
+        "cost_usd": 1.9355138000000005
+    }
+}

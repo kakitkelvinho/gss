@@ -113,8 +113,8 @@ lab time, tool calls, stray-beam events and time, and footprint.
 
 On Windows, follow [the WSL 2 and Docker setup guide](docs/WINDOWS_SETUP.md), then run
 `bash scripts/setup-harbor-wsl.sh` inside Ubuntu. For Gemini runs, `bash scripts/run-gemini.sh`
-shows a model menu and prompts for the API key each time. The planned replay interface is described
-in [the viewer brief](docs/VIEWER_BRIEF.md).
+shows a model menu and prompts for the API key each time. Every recorded run can be replayed step by
+step, with the score explained, at **<https://kakitkelvinho.github.io/gss/>** (source in `viewer/`).
 
 ```bash
 harbor run -p . -a opencode -m <provider/model>   # one agent run (needs Docker)
@@ -155,6 +155,9 @@ are in [docs/expert_recipe_seed1.md](docs/expert_recipe_seed1.md) and
 | 2 | do-nothing | 0.000 | 0.000 | 0.0% | R = 0 ✅ |
 | 2 | stop-early | 0.199 | 0.195 | 38.7% | spatial credit only, R ≤ 0.2 ✅ |
 
+Raw Harbor job folders for the oracle and Gemini runs, with their verifier scores, are in
+[runs/harbor/](runs/harbor/).
+
 Historical blind playthroughs by fresh Claude agents with no access to the code, under earlier task
 versions ([docs/playthroughs.md](docs/playthroughs.md)):
 on the first version, 1 of 3 failed (R = 0, an invisible clipping problem, since fixed) and 2 succeeded
@@ -185,7 +188,7 @@ docs/DECISIONS.md                design decisions (they take precedence over HAN
 ## Disclosure
 
 All code was written at the event. **QUOP** (https://kakitkelvinho.github.io/quop/, the author's own
-earlier open-source tool) is planned only as a replay *viewer*. No QUOP code is copied, and the
-exporter has not been written yet.
+earlier open-source tool) served only as the visual reference for the replay viewer's
+millimetre-true table drawing. No QUOP code or assets are copied; the viewer in `viewer/` was written here.
 
 MIT licence.

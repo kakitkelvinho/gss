@@ -1,0 +1,32 @@
+{
+ "reward": 0.0,
+ "spatial_score": 0.0,
+ "temporal_score": 0.0,
+ "efficiency_score": 0.0,
+ "success": false,
+ "eta": 0.0,
+ "O": 0.0,
+ "abs_dt_fs": null,
+ "T_800": 0.0,
+ "T_opa": 0.0,
+ "opa_lambda_nm": 450.0,
+ "design_viable": true,
+ "level": 1,
+ "diagnostics_bought": [
+  "F-BP550",
+  "GAN-1",
+  "PD-SI"
+ ],
+ "cost_eur": 6700.0,
+ "c_min_eur": 1700.0,
+ "lab_time_min": 237.88,
+ "lab_time_frac": 0.9912,
+ "tool_calls": 137,
+ "malformed_calls": 1,
+ "stray_events": 7,
+ "stray_time_min": 129.93,
+ "parts_placed": 8,
+ "footprint_m2": 0.6364,
+ "ended_by": "agent",
+ "seed": 2
+}

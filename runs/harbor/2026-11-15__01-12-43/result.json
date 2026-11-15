@@ -1,0 +1,172 @@
+{
+    "schema_version": 1,
+    "id": "1f35c929-febe-47f6-b5f2-ed5b0d7bbedb",
+    "started_at": "2026-11-15T01:12:45.486412",
+    "updated_at": "2026-11-15T01:23:09.406311",
+    "finished_at": "2026-11-15T01:23:09.406311",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "opencode__gemini-3.1-pro-preview__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "O": 0.0,
+                        "T_800": 0.0,
+                        "T_opa": 0.0,
+                        "c_min_eur": 7450.0,
+                        "cost_eur": 15080.0,
+                        "design_viable": 1.0,
+                        "efficiency_score": 0.0,
+                        "eta": 0.0,
+                        "footprint_m2": 1.3828,
+                        "lab_time_frac": 0.996,
+                        "lab_time_min": 239.04,
+                        "level": 1.0,
+                        "malformed_calls": 15.0,
+                        "opa_lambda_nm": 1300.0,
+                        "parts_placed": 6.0,
+                        "reward": 0.0,
+                        "seed": 1.0,
+                        "spatial_score": 0.0,
+                        "stray_events": 4.0,
+                        "stray_time_min": 62.09,
+                        "success": 0.0,
+                        "temporal_score": 0.0,
+                        "tool_calls": 174.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "spatial_score": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "temporal_score": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "efficiency_score": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "success": {
+                        "0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "eta": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "O": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "T_800": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "T_opa": {
+                        "0.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "opa_lambda_nm": {
+                        "1300.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "design_viable": {
+                        "1": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "level": {
+                        "1": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "cost_eur": {
+                        "15080.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "c_min_eur": {
+                        "7450.0": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "lab_time_min": {
+                        "239.04": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "lab_time_frac": {
+                        "0.996": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "tool_calls": {
+                        "174": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "malformed_calls": {
+                        "15": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "stray_events": {
+                        "4": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "stray_time_min": {
+                        "62.09": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "parts_placed": {
+                        "6": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "footprint_m2": {
+                        "1.3828": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    },
+                    "seed": {
+                        "1": [
+                            "gss-scoring__PvHDfV5"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 3880247,
+        "n_cache_tokens": 3635933,
+        "n_output_tokens": 5604,
+        "cost_usd": 1.8215746000000002
+    }
+}

@@ -1,0 +1,32 @@
+{
+ "reward": 0.0,
+ "spatial_score": 0.0,
+ "temporal_score": 0.0,
+ "efficiency_score": 0.0,
+ "success": false,
+ "eta": 0.0,
+ "O": 0.0,
+ "abs_dt_fs": null,
+ "T_800": 0.0,
+ "T_opa": 1.0,
+ "opa_lambda_nm": 600.0,
+ "design_viable": true,
+ "level": 1,
+ "diagnostics_bought": [
+  "BBO-T292",
+  "F-BP400",
+  "GAP-TPA"
+ ],
+ "cost_eur": 7030.0,
+ "c_min_eur": 950.0,
+ "lab_time_min": 238.01,
+ "lab_time_frac": 0.9917,
+ "tool_calls": 145,
+ "malformed_calls": 2,
+ "stray_events": 12,
+ "stray_time_min": 95.83,
+ "parts_placed": 10,
+ "footprint_m2": 0.9697,
+ "ended_by": "timeout",
+ "seed": 3
+}

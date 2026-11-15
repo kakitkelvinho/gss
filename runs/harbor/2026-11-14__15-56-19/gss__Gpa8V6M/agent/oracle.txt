@@ -1,0 +1,26 @@
+downloading uv 0.9.7 aarch64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading cryptography (4.5MiB)
+Downloading beartype (1.5MiB)
+Downloading pygments (1.2MiB)
+Downloading pydantic-core (2.0MiB)
+ Downloading pygments
+ Downloading beartype
+ Downloading pydantic-core
+ Downloading cryptography
+Installed 62 packages in 56ms
+# ports 800nm z=294.0 h=120.0, opa z=935.0 h=158.0; OPA 1300 nm, L_opa=1545.0
+# photon energies 1.55 + 0.95 eV; buying ['CAM-VSWIR', 'GAP-TPA']
+# OPA arm table+internal path 2815 mm, stage apex 771, reference x 874
+# predicted time zero at stage 14.600 mm
+# coarse peak at 15.4300 mm
+# fine peak at 15.43749 mm

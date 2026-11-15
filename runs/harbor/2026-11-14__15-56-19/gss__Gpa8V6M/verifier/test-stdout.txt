@@ -1,0 +1,27 @@
+{
+ "reward": 0.9069692181887464,
+ "eta": 0.9968789871397994,
+ "O": 0.9971690228885238,
+ "abs_dt_fs": 3.1759709833372325,
+ "T_800": 1.0,
+ "T_opa": 1.0,
+ "opa_lambda_nm": 1300.0,
+ "design_viable": true,
+ "level": 2,
+ "diagnostics_bought": [
+  "CAM-VSWIR",
+  "GAP-TPA"
+ ],
+ "cost_eur": 10350.0,
+ "c_min_eur": 7300.0,
+ "lab_time_min": 151.97,
+ "lab_time_frac": 0.6332,
+ "tool_calls": 115,
+ "malformed_calls": 0,
+ "stray_events": 3,
+ "stray_time_min": 44.35,
+ "parts_placed": 7,
+ "footprint_m2": 0.8029,
+ "ended_by": "agent",
+ "seed": 1
+}

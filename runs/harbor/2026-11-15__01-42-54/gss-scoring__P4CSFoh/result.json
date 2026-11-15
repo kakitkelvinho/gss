@@ -1,0 +1,156 @@
+{
+    "schema_version": 1,
+    "id": "51c02367-a74d-4056-b5f1-20f05eb22c89",
+    "task_name": "gss/find-time-zero",
+    "trial_name": "gss-scoring__P4CSFoh",
+    "trial_uri": "file:///Users/hok5/Documents/gss-scoring/jobs/2026-11-15__01-42-54/gss-scoring__P4CSFoh",
+    "task_id": {
+        "path": "."
+    },
+    "source": null,
+    "task_checksum": "0520da99a6b55a908bd7138f4ea16eabd95b634177ff21a7fed8949f34919172",
+    "config": {
+        "schema_version": 1,
+        "task": {
+            "path": ".",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "gss-scoring__P4CSFoh",
+        "trials_dir": "jobs/2026-11-15__01-42-54",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "opencode",
+            "import_path": null,
+            "model_name": "gemini/gemini-3.1-pro-preview",
+            "base_url": null,
+            "model_api_key_name": null,
+            "model_api_format": null,
+            "skip_model_parsing": false,
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "override_error_policy": {},
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "118d1634-031e-4fca-bcc7-3a5bb91aaaf5",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "opencode",
+        "version": "1.19.5",
+        "model_info": {
+            "name": "gemini-3.1-pro-preview",
+            "provider": "gemini"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 5226583,
+        "n_cache_tokens": 4879589,
+        "n_output_tokens": 4217,
+        "cost_usd": 1.9355138000000005,
+        "model_usage": {
+            "gemini/gemini-3.1-pro-preview": {
+                "n_input_tokens": 5226583,
+                "n_cache_tokens": 4879589,
+                "n_output_tokens": 4217,
+                "cost_usd": 1.9355138000000005
+            }
+        },
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0,
+            "spatial_score": 0.0,
+            "temporal_score": 0.0,
+            "efficiency_score": 0.0,
+            "success": 0,
+            "eta": 0.0,
+            "O": 0.0,
+            "T_800": 0.0,
+            "T_opa": 1.0,
+            "opa_lambda_nm": 600.0,
+            "design_viable": 1,
+            "level": 1,
+            "cost_eur": 7030.0,
+            "c_min_eur": 950.0,
+            "lab_time_min": 238.01,
+            "lab_time_frac": 0.9917,
+            "tool_calls": 145,
+            "malformed_calls": 2,
+            "stray_events": 12,
+            "stray_time_min": 95.83,
+            "parts_placed": 10,
+            "footprint_m2": 0.9697,
+            "seed": 3
+        }
+    },
+    "verifier_environment_mode": "separate",
+    "exception_info": null,
+    "started_at": "2026-11-14T23:42:56.316355Z",
+    "finished_at": "2026-11-14T23:52:12.985485Z",
+    "environment_setup": {
+        "started_at": "2026-11-14T23:42:56.450960Z",
+        "finished_at": "2026-11-14T23:43:06.995606Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-11-14T23:43:06.995725Z",
+        "finished_at": "2026-11-14T23:43:07.738564Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-11-14T23:43:07.739524Z",
+        "finished_at": "2026-11-14T23:51:45.399849Z"
+    },
+    "verifier": {
+        "started_at": "2026-11-14T23:51:57.627058Z",
+        "finished_at": "2026-11-14T23:52:12.985430Z"
+    },
+    "step_results": null,
+    "reward_valid": true
+}
