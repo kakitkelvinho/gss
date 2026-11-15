@@ -415,6 +415,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   .fm-p { font:500 40px Oswald, Impact, sans-serif; fill:#EDE3CC; letter-spacing:.02em; }
   .fm-s { font:500 24px Oswald, Impact, sans-serif; fill:#EDE3CC; opacity:.8; letter-spacing:.03em; text-transform:uppercase; }
   .lk-p { font:400 120px "Bebas Neue", Impact, sans-serif; fill:#EDE3CC; letter-spacing:.02em; }
+  a .lk-p { cursor:pointer; text-decoration:underline; text-decoration-thickness:4px; text-underline-offset:12px; } a:hover .lk-p { fill:#E8742A; }
   .slide .sn { position:absolute; right:36px; bottom:26px; z-index:5; min-width:56px; padding:6px 12px; text-align:center;
     background:#16120F; color:#EDE3CC; font:400 38px/1 "Bebas Neue", Impact, sans-serif; letter-spacing:.04em; }
   .slide:not(.poster) .sn { display:none; }
@@ -597,7 +598,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <g filter="url(#pcut)">
     <text x="110" y="110" class="pt-sm" style="font-size:40px;fill:#EDE3CC">≤ 4 hours simulated lab time</text><text x="110" y="156" class="pt-sm" style="font-size:40px;fill:#EDE3CC">≤ €30,000 parts budget</text>
     <text x="110" y="905" class="pt-big" style="font-size:140px;fill:#EDE3CC" textLength="1456" lengthAdjust="spacingAndGlyphs">MAKE TWO LASER PULSES ARRIVE</text><text x="110" y="1040" class="pt-big" style="font-size:140px;fill:#E8742A" textLength="1283.8" lengthAdjust="spacingAndGlyphs">AT THE SAME SPOT AND TIME.</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">Make two laser pulses arrive at the same spot and time.</h2>
     <aside class="notes"><b>~12 s.</b> An 800 nm pulse and an OPA pulse start on opposite sides of an empty optical table. The agent has to build both beam paths so they focus on the same spot of the sample and arrive within about 100 femtoseconds of each other.</aside>
@@ -628,7 +629,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <g filter="url(#pcut)">
     <text x="110" y="110" class="pt-sm" style="font-size:32px;fill:#16120F">About 20 tools · physical actions cost lab time</text>
     <text x="110" y="925" class="pt-big" style="font-size:120px;fill:#16120F" textLength="888" lengthAdjust="spacingAndGlyphs">THE AGENT CONTROLS A</text><text x="110" y="1043" class="pt-big" style="font-size:120px;fill:#E8742A" textLength="1052.4" lengthAdjust="spacingAndGlyphs">PHYSICS LAB THROUGH MCP.</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">The agent controls a physics lab through MCP.</h2>
     <aside class="notes"><b>~13 s.</b> About twenty tools in six groups. Reading manuals is free; anything physical costs simulated lab time. The agent only sees instrument readings, never the simulator's true state.</aside>
@@ -656,7 +657,8 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <g filter="url(#pcut)">
     <text x="110" y="160" class="fm-p">SCORE = <tspan fill="#4A8FC4">0.2 × SPOT OVERLAP</tspan> + <tspan fill="#E8742A">0.5 × TIMING × PRECISION</tspan> + <tspan fill="#EDE3CC">[0.2 × MIN € ÷ € + 0.1 × (1 − LAB TIME)²]</tspan></text>
     <text x="110" y="960" class="pt-big" style="font-size:150px;fill:#EDE3CC" textLength="985.5" lengthAdjust="spacingAndGlyphs">SCORED ON PHYSICS.</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+    <text x="150" y="1025" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="400" fill="#EDE3CC" opacity=".7">Tested exploits: empty submit, tool/buy spam, and single-arm shortcuts — all score 0.000.</text>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">Scored on physics.</h2>
     <aside class="notes"><b>~14 s.</b> The score is computed from the simulator's true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing (falling with every femtosecond of error), and 0.3 for money and lab time saved, but only once the setup really works: spend is credited as the cheapest workable design over what was spent, and lab time quadratically. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.</aside>
@@ -676,7 +678,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   </g>
   <g filter="url(#pcut)">
     <text x="110" y="960" class="pt-big" style="font-size:120px;fill:#EDE3CC" textLength="1032" lengthAdjust="spacingAndGlyphs">AVERAGE SCORE OF MODELS</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">Average score of models.</h2>
     <aside class="notes"><b>~16 s.</b> Average reward per model, all re-scored with the current, tougher grader. Gemini 3.1 Pro never got both beams to the sample, so it scores zero in four runs. Flash aligned the spots and stopped near 0.2 twice, and once found time zero for 0.81. Hydrogen stopped at the stop-early line of about 0.2. Claude played six blind runs on the harder 90-degree level: four found time zero (0.85 to 0.90), one lost power at the retroreflector (0.54), and one chose the wrong detectors and submitted at a tape-measure guess 6.4 picoseconds off (0.20), averaging 0.71. Our scripted reference averages 0.84 over ten seeds at that level: the score now rewards precise timing, minimum spend and fast work, so even the reference leaves points on the table.</aside>
@@ -727,7 +729,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
       <text x="200" y="478" text-anchor="middle" class="cap-p">€4,030 OVER BUDGET,</text><text x="200" y="516" text-anchor="middle" class="cap-p2">234 of 240 min used</text></g>
   <g filter="url(#pcut)">
     <text x="110" y="960" class="pt-big" style="font-size:150px;fill:#16120F" textLength="870" lengthAdjust="spacingAndGlyphs">COMMON MISTAKES</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">Common mistakes.</h2>
     <aside class="notes"><b>~16 s.</b> Flash reported “The alignment and time-zero setup has been completed and submitted”, while the pulses were 46 picoseconds apart. It scanned with a short integration time, so the peak drowned in noise; it never blocked one arm to check the backgrounds; and it overspent by €4,030 and used 234 of 240 minutes. Each failure is a decision, and the manuals describe the tools that avoid it.</aside>
@@ -747,8 +749,15 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     <text x="190" y="490" class="cmd"><tspan fill="#2E6F9E">harbor</tspan> run -p . -a opencode -m <tspan fill="#E8742A">&lt;model&gt;</tspan></text>
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="820" class="lk-p">kakitkelvinho.github.io/gss</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+    <text x="110" y="750" class="pt-big" font-size="64" fill="#E8742A" letter-spacing="2">TRY IT →</text>
+    <a href="https://kakitkelvinho.github.io/gss" target="_blank" rel="noopener"><text x="110" y="870" class="lk-p">kakitkelvinho.github.io/gss</text></a>
+    <a href="https://kakitkelvinho.github.io/gss" target="_blank" rel="noopener">
+      <g transform="translate(1480 650)">
+        <rect width="272" height="272" fill="#EDE3CC"/>
+        <path transform="translate(20 20) scale(8)" fill="#16120F" d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM8 0h1v1h-1zM11 0h1v1h-1zM12 0h1v1h-1zM15 0h1v1h-1zM16 0h1v1h-1zM18 0h1v1h-1zM19 0h1v1h-1zM20 0h1v1h-1zM22 0h1v1h-1zM23 0h1v1h-1zM24 0h1v1h-1zM25 0h1v1h-1zM26 0h1v1h-1zM27 0h1v1h-1zM28 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM10 1h1v1h-1zM12 1h1v1h-1zM14 1h1v1h-1zM15 1h1v1h-1zM18 1h1v1h-1zM20 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM13 2h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM22 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM26 2h1v1h-1zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM17 3h1v1h-1zM19 3h1v1h-1zM22 3h1v1h-1zM24 3h1v1h-1zM25 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM9 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM14 5h1v1h-1zM19 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM27 6h1v1h-1zM28 6h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM15 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM19 7h1v1h-1zM0 8h1v1h-1zM1 8h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM10 8h1v1h-1zM11 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM22 8h1v1h-1zM23 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM0 9h1v1h-1zM3 9h1v1h-1zM4 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM9 9h1v1h-1zM12 9h1v1h-1zM16 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM22 9h1v1h-1zM23 9h1v1h-1zM24 9h1v1h-1zM28 9h1v1h-1zM0 10h1v1h-1zM1 10h1v1h-1zM3 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM9 10h1v1h-1zM11 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM0 11h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM19 11h1v1h-1zM22 11h1v1h-1zM24 11h1v1h-1zM28 11h1v1h-1zM0 12h1v1h-1zM2 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM12 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM17 12h1v1h-1zM19 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM1 13h1v1h-1zM7 13h1v1h-1zM10 13h1v1h-1zM12 13h1v1h-1zM13 13h1v1h-1zM15 13h1v1h-1zM16 13h1v1h-1zM19 13h1v1h-1zM22 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM0 14h1v1h-1zM2 14h1v1h-1zM3 14h1v1h-1zM4 14h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM14 14h1v1h-1zM19 14h1v1h-1zM23 14h1v1h-1zM24 14h1v1h-1zM26 14h1v1h-1zM27 14h1v1h-1zM28 14h1v1h-1zM1 15h1v1h-1zM3 15h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM16 15h1v1h-1zM18 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM27 15h1v1h-1zM0 16h1v1h-1zM3 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM23 16h1v1h-1zM24 16h1v1h-1zM25 16h1v1h-1zM27 16h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM8 17h1v1h-1zM9 17h1v1h-1zM10 17h1v1h-1zM13 17h1v1h-1zM15 17h1v1h-1zM18 17h1v1h-1zM20 17h1v1h-1zM23 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM0 18h1v1h-1zM2 18h1v1h-1zM6 18h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM20 18h1v1h-1zM23 18h1v1h-1zM24 18h1v1h-1zM26 18h1v1h-1zM2 19h1v1h-1zM5 19h1v1h-1zM8 19h1v1h-1zM10 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 19h1v1h-1zM20 19h1v1h-1zM21 19h1v1h-1zM23 19h1v1h-1zM26 19h1v1h-1zM1 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM26 20h1v1h-1zM8 21h1v1h-1zM9 21h1v1h-1zM10 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM0 22h1v1h-1zM1 22h1v1h-1zM2 22h1v1h-1zM3 22h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM9 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM16 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM27 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM0 24h1v1h-1zM2 24h1v1h-1zM3 24h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM9 24h1v1h-1zM10 24h1v1h-1zM14 24h1v1h-1zM17 24h1v1h-1zM18 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM0 25h1v1h-1zM2 25h1v1h-1zM3 25h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM8 25h1v1h-1zM11 25h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM21 25h1v1h-1zM23 25h1v1h-1zM24 25h1v1h-1zM25 25h1v1h-1zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM13 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM23 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM9 27h1v1h-1zM11 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM22 27h1v1h-1zM23 27h1v1h-1zM25 27h1v1h-1zM27 27h1v1h-1zM0 28h1v1h-1zM1 28h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM8 28h1v1h-1zM9 28h1v1h-1zM10 28h1v1h-1zM11 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM15 28h1v1h-1zM18 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM23 28h1v1h-1zM24 28h1v1h-1zM27 28h1v1h-1z"/>
+      </g>
+    </a>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">One command to check us. kakitkelvinho.github.io/gss</h2>
     <aside class="notes"><b>~6 s.</b> One Harbor command runs the reference or any agent; seeds are fixed, so every number in this deck reproduces, and every run can be replayed on our site.</aside>
@@ -760,7 +769,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
       <rect width="1920" height="1080" fill="#E8742A"/>
   <g filter="url(#pcut)">
     <text x="110" y="420" class="pt-big" style="font-size:150px;fill:#16120F" textLength="1465.5" lengthAdjust="spacingAndGlyphs">AGENTS CUT CODING TO HOURS.</text><text x="110" y="580" class="pt-big" style="font-size:150px;fill:#EDE3CC" textLength="895.5" lengthAdjust="spacingAndGlyphs">LAB WORK IS NEXT.</text><text x="110" y="740" class="pt-big" style="font-size:150px;fill:#16120F" textLength="1700" lengthAdjust="spacingAndGlyphs">SO WE CAN FOCUS ON REAL PHYSICS.</text>
-  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1"/>
+  </g><rect width="1920" height="1080" filter="url(#pgrain)" opacity="0.45" pointer-events="none"/><rect width="1920" height="1080" filter="url(#pwear)" opacity=".1" pointer-events="none"/>
     </svg>
     <h2 class="sr">Agents cut coding to hours. Lab work is next, so we can focus on real physics.</h2>
     <aside class="notes"><b>~8 s.</b> Coding used to take us months; agents now do it in hours. Lab work still takes us months. GSS is a lab where agents can practise, so one day they can do it in hours too.</aside>
@@ -780,14 +789,14 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
   <section class="slide">
     <h2>What the current score measures</h2>
     <p>Up to 0.2 for transmitted spatial overlap and 0.5 more as the pulses reach time zero.</p>
-    <p class="muted" style="margin-top:42px">The final 0.3 rewards money and lab time left only when physical efficiency is at least 0.9. Reading or buying alone earns nothing.</p>
+    <p class="muted" style="margin-top:42px">The final 0.3 rewards money and lab time left only when physical efficiency is at least 0.9. Reading, buying, empty submits, and single-arm shortcuts all score 0.000.</p>
     <aside class="notes">Each component is computed from the simulator's true final state. Partial alignment now gives a training signal without paying for empty tables or tool-call spam. The success threshold is based on measured physical efficiency.</aside>
     <span class="sn">11</span>
   </section>
 
   <section class="slide">
     <h2>Evidence still to collect</h2>
-    <ul><li>More frontier-model runs per seed, so averages become distributions.</li><li>Level 2 (90° crossing) runs with stronger models <span class="ph">[update when the Claude Level 2 runs are in]</span>.</li><li>Training a smaller model on GSS experience (the stretch goal).</li></ul>
+    <ul><li>More frontier-model runs per seed, so averages become distributions.</li><li>Level 2 (90° crossing) runs across more models and seeds.</li><li>Training a smaller model on GSS experience (the stretch goal).</li></ul>
     <p class="muted" style="margin-top:35px">These are next steps, not claims about the current results.</p>
     <aside class="notes">Judges rerun three agent trials. We have seven scored Level 1 Gemini runs (four Pro, two Flash, one Hydrogen), all archived and replayable. The Carbon run made no tool calls because of a thinking-budget harness issue and is not counted.</aside>
     <span class="sn">12</span>
@@ -925,7 +934,7 @@ Ctrl/Cmd+P → Save as PDF gives the submission pitch deck (one slide per page, 
     else if (k === 'Home') { show(order()[0]); } else if (k === 'End') { var o = order(); show(o[o.length - 1]); }
   });
   document.addEventListener('click', function (e) {
-    if (e.target.closest('#bar, #hot, #notes')) return;
+    if (e.target.closest('#bar, #hot, #notes, a')) return;
     if (mode === 'pen') return;
     var sl = e.target.closest('.slide');
     if (inOverview()) { if (sl) { i = slides.indexOf(sl); toggleOverview(false); } return; }
