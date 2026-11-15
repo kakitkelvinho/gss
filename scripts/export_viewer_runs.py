@@ -124,6 +124,19 @@ def harbor_usage(trial: Path) -> dict | None:
     return usage or None
 
 
+def diagnostics_match(actual: dict, recorded: dict) -> bool:
+    if actual.keys() != recorded.keys():
+        return False
+    for key, value in actual.items():
+        expected = recorded[key]
+        if isinstance(value, float) and isinstance(expected, (int, float)) and not isinstance(expected, bool):
+            if not math.isclose(value, expected, rel_tol=1e-9, abs_tol=1e-9):
+                return False
+        elif value != expected:
+            return False
+    return True
+
+
 def export_run(verifier_dir: Path, jobs_dir: Path):
     diagnostics = json.loads((verifier_dir / "diagnostics.json").read_text())
     recorded = json.loads((verifier_dir / "trajectory.json").read_text())["trajectory"]
@@ -138,7 +151,7 @@ def export_run(verifier_dir: Path, jobs_dir: Path):
         truth.update(CURRENT_REWARD.score(truth["eta"], truth["O"], truth["T_800"], truth["T_opa"],
                               ep.cost, ep.t / K.BUDGET_S, ep.c_min))
         steps.append({**step, "truth": truth, "snapshot": snapshot(ep, step["tool"], response)})
-    if ep.result() != diagnostics:
+    if not diagnostics_match(ep.result(), diagnostics):
         raise ValueError(f"final diagnostics differ at {verifier_dir}")
 
     trial = verifier_dir.parent
