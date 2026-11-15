@@ -105,7 +105,7 @@ const p4 = poster(CREAM, `
       return `<g class="mm-node" style="--d:${0.2 + i * 0.1}s"><text x="${lx}" y="${n.y - 14}" text-anchor="${a}" class="mm-t">${n.t}</text>${n.tools.map((s, j) => `<text x="${lx}" y="${n.y + 22 + j * 33}" text-anchor="${a}" class="mm-s">${s}</text>`).join('')}</g>`; }).join('')}
   </g>
   <g filter="url(#pcut)">
-    ${small(['About 20 tools · reading is free · physical actions cost lab time'], INK, 110, 32)}
+    ${small(['About 20 tools · physical actions cost lab time'], INK, 110, 32)}
     ${title(['THE AGENT CONTROLS A', 'PHYSICS LAB THROUGH MCP.'], 120, 925, 118, [INK, ORANGE])}
   </g>`, 'The agent controls a physics lab through MCP.',
   '<b>~13 s.</b> About twenty tools in six groups. Reading manuals is free; anything physical costs simulated lab time. The agent only sees instrument readings, never the simulator\'s true state.');
@@ -156,9 +156,9 @@ const caps = [['SPOTS ALIGNED,', 'pulses 46 ps apart'], ['SHORT INTEGRATION:', '
 const p6 = poster(ORANGE, `
   ${pan.map((c, i) => { const x = 110 + i * 433;
     return `<g transform="translate(${x},200)"><svg width="400" height="420" viewBox="0 0 400 420"><g filter="url(#pcut)"><rect x="4" y="4" width="392" height="412" fill="${CREAM}"/>${c}</g></svg>
-      </g>`; }).join('')}
+      <text x="200" y="478" text-anchor="middle" class="cap-p">${caps[i][0]}</text><text x="200" y="516" text-anchor="middle" class="cap-p2">${caps[i][1]}</text></g>`; }).join('')}
   <g filter="url(#pcut)">
-    ${title(['COMMON MISTAKES'], 150, 900, 112, [INK])}
+    ${title(['COMMON MISTAKES'], 150, 960, 112, [INK])}
   </g>`, 'Common mistakes.',
   '<b>~16 s.</b> Flash reported “The alignment and time-zero setup has been completed and submitted”, while the pulses were 46 picoseconds apart. It scanned with a short integration time, so the peak drowned in noise; it never blocked one arm to check the backgrounds; and it overspent by €4,030 and used 234 of 240 minutes. Each failure is a decision, and the manuals describe the tools that avoid it.');
 
@@ -200,8 +200,7 @@ const p8 = poster(INK, `
         <text x="${B1 + 30}" y="${y + 48}" class="bv-p">${v}</text></g>`; }).join('')}
   </g>
   <g filter="url(#pcut)">
-    <text x="110" y="140" class="fm-p">SCORE = <tspan fill="${BLUE2}">0.2 × SPOT OVERLAP</tspan> + <tspan fill="${ORANGE}">0.5 × TIMING OVERLAP</tspan> + <tspan fill="${CREAM}">[0.2 × (1 − EXTRA €) + 0.1 × (1 − LAB TIME)]</tspan></text>
-    <text x="110" y="200" class="fm-s">[ … ] counts only if timing overlap ≥ 0.9 · extra € = spend above the cheapest working setup, as a share of the €30k cap · buying more can only lower the score</text>
+    <text x="110" y="160" class="fm-p">SCORE = <tspan fill="${BLUE2}">0.2 × SPOT OVERLAP</tspan> + <tspan fill="${ORANGE}">0.5 × TIMING OVERLAP</tspan> + <tspan fill="${CREAM}">[0.2 × (1 − EXTRA €) + 0.1 × (1 − LAB TIME)]</tspan></text>
     ${title(['SCORED ON PHYSICS.'], 150, 960, 118, [CREAM])}
   </g>`, 'Scored on physics.',
   '<b>~14 s.</b> The score is computed from the simulator\'s true final state, never from what the agent reports. Up to 0.2 for both beams overlapping on the sample, 0.5 for the timing, and 0.3 for money and lab time saved, but only once the setup really works. Doing nothing or trying the exploits scores zero, and stopping after alignment caps at 0.2.');
@@ -230,14 +229,14 @@ const trow = (y, name, done) => `<text x="110" y="${y + 78}" class="tk-n">${name
            : `<rect x="${TB0}" y="${y + 120}" width="130" height="${TH}" fill="none" stroke="${INK}" stroke-width="6" stroke-dasharray="16 12"/><text x="${TB0 + 154}" y="${y + 188}" class="tk-b">HOURS? NOT YET</text>`}`;
 const p10 = poster(ORANGE, `
   <g filter="url(#pcut)">
-    ${title(['AGENTS CUT CODING TO HOURS.', 'LAB WORK IS NEXT.'], 150, 500, 160, [INK, CREAM])}
-  </g>`, 'Agents cut coding to hours. Lab work is next.',
+    ${title(['AGENTS CUT CODING TO HOURS.', 'LAB WORK IS NEXT.', 'SO WE CAN FOCUS ON REAL PHYSICS.'], 150, 420, 160, [INK, CREAM, INK])}
+  </g>`, 'Agents cut coding to hours. Lab work is next, so we can focus on real physics.',
   '<b>~8 s.</b> Coding used to take us months; agents now do it in hours. Lab work still takes us months. GSS is a lab where agents can practise, so one day they can do it in hours too.');
 
 // ---- swap sections 3..10 ----
 const secs = [...html.matchAll(/  <section class="slide[^"]*"[^>]*>[\s\S]*?<\/section>\n/g)];
 const start = secs[2].index, end = secs[9].index + secs[9][0].length;
-html = html.slice(0, start) + [p7, p4, p8, p5, p6, p9, p10].join('\n') + html.slice(end);  // scan, lab, scoring, results, failures, command, takeaway (task slide dropped)
+html = html.slice(0, start) + [p3, p4, p8, p5, p6, p9, p10].join('\n') + html.slice(end);  // task, lab, scoring, results, failures, command, takeaway (scan slide dropped)
 
 const css = `
   /* ===== v6: all video slides are posters; backups on cream paper ===== */
@@ -258,11 +257,12 @@ const css = `
   .bl-p.ph, .bv-p.ph { fill:${ORANGE}; } .rn-p { font:500 26px Oswald, Impact, sans-serif; fill:${CREAM}; letter-spacing:.04em; } .rn-p.ink { fill:${INK}; }
   .tk-n { font:400 96px "Bebas Neue", Impact, sans-serif; fill:${INK}; } .tk-b { font:400 54px "Bebas Neue", Impact, sans-serif; fill:${INK}; }
   .bv-p { font:400 60px "Bebas Neue", Impact, sans-serif; fill:${CREAM}; }
-  .fm-p { font:500 44px Oswald, Impact, sans-serif; fill:${CREAM}; letter-spacing:.02em; }
+  .fm-p { font:500 40px Oswald, Impact, sans-serif; fill:${CREAM}; letter-spacing:.02em; }
   .fm-s { font:500 24px Oswald, Impact, sans-serif; fill:${CREAM}; opacity:.8; letter-spacing:.03em; text-transform:uppercase; }
   .lk-p { font:400 120px "Bebas Neue", Impact, sans-serif; fill:${CREAM}; letter-spacing:.02em; }
   .slide .sn { position:absolute; right:36px; bottom:26px; z-index:5; min-width:56px; padding:6px 12px; text-align:center;
     background:${INK}; color:${CREAM}; font:400 38px/1 "Bebas Neue", Impact, sans-serif; letter-spacing:.04em; }
+  .slide:not(.poster) .sn { display:none; }
   .cmd { font:700 64px "Courier New", Courier, monospace; fill:${INK}; }
   @keyframes ppO { 0%,8% { transform:translate(0,0) scale(1.4); opacity:0; } 14% { opacity:1; } 52% { transform:translate(940px,-400px) scale(.3); opacity:1; } 56%,100% { transform:translate(940px,-400px) scale(.3); opacity:0; } }
   @keyframes ppB { 0%,8% { transform:translate(0,0) scale(1.4); opacity:0; } 14% { opacity:1; } 52% { transform:translate(-860px,-340px) scale(.3); opacity:1; } 56%,100% { transform:translate(-860px,-340px) scale(.3); opacity:0; } }

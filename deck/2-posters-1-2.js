@@ -111,9 +111,6 @@ const poster2 = `
     </g>
   </g>
   <g class="pt" filter="url(#cut)">
-    <text x="110" y="118" class="pt-small dk">Knowing pump–probe optics is the beginning.</text>
-    <text x="110" y="156" class="pt-small dk">The agent still has to build, align, measure</text>
-    <text x="110" y="194" class="pt-small dk">and recover when its first plan fails.</text>
     <text x="110" y="905" class="pt-title2" textLength="1700" lengthAdjust="spacingAndGlyphs">A KNOWN DESIGN IS</text>
     <text x="110" y="1040" class="pt-title2 or" textLength="1700" lengthAdjust="spacingAndGlyphs">NOT A WORKING SETUP.</text>
   </g>
