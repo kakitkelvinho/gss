@@ -189,10 +189,6 @@ tests/                           separate verifier image + grader
 docs/DECISIONS.md                design decisions (they take precedence over HANDOFF.md)
 ```
 
-## Disclosure
-
-All code was written at the event. **QUOP** (https://kakitkelvinho.github.io/quop/, the author's own
-earlier open-source tool) served only as the visual reference for the replay viewer's
-millimetre-true table drawing. No QUOP code or assets are copied; the viewer in `viewer/` was written here.
+## Licence
 
 MIT licence.
