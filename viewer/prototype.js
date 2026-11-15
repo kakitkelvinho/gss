@@ -29,13 +29,13 @@ function actionCoordinates(call) {
 // World axes follow sim/vec.py: x along the 2400 mm table, z across the 1200 mm table, h up from the table top.
 // Every optic is drawn from the replay pose with the simulator's own mount dimensions (sim/constants.py).
 const DEG = Math.PI / 180;
-const C = { ink: '#16120F', ink2: '#2B231D', ink3: '#413629', room: '#1E1915', floor: '#0E0B09', paper: '#EDE3CC', paper2: '#F7F0DF', table: '#D3C6A8', tableHole: '#3A3027', house: '#DCCFB2', house2: '#C9BB9C', figure: '#A99A7C', figureEdge: '#16120F', kraft: '#9C927E', kraft2: '#776E5C', orange: '#E8742A', blue: '#4A8FC4' };
-const BEAMS = [['800nm', C.orange, '800 nm'], ['opa', C.blue, 'OPA']];
+const C = { ink: '#16120F', ink2: '#2B231D', ink3: '#413629', room: '#1E1915', floor: '#0E0B09', paper: '#EDE3CC', paper2: '#F7F0DF', table: '#D3C6A8', tableHole: '#3A3027', house: '#DCCFB2', house2: '#C9BB9C', fig: '#8E2A24', figTop: '#B23A30', figDark: '#5E1B17', laser800: '#FF4A26', laserOpa: '#3CC8EC', kraft: '#9C927E', kraft2: '#776E5C', orange: '#E8742A', blue: '#4A8FC4' };
+const BEAMS = [['800nm', C.laser800, '800 nm'], ['opa', C.laserOpa, 'OPA']];
 // Orthographic camera: yaw about the vertical axis, then pitch down. The drawing stays a true projection at any setting.
 const VIEW = {}, TOWARD_VIEWER = {};
 function setView(yaw, pitch) { Object.assign(VIEW, { c: Math.cos(yaw * DEG), s: Math.sin(yaw * DEG), sf: Math.sin(pitch * DEG), cf: Math.cos(pitch * DEG) }); Object.assign(TOWARD_VIEWER, { x: VIEW.s * VIEW.cf, z: VIEW.c * VIEW.cf, h: VIEW.sf }); }
 setView(DEFAULT_CAM.yaw, DEFAULT_CAM.pitch);
-const LIGHT = norm({ x: -0.55, z: 0.8, h: 0 });
+const LIGHT_DIR = norm({ x: 0.75, z: 1.0, h: -1.1 }), LIGHT = norm({ x: -LIGHT_DIR.x, z: -LIGHT_DIR.z, h: 0 });
 const MM = { table: { x: 2400, z: 1200 }, slab: 60, floor: -760, robot: 1050, mountHalf: 19, mountDepth: [0.5, 12], postR: 6.35, postBehind: 6, lensRing: 25.4, retroR: 19.05, apex: 90, retroFront: 40, minPost: 50 };
 const SCENE = { w: 1200, h: 800, fit: { x0: 40, y0: 96, x1: 1160, y1: 600 } };
 let FIT = { k: 0.4, ox: 0, oy: 0 };
@@ -140,7 +140,8 @@ function housingSvg(box, port, label, color) {
 }
 function tableSvg() {
   const T = MM.table, top = [{ x: 0, z: 0 }, { x: T.x, z: 0 }, { x: T.x, z: T.z }, { x: 0, z: T.z }], at = h => top.map(p => ({ ...p, h }));
-  const shadow = poly(at(MM.floor).map(p => ({ ...p, x: p.x + (p.x ? 60 : -60), z: p.z + (p.z ? 60 : -60) })), `fill="${C.floor}"`);
+  const slabBox = { c: { x: T.x / 2, z: T.z / 2, h: -MM.slab / 2 }, u: { x: T.x / 2, z: 0, h: 0 }, v: { x: 0, z: T.z / 2, h: 0 }, w: { x: 0, z: 0, h: MM.slab / 2 } };
+  const shadow = `<g fill="${C.floor}" opacity=".55">${shadowOn([slabBox], MM.floor)}</g>`;
   const legs = [[250, 220], [T.x - 250, 220], [250, T.z - 220], [T.x - 250, T.z - 220]].sort((a, b) => depth({ x: a[0], z: a[1] }) - depth({ x: b[0], z: b[1] }))
     .map(([x, z]) => block({ c: { x, z }, L: 170, W: 170, h0: MM.floor, h1: -MM.slab }, { top: C.ink, light: C.ink3, dark: C.ink2 })).join('');
   const slab = block({ c: { x: T.x / 2, z: T.z / 2 }, L: T.x, W: T.z, h0: -MM.slab, h1: 0 }, { top: C.table, light: C.kraft, dark: C.kraft2 }, 'filter="url(#pcutS)"');
@@ -158,26 +159,63 @@ function deskSvg(meta) {
   const s = [{ x: c.x - 29, z: c.z - 130, h: -100 }, { x: c.x - 29, z: c.z + 130, h: -100 }, { x: c.x - 29, z: c.z + 130, h: 100 }, { x: c.x - 29, z: c.z - 130, h: 100 }];
   return desk + screen + poly(s, `fill="${C.paper}"`);
 }
-function mannequinSvg(pose, you, targetX, outline) {
-  const foot = proj({ x: you.x, z: you.z, h: MM.floor }), scale = MM.robot * FIT.k * VIEW.cf / 182;
-  const flip = targetX < foot.x ? -1 : 1, ink = C.figure;
-  const key = outline ? ` stroke="${C.figureEdge}" stroke-width="${(2 / scale).toFixed(2)}" stroke-linejoin="round"` : '';
-  const paint = `fill="${ink}"${key}`, limb = `stroke="${ink}" stroke-width="14" fill="none" stroke-linecap="square"`;
-  const limbKey = outline ? `<path d="ARM" stroke="${C.ink}" stroke-width="${(14 + 4 / scale).toFixed(2)}" fill="none" stroke-linecap="square"/>` : '';
-  const arm = pose === 'manual' ? 'M-24 -109 L20 -89 M24 -86 L78 -77 M27 -110 L62 -79 M67 -75 L97 -68'
-    : pose === 'adjust' ? 'M-24 -112 L17 -122 M21 -124 L51 -151 M27 -111 L60 -123 M64 -125 L88 -143'
-    : 'M-24 -111 L-33 -74 M-31 -69 L-15 -58 M26 -110 L58 -78 M62 -76 L93 -84';
-  const prop = pose === 'manual' ? `<path d="M80 -86 L112 -96 L122 -64 L90 -54 Z" fill="${C.orange}"/><path d="M101 -91 L106 -59" stroke="${C.ink}" stroke-width="2"/>`
-    : pose === 'buy' ? `<rect x="-20" y="-224" width="40" height="40" fill="${C.orange}"/><text x="0" y="-194" text-anchor="middle" class="sc-euro">€</text>`
-    : pose === 'measure' ? `<rect x="84" y="-104" width="46" height="34" fill="${C.orange}"/><path d="M89 -84 L98 -88 L106 -80 L115 -96 L125 -90" fill="none" stroke="${C.ink}" stroke-width="2.4"/>` : '';
-  const headTilt = pose === 'manual' || pose === 'adjust';
-  return `<g transform="translate(${foot.x.toFixed(1)} ${foot.y.toFixed(1)}) scale(${(flip * scale).toFixed(3)} ${scale.toFixed(3)})" filter="url(#pcutS)">
-    <path d="M-22 -64 L-4 -64 L-9 -37 L-28 -35 Z M8 -64 L27 -64 L36 -35 L17 -34 Z M-28 -30 L-10 -30 L-13 -5 L-33 -5 Z M18 -29 L37 -29 L43 -5 L22 -5 Z M-34 -5 L-11 -5 L-9 1 L-40 1 Z M20 -5 L45 -5 L50 1 L19 1 Z" ${paint}/>
-    ${limbKey.replace('ARM', arm)}<path d="${arm}" ${limb}/>
-    <path d="M-29 -121 L21 -126 L36 -102 L27 -66 L-24 -64 L-35 -99 Z" ${paint}/>
-    <path d="M-17 -22 L10 -25 L22 -12 L17 13 L-13 18 L-23 5 L-24 -11 Z" transform="translate(${headTilt ? 18 : 2} -150) rotate(${headTilt ? 18 : 0})" ${paint}/>
-    ${prop}
-  </g>`;
+// ---- The worker: a blocky mannequin built in world millimetres, so it turns with the camera and casts real shadows. ----
+// One fixed key light travels along LIGHT_DIR (from high behind-left); block faces and shadows both use it.
+function cuboid(c, u, v, w, fills, edge = '') {
+  const P = (a, b, d) => add(add(add(c, u, a), v, b), w, d);
+  const faces = [[u, [P(1, 1, 1), P(1, 1, -1), P(1, -1, -1), P(1, -1, 1)]], [u, [P(-1, 1, 1), P(-1, 1, -1), P(-1, -1, -1), P(-1, -1, 1)], -1],
+    [v, [P(1, 1, 1), P(1, 1, -1), P(-1, 1, -1), P(-1, 1, 1)]], [v, [P(1, -1, 1), P(1, -1, -1), P(-1, -1, -1), P(-1, -1, 1)], -1],
+    [w, [P(1, 1, 1), P(1, -1, 1), P(-1, -1, 1), P(-1, 1, 1)]], [w, [P(1, 1, -1), P(1, -1, -1), P(-1, -1, -1), P(-1, 1, -1)], -1]];
+  return faces.map(([axis, q, sign = 1]) => { const n = norm({ x: axis.x * sign, z: axis.z * sign, h: (axis.h || 0) * sign }); return { n, q }; })
+    .filter(f => dot(f.n, TOWARD_VIEWER) > 1e-6)
+    .map(f => { const lit = -dot(f.n, LIGHT_DIR); return poly(f.q, `fill="${f.n.h > 0.6 ? fills.top : lit > 0.15 ? fills.light : fills.dark}" ${edge}`); }).join('');
+}
+function corners(c, u, v, w) { const out = []; for (const a of [-1, 1]) for (const b of [-1, 1]) for (const d of [-1, 1]) out.push(add(add(add(c, u, a), v, b), w, d)); return out; }
+function hull(points) {
+  const p = points.map(q => [q.x, q.y]).sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower = [], upper = [];
+  for (const q of p) { while (lower.length > 1 && cr(lower.at(-2), lower.at(-1), q) <= 0) lower.pop(); lower.push(q); }
+  for (const q of p.reverse()) { while (upper.length > 1 && cr(upper.at(-2), upper.at(-1), q) <= 0) upper.pop(); upper.push(q); }
+  return lower.slice(0, -1).concat(upper.slice(0, -1));
+}
+// Shadow of a set of boxes on the horizontal plane h = plane, along the key light. Parts below the plane cast nothing on it.
+function shadowOn(boxes, plane) {
+  return boxes.map(b => {
+    const pts = corners(b.c, b.u, b.v, b.w).map(p => { const q = { ...p, h: Math.max(p.h, plane) }, t = (plane - q.h) / LIGHT_DIR.h; return proj(add(q, LIGHT_DIR, t)); });
+    return `<polygon points="${hull(pts).map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')}"/>`;
+  }).join('');
+}
+function segmentBox(a, b, t, fills) {
+  const c = { x: (a.x + b.x) / 2, z: (a.z + b.z) / 2, h: (a.h + b.h) / 2 }, u = { x: (b.x - a.x) / 2, z: (b.z - a.z) / 2, h: (b.h - a.h) / 2 };
+  const along = norm(u), side = Math.abs(along.h) > 0.95 ? { x: 1, z: 0, h: 0 } : norm(cross(along, { x: 0, z: 0, h: 1 })), up = norm(cross(side, along));
+  return { c, u, v: { x: side.x * t / 2, z: side.z * t / 2, h: side.h * t / 2 }, w: { x: up.x * t / 2, z: up.z * t / 2, h: up.h * t / 2 }, fills };
+}
+function figureBoxes(pose, you, facing) {
+  const f = norm(facing), s = { x: -f.z, z: f.x, h: 0 }, F = { x: you.x, z: you.z, h: MM.floor };
+  const L = (fwd, side, h) => ({ x: F.x + f.x * fwd + s.x * side, z: F.z + f.z * fwd + s.z * side, h: F.h + h });
+  const box = (fwd, side, h, lf, ls, lh, fills = FIG) => ({ c: L(fwd, side, h), u: { x: f.x * lf / 2, z: f.z * lf / 2, h: 0 }, v: { x: s.x * ls / 2, z: s.z * ls / 2, h: 0 }, w: { x: 0, z: 0, h: lh / 2 }, fills });
+  const boxes = [box(0, -72, 235, 120, 95, 470), box(0, 72, 235, 120, 95, 470), box(0, 0, 640, 170, 310, 330), box(10, 0, 925, 175, 165, 180)];
+  const hands = { observe: [[40, -205, 420], [40, 205, 420]], adjust: [[470, -110, 830], [470, 110, 830]], measure: [[40, -205, 420], [330, 115, 720]], manual: [[300, -95, 640], [300, 95, 640]], buy: [[40, -205, 420], [60, 225, 1180]] }[pose] || [[40, -205, 420], [40, 205, 420]];
+  hands.forEach(([hf, hs, hh], i) => {
+    const sh = L(0, i ? 172 : -172, 770), hand = L(hf, hs, hh), out = i ? 1 : -1;
+    const elbow = add(L((hf) * .45, (hs * .5 + out * 190 * .5), (770 + hh) / 2 - 70), { x: 0, z: 0, h: 0 });
+    boxes.push(segmentBox(sh, elbow, 82, FIG), segmentBox(elbow, hand, 70, FIG));
+  });
+  if (pose === 'manual') boxes.push(box(330, 0, 650, 150, 210, 36, PROP));
+  if (pose === 'measure') boxes.push(box(360, 115, 735, 14, 150, 105, PROP));
+  if (pose === 'buy') boxes.push(box(70, 225, 1260, 14, 120, 120, PROP));
+  return boxes;
+}
+const FIG = { top: C.figTop, light: C.fig, dark: C.figDark };
+const PROP = { top: '#F09A55', light: C.orange, dark: '#B9561A' };
+function figureSvg(boxes) {
+  const edge = `stroke="${C.ink}" stroke-width=".8" stroke-linejoin="round"`;
+  return boxes.slice().sort((a, b) => depth(a.c) - depth(b.c)).map(b => cuboid(b.c, b.u, b.v, b.w, b.fills, edge)).join('');
+}
+function facingFor(pose, you, target) {
+  if (you.at_desk) return { x: -1, z: 0, h: 0 };
+  if (target && (pose === 'adjust' || pose === 'measure')) { const d = { x: target.x - you.x, z: target.z - you.z, h: 0 }; if (Math.hypot(d.x, d.z) > 1) return d; }
+  return you.z < 0 ? { x: 0, z: 1, h: 0 } : you.z > MM.table.z ? { x: 0, z: -1, h: 0 } : { x: you.x < 0 ? 1 : -1, z: 0, h: 0 };
 }
 function headlineText(call, action) { return [action.verb.toUpperCase(), `${cleanTool(call.tool)}${Object.keys(call.args || {}).length ? ' · ' + shortArgs(call.args) : ''}`.toUpperCase()]; }
 // Size the drawing to the real pane so the table never letterboxes; the poster headline takes a fixed band at the bottom.
@@ -204,7 +242,7 @@ function sceneSvg(call) {
   const labels = [], objects = parts.map(part => ({ d: depth(part.pos), svg: part.kind === 'mirror' ? mirrorSvg(part) : part.kind === 'stage' ? stageSvg(part) : part.kind === 'periscope' ? periscopeSvg(part) : part.kind === 'sample' ? sampleSvg(part, hit) : '' }));
   (meta.housings_mm || []).forEach((box, i) => { const [key, color, label] = BEAMS[i === 0 ? 0 : 1]; const h = housingSvg(box, meta.ports?.[key], label, color); labels.push(h.label); objects.push({ d: depth({ x: box.x0, z: (box.z0 + box.z1) / 2 }), svg: h.body }); });
   objects.sort((a, b) => a.d - b.d); parts.forEach(part => labels.push(partLabel(part)));
-  const beamSvg = BEAMS.map(([key, color]) => beams[key]?.open ? (beams[key].segments || []).map(([a, b]) => line(a, b, `stroke="${color}" stroke-width="3.4" stroke-linecap="round"`)).join('') : '').join('');
+  const beamSvg = BEAMS.map(([key, color]) => beams[key]?.open ? (beams[key].segments || []).map(([a, b]) => line(a, b, `stroke="${C.ink}" stroke-width="6" stroke-linecap="round" opacity=".7"`) + line(a, b, `stroke="${color}" stroke-width="3.2" stroke-linecap="round"`)).join('') : '').join('');
   const beamShadow = BEAMS.map(([key]) => beams[key]?.open ? (beams[key].segments || []).map(([a, b]) => line({ ...a, h: 0 }, { ...b, h: 0 }, `stroke="${C.ink}" stroke-width="1.6" opacity=".22"`)).join('') : '').join('');
   const target = actionCoordinates(call), targetPart = parts.find(p => target && p.pos.x === target.x && p.pos.z === target.z);
   const marker = target ? (() => {
@@ -214,11 +252,13 @@ function sceneSvg(call) {
       + `<rect x="${bx.toFixed(1)}" y="${(q.y - 44).toFixed(1)}" width="166" height="26" fill="${C.ink}"/><text x="${(bx + 10).toFixed(1)}" y="${(q.y - 25).toFixed(1)}" class="sc-coord">X ${Math.round(target.x)} · Z ${Math.round(target.z)} MM</text>`;
   })() : '';
   const you = snap.you_mm || meta.desk_mm || { x: -300, z: 600 }, behind = depth({ x: you.x, z: you.z, h: 0 }) < depth({ x: MM.table.x / 2, z: MM.table.z / 2, h: 0 }), front = !behind;
-  const tx = proj(targetPart?.pos || target || { x: 1200, z: 600 }).x, figure = mannequinSvg(action.pose, you, you.at_desk ? 1e4 : tx, front);
+  const tx = proj(targetPart?.pos || target || { x: 1200, z: 600 }).x, figBoxes = figureBoxes(action.pose, you, facingFor(action.pose, you, targetPart?.pos || target)), figure = figureSvg(figBoxes);
+  const topClip = `<clipPath id="tableTop">${poly([{ x: 0, z: 0, h: 0 }, { x: MM.table.x, z: 0, h: 0 }, { x: MM.table.x, z: MM.table.z, h: 0 }, { x: 0, z: MM.table.z, h: 0 }], '')}</clipPath>`;
+  const figShadowFloor = `<g fill="${C.floor}" opacity=".6">${shadowOn(figBoxes, MM.floor)}</g>`, figShadowTable = `${topClip}<g clip-path="url(#tableTop)" fill="${C.ink}" opacity=".26">${shadowOn(figBoxes, 0)}</g>`;
   const deskAt = meta.desk_mm || { x: -300, z: 600 }, deskBehind = depth({ x: deskAt.x - 260, z: deskAt.z, h: 0 }) < depth({ x: MM.table.x / 2, z: MM.table.z / 2, h: 0 }), desk = deskSvg(meta);
   return `<svg viewBox="0 0 ${SCENE.w} ${SCENE.h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Optical table in millimetre-true projection, with the worker beside it">
     <rect width="${SCENE.w}" height="${SCENE.h}" fill="${C.room}"/>
-    ${deskBehind ? desk : ''}${behind ? figure : ''}${table.under}${table.slab}${table.ticks}${beamShadow}
+    ${figShadowFloor}${deskBehind ? desk : ''}${behind ? figure : ''}${table.under}${table.slab}${figShadowTable}${table.ticks}${beamShadow}
     ${objects.map(o => o.svg).join('')}${beamSvg}${labels.join('')}${marker}
     ${deskBehind ? '' : desk}${behind ? '' : figure}${headline(call, action)}
   </svg>`;
